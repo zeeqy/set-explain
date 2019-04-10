@@ -2,11 +2,10 @@ import json, sys, os
 import argparse
 import threading
 
-
-def merge_task(pid, task_list, args):
-	context = []
-	outputname = 'CONCAT_{}'.format(pid) 
+def merge_task(task_list, args):
 	for folder in task_list:
+		context = []
+		outputname = 'CONCAT_{}'.format(folder) 
 		working_dir = '{}/{}'.format(args.input_dir,folder)
 		for fname in os.listdir(working_dir):
 			with open('{}/{}'.format(working_dir,fname), 'r') as f:
@@ -16,9 +15,9 @@ def merge_task(pid, task_list, args):
 				item_dict = json.loads(item)
 				paragraph = parse(item_dict['text'])
 				context.append(paragraph)
-	with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-		f.write('\n'.join(context))
-	f.close()
+		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
+			f.write('\n'.join(context))
+		f.close()
 
 def split(a, n):
 	k, m = divmod(len(a), n)
@@ -29,7 +28,6 @@ def parse(text):
 	#remove invalid sentences
 	sentences = [line for line in sentences if len(line) >= 20]
 	return '\n'.join(sentences)
-
 
 def main():
 	parser = argparse.ArgumentParser(description="Merge json in to corpus")
@@ -44,7 +42,7 @@ def main():
 
 	threads = []
 	for i in range(args.num_process):
-		t = threading.Thread(target=merge_task, args=(i, tasks[i], args,))
+		t = threading.Thread(target=merge_task, args=(tasks[i], args,))
 		threads.append(t)
 		t.start()
 
