@@ -24,10 +24,14 @@ def split(a, n):
 	return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
 def parse(text):
-	sentences = text.split('\n')
-	#remove invalid sentences
-	sentences = [line for line in sentences if len(line) >= 20]
-	return '\n'.join(sentences)
+	new_text = text.replace('<br>','\n')
+	new_text = new_text.replace('\n\n',' ')
+	new_text = new_text.replace('\n',' ')
+	new_text = new_text.replace('  ',' ')
+	new_text = new_text.replace('<nowiki>','')
+	new_text = new_text.replace('</nowiki>','')
+	new_text = new_text.replace('()','')
+	return new_text
 
 def main():
 	parser = argparse.ArgumentParser(description="Merge json in to corpus")
