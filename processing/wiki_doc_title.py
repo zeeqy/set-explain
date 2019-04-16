@@ -2,6 +2,12 @@ import json, sys, os
 import argparse
 import threading
 
+"""
+
+Extract wiki document title from wiki dump json
+
+"""
+
 def merge_task(task_list, args):
 	for folder in task_list:
 		context = []
