@@ -1,28 +1,44 @@
-import json, sys, os
+import json, sys, os, time
 import argparse
 import threading
+import requests
+import urllib
 
 """
 
 Extract wiki document title from wiki dump json
 
 """
+def monthly_view(data):
+	if "items" not in data.keys():
+		return -1
+	else:
+		views = 0
+		for res in data['items']:
+			if 'views' in res.keys():
+				views += res['views']
+		return views // 12
 
 def merge_task(task_list, args):
 	for folder in task_list:
-		context = []
-		outputname = 'TITLE_{}'.format(folder) 
+		view_freq = {}
+		outputname = 'FREQ_{}'.format(folder) 
 		working_dir = '{}/{}'.format(args.input_dir,folder)
 		for fname in os.listdir(working_dir):
-			with open('{}/{}'.format(working_dir,fname), 'r') as f:
+			with open('{}/{}'.format(working_dir,fname), 'r', errors='ignore') as f:
 				raw = f.readlines()
 			f.close()
 			for item in raw:
 				item_dict = json.loads(item)
-				title = item_dict['title'].lower().strip()
-				context.append(title)
+				title = item_dict['title']
+				enc_title = urllib.parse.quote(title)
+				url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia.org/all-access/all-agents/{}/monthly/20180101/20190101".format(enc_title)
+				r = requests.get(url)
+				avg_view = monthly_view(r.json())
+				view_freq.update({title: avg_view})
+			print("finish requesting {}/{}".format(folder, fname))
 		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-			f.write('\n'.join(context))
+			f.write(json.dumps(view_freq))
 		f.close()
 
 def split(a, n):
