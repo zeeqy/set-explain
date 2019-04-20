@@ -20,7 +20,7 @@ def merge_task(task_list, args):
 				item_dict = json.loads(item)
 				title = item_dict['title']
 				length = len(item_dict['text'])
-				stats.apped((title, length))
+				stats.append((title, length))
 		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
 			f.write('\n'.join('{}\t{}'.format(x[0],x[1]) for x in stats))
 		f.close()
