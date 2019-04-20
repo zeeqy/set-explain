@@ -22,7 +22,7 @@ def merge_task(task_list, args):
 				length = len(item_dict['text'])
 				stats.apped((title, length))
 		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-			f.write('\n'.join('{} {}'.format(x[0],x[1]) for x in stats))
+			f.write('\n'.join('{}\t{}'.format(x[0],x[1]) for x in stats))
 		f.close()
 
 def split(a, n):
