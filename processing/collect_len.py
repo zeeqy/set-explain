@@ -1,44 +1,28 @@
-import json, sys, os, time
+import json, sys, os
 import argparse
 import threading
-import requests
-import urllib
 
 """
-
-Extract wiki document title from wiki dump json
+Collect wiki document length
 
 """
-def monthly_view(data):
-	if "items" not in data.keys():
-		return -1
-	else:
-		views = 0
-		for res in data['items']:
-			if 'views' in res.keys():
-				views += res['views']
-		return views // 12
 
 def merge_task(task_list, args):
 	for folder in task_list:
-		view_freq = {}
-		outputname = 'FREQ_{}'.format(folder) 
+		stats = []
+		outputname = 'LENGTH_{}'.format(folder) 
 		working_dir = '{}/{}'.format(args.input_dir,folder)
 		for fname in os.listdir(working_dir):
-			with open('{}/{}'.format(working_dir,fname), 'r', errors='ignore') as f:
+			with open('{}/{}'.format(working_dir,fname), 'r') as f:
 				raw = f.readlines()
 			f.close()
 			for item in raw:
 				item_dict = json.loads(item)
 				title = item_dict['title']
-				enc_title = urllib.parse.quote(title)
-				url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia.org/all-access/all-agents/{}/monthly/20180101/20190101".format(enc_title)
-				r = requests.get(url)
-				avg_view = monthly_view(r.json())
-				view_freq.update({title: avg_view})
-			print("finish requesting {}/{}".format(folder, fname))
+				length = len(item_dict['text'])
+				stats.apped((title, length))
 		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-			f.write(json.dumps(view_freq))
+			f.write('\n'.join('{} {}'.format(x[0],x[1]) for x in stats))
 		f.close()
 
 def split(a, n):
@@ -46,7 +30,7 @@ def split(a, n):
 	return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
 def main():
-	parser = argparse.ArgumentParser(description="Extract title from wiki json")
+	parser = argparse.ArgumentParser(description="Merge json in to corpus")
 	parser.add_argument('--input_dir', type=str, default='', help='dump file directory')
 	parser.add_argument('--output_dir', type=str, default='', help='output directory')
 	parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
@@ -64,3 +48,4 @@ def main():
 
 if __name__ == '__main__':
 	main()
+	

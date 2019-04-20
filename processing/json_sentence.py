@@ -1,7 +1,6 @@
 import json, sys, os
 import argparse
 import threading
-import requests
 
 """
 Merge wiki dump json into corpus
