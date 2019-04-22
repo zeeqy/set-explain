@@ -1,5 +1,6 @@
 import json, sys, os
 import argparse
+import bisect
 import threading
 
 """
@@ -7,7 +8,7 @@ Merge wiki dump json into corpus
 
 """
 
-def merge_task(task_list, args):
+def merge_task(task_list, invalid, args):
 	for folder in task_list:
 		context = []
 		outputname = 'CONCAT_{}'.format(folder) 
@@ -18,11 +19,15 @@ def merge_task(task_list, args):
 			f.close()
 			for item in raw:
 				item_dict = json.loads(item)
-				paragraph = parse(item_dict['text'])
-				context.append(paragraph)
-		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-			f.write('\n'.join(context))
-		f.close()
+				if item_dict['title'] in invalid:
+					continue
+				else:
+					paragraph = parse(item_dict['text'])
+					context.append(paragraph)
+		if context != []:
+			with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
+				f.write('\n'.join(context))
+			f.close()
 
 def split(a, n):
 	k, m = divmod(len(a), n)
@@ -43,15 +48,22 @@ def main():
 	parser.add_argument('--input_dir', type=str, default='', help='dump file directory')
 	parser.add_argument('--output_dir', type=str, default='', help='output directory')
 	parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
+	parser.add_argument('--invlaid_list', type=str, default='', help='list of invalid pages')
 	
 	args = parser.parse_args()
+
+	with open(args.invlaid_list, 'r') as f:
+		invalid = f.readlines()
+	f.close()
+
+	invalid = set(invalid)
 
 	dump_dir = os.listdir(args.input_dir)
 	tasks = list(split(dump_dir, args.num_process))
 
 	threads = []
 	for i in range(args.num_process):
-		t = threading.Thread(target=merge_task, args=(tasks[i], args,))
+		t = threading.Thread(target=merge_task, args=(tasks[i], invalid, args, ))
 		threads.append(t)
 		t.start()
 
