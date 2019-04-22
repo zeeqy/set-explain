@@ -37,11 +37,14 @@ def parse(text):
 	new_text = text.replace('<br>','\n')
 	new_text = new_text.replace('\n\n',' ')
 	new_text = new_text.replace('\n',' ')
-	new_text = new_text.replace('  ',' ')
 	new_text = new_text.replace('<nowiki>','')
 	new_text = new_text.replace('</nowiki>','')
+	new_text = new_text.replace('<onlyinclude>','')
+	new_text = new_text.replace('</onlyinclude>','')
 	new_text = new_text.replace('()','')
-	return new_text
+	new_text = new_text.replace('  ',' ')
+	new_text = new_text.replace('  ',' ')
+	return new_text.strip()
 
 def main():
 	parser = argparse.ArgumentParser(description="Merge json in to corpus")
