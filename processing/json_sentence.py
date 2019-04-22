@@ -53,10 +53,10 @@ def main():
 	args = parser.parse_args()
 
 	with open(args.invlaid_list, 'r') as f:
-		invalid = f.readlines()
+		invalid = f.read()
 	f.close()
 
-	invalid = set(invalid)
+	invalid = set(invalid.split('\n'))
 
 	dump_dir = os.listdir(args.input_dir)
 	tasks = list(split(dump_dir, args.num_process))
