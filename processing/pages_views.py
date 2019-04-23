@@ -39,6 +39,8 @@ def main():
 
 	titles = raw.split('\n')
 
+	titles = [t for t in titles if t != ""]
+
 	chunks = [titles[i:i + 80] for i in range(0, len(titles), 80)]
 	for c in chunks:
 		aio.each(
@@ -49,7 +51,7 @@ def main():
 			on_done = lambda _status, session: session.close(),
 			run = True,
 		)
-		time.sleep(0.2)
+		time.sleep(0.4)
 
 	with open('{}/FREQ_{}'.format(args.output_dir,fname), 'w+') as f:
 		f.write(json.dumps(freq_collect))

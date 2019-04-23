@@ -13,4 +13,4 @@ for fname in file_list:
 	in_dir = '{}/{}'.format(args.input_dir,fname)
 	os.system("python3 /root/set-explain/processing/pages_views.py --input_dir={} --output_dir={}".format(in_dir,args.output_dir))
 	print('finish running {}'.format(fname))
-	time.sleep(0.1)  
+	time.sleep(1)  
