@@ -51,7 +51,7 @@ def main():
 		)
 		time.sleep(0.2)
 
-	with open('{}/FREQ_{}'.format(args.output_dir,fname), 'r') as f:
+	with open('{}/FREQ_{}'.format(args.output_dir,fname), 'w+') as f:
 		f.write(json.dumps(freq_collect))
 	f.close()
 
