@@ -6,7 +6,10 @@ import urllib
 import argparse
 import json
 
-async def fetch(url, session):
+freq_collect = {}
+
+async def fetch(t, session):
+	url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia.org/all-access/all-agents/{}/monthly/20180101/20190101".format(urllib.parse.quote(t))
 	async with session.get(url) as response:
 		res = await response.read()
 		jres = json.loads(res)
@@ -14,7 +17,9 @@ async def fetch(url, session):
 		if 'items' in jres.keys():
 			for v in jres['items']:
 				views += v['views']
-			print(views//12)
+			freq_collect.update({t:views // 12})
+		else:
+			freq_collect.update({t:-1})
 
 
 def main():
@@ -24,28 +29,21 @@ def main():
 	parser.add_argument('--output_dir', type=str, default='', help='output directory')
 	args = parser.parse_args()
 
-	dump_dir = os.listdir(args.input_dir)
-
 	limit = 80
 
-	for folder in dump_dir:
-		titles = []
-		working_dir = '{}/{}'.format(args.input_dir,folder)
-		for fname in os.listdir(working_dir):
-			with open('{}/{}'.format(working_dir,fname), 'r', errors='ignore') as f:
-				raw = f.readlines()
-			f.close()
-			
-			for item in raw:
-				item_dict = json.loads(item)
-				titles.append(item_dict['title'])
-	print(len(titles))
+	fname = args.input_dir.split('/')[-1]
+	
+	with open(args.input_dir, 'r') as f:
+		raw = f.read()
+	f.close()
+
+	titles = raw.split('\n')
+
 	chunks = [titles[i:i + 80] for i in range(0, len(titles), 80)]
 	for c in chunks:
-		urls = ["https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia.org/all-access/all-agents/{}/monthly/20180101/20190101".format(urllib.parse.quote(t)) for t in c]
 		aio.each(
 			fetch, 
-			urls,
+			c,
 			workers = limit,
 			on_start = lambda: ClientSession(connector=TCPConnector(limit=None)),
 			on_done = lambda _status, session: session.close(),
@@ -55,3 +53,8 @@ def main():
 
 if __name__ == '__main__':
 	main()
+	with open('{}/FREQ_{}'.format(args.output_dir,fname), 'r') as f:
+		f.write(json.dumps(freq_collect))
+	f.close()
+
+	
