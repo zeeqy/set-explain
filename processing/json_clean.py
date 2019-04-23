@@ -22,7 +22,8 @@ def merge_task(task_list, invalid, args):
 				if item_dict['title'] in invalid:
 					continue # filter out invalid documents
 				else:
-					item_dict['text'] = parse(item_dict['text'])
+					paragraph = parse(item_dict['text'])
+					item_dict['text'] = paragraph[len(item_dict['title']):].strip()
 					context.append(json.dumps(item_dict))
 
 		if context != []:
