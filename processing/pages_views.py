@@ -9,7 +9,7 @@ import json
 freq_collect = {}
 
 async def fetch(t, session):
-	url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia.org/all-access/all-agents/{}/monthly/20180101/20190101".format(urllib.parse.quote(t))
+	url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia.org/all-access/all-agents/{}/monthly/20180101/20190101".format(urllib.parse.quote(t.replace('&amp;', '&'), safe=''))
 	async with session.get(url) as response:
 		res = await response.read()
 		jres = json.loads(res)
