@@ -51,10 +51,12 @@ def main():
 		)
 		time.sleep(0.2)
 
-if __name__ == '__main__':
-	main()
 	with open('{}/FREQ_{}'.format(args.output_dir,fname), 'r') as f:
 		f.write(json.dumps(freq_collect))
 	f.close()
 
+	return 0
+
+if __name__ == '__main__':
+	main()
 	
