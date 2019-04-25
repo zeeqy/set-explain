@@ -1,4 +1,4 @@
-import json, sys, os
+import json, sys, os, re
 import argparse
 import bisect
 import threading
@@ -44,6 +44,12 @@ def parse(text):
 	new_text = new_text.replace('<onlyinclude>','')
 	new_text = new_text.replace('</onlyinclude>','')
 	new_text = new_text.replace('()','')
+	new_text = new_text.replace('  ',' ')
+	new_text = new_text.replace('  ',' ')
+	new_text = re.sub(r'\[\[\bCategory:\b.*?\]\]', '', new_text)
+	new_text = re.sub(r'\[\[(?:[^\]|]*\|)?([^\]|]*)\]\]', r'\1', new_text)
+	new_text = re.sub(r'\[\[\bFile:\b.*?\|\bthumb\b\|.*?\]\]\ ', '', new_text)
+	new_text = new_text.replace('\n',' ')
 	new_text = new_text.replace('  ',' ')
 	new_text = new_text.replace('  ',' ')
 	return new_text.strip()
