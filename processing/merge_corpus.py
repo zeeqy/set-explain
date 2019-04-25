@@ -50,6 +50,11 @@ def parse(text):
 	new_text = new_text.replace('\n',' ')
 	new_text = new_text.replace('  ',' ')
 	new_text = new_text.replace('  ',' ')
+	new_text = new_text.replace('[...]','')
+	new_text = new_text.replace('( )','')
+	new_text = new_text.replace('\n',' ')
+	new_text = new_text.replace('  ',' ')
+	new_text = new_text.replace('  ',' ')
 	return new_text.strip()
 
 def main():
