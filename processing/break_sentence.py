@@ -9,7 +9,7 @@ break document level json to sentence level json
 
 """
 
-def merge_task(task_list, invalid, args):
+def merge_task(task_list, args):
 	for fname in task_list:
 		outputname = 'SENTENCE_{}'.format(fname.split('_')[1])
 		context = []
@@ -52,7 +52,7 @@ def main():
 
 	threads = []
 	for i in range(args.num_process):
-		t = threading.Thread(target=merge_task, args=(tasks[i], invalid, args, ))
+		t = threading.Thread(target=merge_task, args=(tasks[i], args, ))
 		threads.append(t)
 		t.start()
 
