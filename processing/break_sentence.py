@@ -28,6 +28,7 @@ def merge_task(task_list, args):
 				sent_json['title'] = title
 				sent_json['id'] = item_dict['id']
 				sent_json['sid'] = sid
+				sent_json['text'] = s
 				sid += 1
 				context.append(json.dumps(sent_json))
 		
