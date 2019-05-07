@@ -29,7 +29,7 @@ def merge_task(task_list, args):
 				sent_json['id'] = item_dict['id']
 				sent_json['sid'] = sid
 				sid += 1
-				context.append(json.dump(sent_json))
+				context.append(json.dumps(sent_json))
 		
 		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
 			f.write('\n'.join(context))
