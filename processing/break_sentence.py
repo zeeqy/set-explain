@@ -1,7 +1,7 @@
 import json, sys, os, re
 import argparse
 import bisect
-from spacy.lang.en import English
+import nltk
 import threading
 
 """
@@ -23,10 +23,7 @@ def merge_task(task_list, args):
 			title = item_dict['title']
 			did = item_dict['did']
 			pid = item_dict['pid']
-			nlp = English()
-			nlp.add_pipe(nlp.create_pipe('sentencizer'))
-			doc = nlp(item_dict['text'])
-			sent_text = [sent.string.strip() for sent in doc.sents]
+			sent_text = nltk.sent_tokenize(item_dict['text'])
 			sid = 0
 			for s in sent_text:
 				sent_json = {}
