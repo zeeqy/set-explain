@@ -1,19 +1,16 @@
 import json, sys, os, re
 import argparse
 import bisect
-from spacy.lang.en import English
 import threading
 
 """
-break document level json to sentence level json
+break document level json to paragraph level json
 
 """
 
 def merge_task(task_list, args):
-	nlp = English()
-	nlp.add_pipe(nlp.create_pipe('sentencizer'))
 	for fname in task_list:
-		outputname = 'SENTENCE_{}'.format(fname.split('_')[1])
+		outputname = 'PARAGRAPH_{}'.format(fname.split('_')[1])
 		context = []
 
 		with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
@@ -23,20 +20,16 @@ def merge_task(task_list, args):
 		for item in doc:
 			item_dict = json.loads(item)
 			title = item_dict['title']
-			did = item_dict['did']
-			pid = item_dict['pid']
-			doc = nlp(item_dict['text'])
-			sent_text = [sent.string.strip() for sent in doc.sents]
-			sid = 0
-			for s in sent_text:
-				sent_json = {}
-				sent_json['title'] = title
-				sent_json['did'] = did
-				sent_json['pid'] = pid
-				sent_json['sid'] = sid
-				sent_json['text'] = s
-				sid += 1
-				context.append(json.dumps(sent_json))
+			para_text = item_dict['text'].split('\n')
+			pid = 0
+			for p in para_text:
+				para_json = {}
+				para_json['title'] = title
+				para_json['did'] = item_dict['id']
+				para_json['pid'] = pid
+				para_json['text'] = p
+				pid += 1
+				context.append(json.dumps(para_json))
 		
 		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
 			f.write('\n'.join(context))
