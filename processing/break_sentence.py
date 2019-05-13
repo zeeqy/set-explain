@@ -10,8 +10,6 @@ break document level json to sentence level json
 """
 
 def merge_task(task_list, args):
-	nlp = English()
-	nlp.add_pipe(nlp.create_pipe('sentencizer'))
 	for fname in task_list:
 		outputname = 'SENTENCE_{}'.format(fname.split('_')[1])
 		context = []
@@ -25,6 +23,8 @@ def merge_task(task_list, args):
 			title = item_dict['title']
 			did = item_dict['did']
 			pid = item_dict['pid']
+			nlp = English()
+			nlp.add_pipe(nlp.create_pipe('sentencizer'))
 			doc = nlp(item_dict['text'])
 			sent_text = [sent.string.strip() for sent in doc.sents]
 			sid = 0
