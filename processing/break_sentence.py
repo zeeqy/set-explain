@@ -11,7 +11,7 @@ break document level json to sentence level json
 
 def merge_task(task_list, args):
 	nlp = spacy.load("en_core_web_sm")
-	
+
 	for fname in task_list:
 		outputname = 'SENTENCE_{}'.format(fname.split('_')[1])
 		context = []
@@ -33,7 +33,7 @@ def merge_task(task_list, args):
 				sent_json['did'] = did
 				sent_json['pid'] = pid
 				sent_json['sid'] = sid
-				sent_json['text'] = s
+				sent_json['text'] = s.text
 				sid += 1
 				context.append(json.dumps(sent_json))
 		

@@ -27,7 +27,7 @@ def merge_task(task_list, args):
 				para_json['title'] = title
 				para_json['did'] = item_dict['id']
 				para_json['pid'] = pid
-				para_json['text'] = p
+				para_json['text'] = p.lower()
 				pid += 1
 				context.append(json.dumps(para_json))
 		
