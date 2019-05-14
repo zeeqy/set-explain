@@ -1,7 +1,7 @@
 import json, sys, os, re
 import argparse
 import bisect
-import spacy
+import nltk
 import threading
 
 """
@@ -10,8 +10,6 @@ break document level json to sentence level json
 """
 
 def merge_task(task_list, args):
-	nlp = spacy.load("en_core_web_sm")
-
 	for fname in task_list:
 		outputname = 'SENTENCE_{}'.format(fname.split('_')[1])
 		context = []
@@ -25,15 +23,15 @@ def merge_task(task_list, args):
 			title = item_dict['title']
 			did = item_dict['did']
 			pid = item_dict['pid']
-			doc = nlp(item_dict['text'])
+			sent_text = nltk.sent_tokenize(item_dict['text'])
 			sid = 0
-			for s in doc.sents:
+			for s in sent_text:
 				sent_json = {}
 				sent_json['title'] = title
 				sent_json['did'] = did
 				sent_json['pid'] = pid
 				sent_json['sid'] = sid
-				sent_json['text'] = s.text
+				sent_json['text'] = s
 				sid += 1
 				context.append(json.dumps(sent_json))
 		
