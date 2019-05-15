@@ -26,7 +26,7 @@ def main():
 
     entity2id = json.loads(raw_entity2id)
 
-    eid = entity2id[args.input_entity]
+    eid = '{}'.format(entity2id[args.input_entity])
 
     print(inverted_index[eid])
 
