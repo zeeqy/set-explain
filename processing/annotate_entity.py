@@ -11,10 +11,10 @@ find entities mentioned in each sentence
 
 def merge_task(task_list, args):
     with open('{}/entitylist.txt'.format(args.entity_dir), 'r') as f:
-        raw_list = f.readlines()
+        raw_list = f.read()
     f.close()
 
-    entityset = set(raw_list)
+    entityset = set(raw_list.split('\n'))
 
     with open('{}/entity2id.txt'.format(args.entity_dir), 'r') as f:
         raw_entity2id = f.read()
@@ -38,7 +38,7 @@ def merge_task(task_list, args):
 
     for fname in task_list:
         outputname = 'SENTENCE_ENTITY_{}'.format(fname.split('_')[-1])
-        context = {}
+        context = []
 
         with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
             doc = f.readlines()
@@ -52,10 +52,10 @@ def merge_task(task_list, args):
             mentioned2id = [entity2id[e] for e in mentioned_entity]
             label = "{}-{}-{}".format(item_dict['did'],item_dict['pid'],item_dict['sid'])
             item_dict.update({'mentioned':mentioned2id})
-            context.update({label:item_dict})
+            context.append(json.dumps({label:item_dict}))
 
         with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-            f.write(json.dumps(context))
+            f.write('\n'.join(context))
         f.close()
 
 def split(a, n):
