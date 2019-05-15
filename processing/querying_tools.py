@@ -50,6 +50,11 @@ class matching_tools(object):
 		k, m = divmod(len(a), n)
 		return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
+	def storeInQueue(f):
+		def wrapper(*args):
+			self.sent_queue.put(f(*args))
+		return wrapper
+
 	@storeInQueue
 	def merge_task(self, task_list, mentionedSet):
 		content = []
@@ -78,16 +83,11 @@ class matching_tools(object):
 
 		tasks = list(self._split(task_list, self.num_process))
 
-		sent_queue = queue.Queue()
-
-		def storeInQueue(f):
-			def wrapper(*args):
-				sent_queue.put(f(*args))
-			return wrapper
+		self.sent_queue = queue.Queue()
 
 		for i in range(self.num_process):
 			t = threading.Thread(target=self.merge_task, args=(tasks[i], mentionedSet, ))
 			t.start()
-			content += sent_queue.get()
+			content += self.sent_queue.get()
 
 		return content
