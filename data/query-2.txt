@@ -1,0 +1,580 @@
+{"title": "cities in ontario, canada", "qid": "C002|2|0", "entities": ["brant", "markham"]}
+{"title": "cities in ontario, canada", "qid": "C002|2|1", "entities": ["london", "vaughan"]}
+{"title": "cities in ontario, canada", "qid": "C002|2|2", "entities": ["london", "mississauga"]}
+{"title": "cities in ontario, canada", "qid": "C002|2|3", "entities": ["sarnia", "markham"]}
+{"title": "cities in ontario, canada", "qid": "C002|2|4", "entities": ["burlington", "thunder_bay"]}
+{"title": "cities in ontario, canada", "qid": "C002|2|5", "entities": ["burlington", "pembroke"]}
+{"title": "cities in ontario, canada", "qid": "C002|2|6", "entities": ["toronto", "cornwall"]}
+{"title": "cities in ontario, canada", "qid": "C002|2|7", "entities": ["kitchener", "kingston"]}
+{"title": "cities in ontario, canada", "qid": "C002|2|8", "entities": ["thunder_bay", "kingston"]}
+{"title": "cities in ontario, canada", "qid": "C002|2|9", "entities": ["kenora", "waterloo"]}
+{"title": "major cities in england", "qid": "C039|2|0", "entities": ["wirral", "leicester"]}
+{"title": "major cities in england", "qid": "C039|2|1", "entities": ["nottingham", "oxford"]}
+{"title": "major cities in england", "qid": "C039|2|2", "entities": ["worthing", "bolton"]}
+{"title": "major cities in england", "qid": "C039|2|3", "entities": ["nottingham", "wirral"]}
+{"title": "major cities in england", "qid": "C039|2|4", "entities": ["mansfield", "york"]}
+{"title": "major cities in england", "qid": "C039|2|5", "entities": ["gloucester", "wigan"]}
+{"title": "major cities in england", "qid": "C039|2|6", "entities": ["telford", "sheffield"]}
+{"title": "major cities in england", "qid": "C039|2|7", "entities": ["cambridge", "telford"]}
+{"title": "major cities in england", "qid": "C039|2|8", "entities": ["portsmouth", "northampton"]}
+{"title": "major cities in england", "qid": "C039|2|9", "entities": ["wakefield", "york"]}
+{"title": "cities in michigan, us", "qid": "C050|2|0", "entities": ["ann_arbor", "genesee"]}
+{"title": "cities in michigan, us", "qid": "C050|2|1", "entities": ["macomb", "southfield"]}
+{"title": "cities in michigan, us", "qid": "C050|2|2", "entities": ["delhi", "summit"]}
+{"title": "cities in michigan, us", "qid": "C050|2|3", "entities": ["warren", "royal_oak"]}
+{"title": "cities in michigan, us", "qid": "C050|2|4", "entities": ["warren", "flint"]}
+{"title": "cities in michigan, us", "qid": "C050|2|5", "entities": ["georgetown", "bedford"]}
+{"title": "cities in michigan, us", "qid": "C050|2|6", "entities": ["wyoming", "kalamazoo"]}
+{"title": "cities in michigan, us", "qid": "C050|2|7", "entities": ["clinton", "dearborn"]}
+{"title": "cities in michigan, us", "qid": "C050|2|8", "entities": ["canton", "detroit"]}
+{"title": "cities in michigan, us", "qid": "C050|2|9", "entities": ["orion", "clinton"]}
+{"title": "popular fast-food restaurants in us", "qid": "C061|2|0", "entities": ["kfc", "pizza_hut"]}
+{"title": "popular fast-food restaurants in us", "qid": "C061|2|1", "entities": ["kfc", "burger_king"]}
+{"title": "popular fast-food restaurants in us", "qid": "C061|2|2", "entities": ["burger_king", "dairy_queen"]}
+{"title": "popular fast-food restaurants in us", "qid": "C061|2|3", "entities": ["pizza_hut", "subway"]}
+{"title": "popular fast-food restaurants in us", "qid": "C061|2|4", "entities": ["taco_bell", "kfc"]}
+{"title": "popular fast-food restaurants in us", "qid": "C061|2|5", "entities": ["subway", "kfc"]}
+{"title": "popular fast-food restaurants in us", "qid": "C061|2|6", "entities": ["dairy_queen", "starbucks"]}
+{"title": "popular fast-food restaurants in us", "qid": "C061|2|7", "entities": ["pizza_hut", "burger_king"]}
+{"title": "popular fast-food restaurants in us", "qid": "C061|2|8", "entities": ["taco_bell", "burger_king"]}
+{"title": "popular fast-food restaurants in us", "qid": "C061|2|9", "entities": ["kfc", "pizza_hut"]}
+{"title": "chemical elements", "qid": "C027|2|0", "entities": ["gallium", "antimony"]}
+{"title": "chemical elements", "qid": "C027|2|1", "entities": ["carbon", "lutetium"]}
+{"title": "chemical elements", "qid": "C027|2|2", "entities": ["selenium", "cadmium"]}
+{"title": "chemical elements", "qid": "C027|2|3", "entities": ["thallium", "hassium"]}
+{"title": "chemical elements", "qid": "C027|2|4", "entities": ["erbium", "barium"]}
+{"title": "chemical elements", "qid": "C027|2|5", "entities": ["osmium", "thulium"]}
+{"title": "chemical elements", "qid": "C027|2|6", "entities": ["lawrencium", "rubidium"]}
+{"title": "chemical elements", "qid": "C027|2|7", "entities": ["actinium", "gadolinium"]}
+{"title": "chemical elements", "qid": "C027|2|8", "entities": ["boron", "neptunium"]}
+{"title": "chemical elements", "qid": "C027|2|9", "entities": ["lithium", "hafnium"]}
+{"title": "body parts", "qid": "C083|2|0", "entities": ["iris", "bladder"]}
+{"title": "body parts", "qid": "C083|2|1", "entities": ["capillary", "head"]}
+{"title": "body parts", "qid": "C083|2|2", "entities": ["mucous_membrane", "tissue"]}
+{"title": "body parts", "qid": "C083|2|3", "entities": ["left_shoulder", "abdomen"]}
+{"title": "body parts", "qid": "C083|2|4", "entities": ["liver", "pancreas"]}
+{"title": "body parts", "qid": "C083|2|5", "entities": ["blood", "pituitary"]}
+{"title": "body parts", "qid": "C083|2|6", "entities": ["larynx", "foot"]}
+{"title": "body parts", "qid": "C083|2|7", "entities": ["right_shoulder", "stomach"]}
+{"title": "body parts", "qid": "C083|2|8", "entities": ["neck", "lung"]}
+{"title": "body parts", "qid": "C083|2|9", "entities": ["blood", "femur"]}
+{"title": "cities in virginia, us", "qid": "C063|2|0", "entities": ["lynchburg", "virginia_beach"]}
+{"title": "cities in virginia, us", "qid": "C063|2|1", "entities": ["fredericksburg", "emporia"]}
+{"title": "cities in virginia, us", "qid": "C063|2|2", "entities": ["waynesboro", "manassas"]}
+{"title": "cities in virginia, us", "qid": "C063|2|3", "entities": ["lexington", "portsmouth"]}
+{"title": "cities in virginia, us", "qid": "C063|2|4", "entities": ["salem", "newport_news"]}
+{"title": "cities in virginia, us", "qid": "C063|2|5", "entities": ["fairfax", "staunton"]}
+{"title": "cities in virginia, us", "qid": "C063|2|6", "entities": ["bristol", "newport_news"]}
+{"title": "cities in virginia, us", "qid": "C063|2|7", "entities": ["emporia", "radford"]}
+{"title": "cities in virginia, us", "qid": "C063|2|8", "entities": ["winchester", "fairfax"]}
+{"title": "cities in virginia, us", "qid": "C063|2|9", "entities": ["staunton", "richmond"]}
+{"title": "arab states of the persian gulf", "qid": "SemSearch_LS-2|2|0", "entities": ["bahrain", "gulf_war"]}
+{"title": "arab states of the persian gulf", "qid": "SemSearch_LS-2|2|1", "entities": ["dubai", "kuwait"]}
+{"title": "arab states of the persian gulf", "qid": "SemSearch_LS-2|2|2", "entities": ["bahrain", "saudi_arabia"]}
+{"title": "arab states of the persian gulf", "qid": "SemSearch_LS-2|2|3", "entities": ["gulf_war", "kuwait"]}
+{"title": "arab states of the persian gulf", "qid": "SemSearch_LS-2|2|4", "entities": ["oman", "dubai"]}
+{"title": "arab states of the persian gulf", "qid": "SemSearch_LS-2|2|5", "entities": ["riyadh", "oman"]}
+{"title": "arab states of the persian gulf", "qid": "SemSearch_LS-2|2|6", "entities": ["riyadh", "saudi_arabia"]}
+{"title": "arab states of the persian gulf", "qid": "SemSearch_LS-2|2|7", "entities": ["oman", "bahrain"]}
+{"title": "arab states of the persian gulf", "qid": "SemSearch_LS-2|2|8", "entities": ["saudi_arabia", "gulf_war"]}
+{"title": "arab states of the persian gulf", "qid": "SemSearch_LS-2|2|9", "entities": ["riyadh", "bahrain"]}
+{"title": "states of matter", "qid": "C073|2|0", "entities": ["gas", "plasma"]}
+{"title": "states of matter", "qid": "C073|2|1", "entities": ["degenerate_matter", "dark_matter"]}
+{"title": "states of matter", "qid": "C073|2|2", "entities": ["degenerate_matter", "glass"]}
+{"title": "states of matter", "qid": "C073|2|3", "entities": ["gas", "degenerate_matter"]}
+{"title": "states of matter", "qid": "C073|2|4", "entities": ["liquid", "glass"]}
+{"title": "states of matter", "qid": "C073|2|5", "entities": ["superfluid", "liquid"]}
+{"title": "states of matter", "qid": "C073|2|6", "entities": ["glass", "liquid"]}
+{"title": "states of matter", "qid": "C073|2|7", "entities": ["solid", "degenerate_matter"]}
+{"title": "states of matter", "qid": "C073|2|8", "entities": ["plasma", "dark_matter"]}
+{"title": "states of matter", "qid": "C073|2|9", "entities": ["dark_matter", "solid"]}
+{"title": "cities in south carolina, us", "qid": "C041|2|0", "entities": ["newberry", "spartanburg"]}
+{"title": "cities in south carolina, us", "qid": "C041|2|1", "entities": ["dillon", "clover"]}
+{"title": "cities in south carolina, us", "qid": "C041|2|2", "entities": ["conway", "gaffney"]}
+{"title": "cities in south carolina, us", "qid": "C041|2|3", "entities": ["bennettsville", "union"]}
+{"title": "cities in south carolina, us", "qid": "C041|2|4", "entities": ["bennettsville", "seneca"]}
+{"title": "cities in south carolina, us", "qid": "C041|2|5", "entities": ["florence", "lancaster"]}
+{"title": "cities in south carolina, us", "qid": "C041|2|6", "entities": ["conway", "camden"]}
+{"title": "cities in south carolina, us", "qid": "C041|2|7", "entities": ["columbia", "dillon"]}
+{"title": "cities in south carolina, us", "qid": "C041|2|8", "entities": ["columbia", "camden"]}
+{"title": "cities in south carolina, us", "qid": "C041|2|9", "entities": ["darlington", "marion"]}
+{"title": "counties in california, us", "qid": "C021|2|0", "entities": ["lake", "nevada"]}
+{"title": "counties in california, us", "qid": "C021|2|1", "entities": ["siskiyou", "san_diego"]}
+{"title": "counties in california, us", "qid": "C021|2|2", "entities": ["sacramento", "santa_cruz"]}
+{"title": "counties in california, us", "qid": "C021|2|3", "entities": ["san_mateo", "alameda"]}
+{"title": "counties in california, us", "qid": "C021|2|4", "entities": ["marin", "imperial"]}
+{"title": "counties in california, us", "qid": "C021|2|5", "entities": ["san_mateo", "riverside"]}
+{"title": "counties in california, us", "qid": "C021|2|6", "entities": ["san_luis_obispo", "merced"]}
+{"title": "counties in california, us", "qid": "C021|2|7", "entities": ["san_francisco", "del_norte"]}
+{"title": "counties in california, us", "qid": "C021|2|8", "entities": ["napa", "orange"]}
+{"title": "counties in california, us", "qid": "C021|2|9", "entities": ["sierra", "riverside"]}
+{"title": "major gods in greek mythology", "qid": "C085|2|0", "entities": ["poseidon", "dionysus"]}
+{"title": "major gods in greek mythology", "qid": "C085|2|1", "entities": ["athena", "hephaestus"]}
+{"title": "major gods in greek mythology", "qid": "C085|2|2", "entities": ["zeus", "hestia"]}
+{"title": "major gods in greek mythology", "qid": "C085|2|3", "entities": ["dionysus", "hades"]}
+{"title": "major gods in greek mythology", "qid": "C085|2|4", "entities": ["dionysus", "hera"]}
+{"title": "major gods in greek mythology", "qid": "C085|2|5", "entities": ["hera", "zeus"]}
+{"title": "major gods in greek mythology", "qid": "C085|2|6", "entities": ["zeus", "hera"]}
+{"title": "major gods in greek mythology", "qid": "C085|2|7", "entities": ["artemis", "hestia"]}
+{"title": "major gods in greek mythology", "qid": "C085|2|8", "entities": ["artemis", "apollo"]}
+{"title": "major gods in greek mythology", "qid": "C085|2|9", "entities": ["poseidon", "athena"]}
+{"title": "gods who dwelt on mount olympus", "qid": "SemSearch_LS-14|2|0", "entities": ["zeus", "hephaestus"]}
+{"title": "gods who dwelt on mount olympus", "qid": "SemSearch_LS-14|2|1", "entities": ["hestia", "hebe"]}
+{"title": "gods who dwelt on mount olympus", "qid": "SemSearch_LS-14|2|2", "entities": ["hephaestus", "aphrodite"]}
+{"title": "gods who dwelt on mount olympus", "qid": "SemSearch_LS-14|2|3", "entities": ["zeus", "apollo"]}
+{"title": "gods who dwelt on mount olympus", "qid": "SemSearch_LS-14|2|4", "entities": ["poseidon", "prometheus"]}
+{"title": "gods who dwelt on mount olympus", "qid": "SemSearch_LS-14|2|5", "entities": ["artemis", "prometheus"]}
+{"title": "gods who dwelt on mount olympus", "qid": "SemSearch_LS-14|2|6", "entities": ["dionysus", "zeus"]}
+{"title": "gods who dwelt on mount olympus", "qid": "SemSearch_LS-14|2|7", "entities": ["dionysus", "prometheus"]}
+{"title": "gods who dwelt on mount olympus", "qid": "SemSearch_LS-14|2|8", "entities": ["aphrodite", "poseidon"]}
+{"title": "gods who dwelt on mount olympus", "qid": "SemSearch_LS-14|2|9", "entities": ["prometheus", "aphrodite"]}
+{"title": "cities in tennessee, us", "qid": "C078|2|0", "entities": ["smyrna", "kingsport"]}
+{"title": "cities in tennessee, us", "qid": "C078|2|1", "entities": ["gallatin", "nashville"]}
+{"title": "cities in tennessee, us", "qid": "C078|2|2", "entities": ["germantown", "smyrna"]}
+{"title": "cities in tennessee, us", "qid": "C078|2|3", "entities": ["smyrna", "murfreesboro"]}
+{"title": "cities in tennessee, us", "qid": "C078|2|4", "entities": ["kingsport", "columbia"]}
+{"title": "cities in tennessee, us", "qid": "C078|2|5", "entities": ["bartlett", "murfreesboro"]}
+{"title": "cities in tennessee, us", "qid": "C078|2|6", "entities": ["germantown", "murfreesboro"]}
+{"title": "cities in tennessee, us", "qid": "C078|2|7", "entities": ["morristown", "collierville"]}
+{"title": "cities in tennessee, us", "qid": "C078|2|8", "entities": ["lebanon", "gallatin"]}
+{"title": "cities in tennessee, us", "qid": "C078|2|9", "entities": ["nashville", "memphis"]}
+{"title": "major cities in canada", "qid": "C055|2|0", "entities": ["richmond_hill", "welland"]}
+{"title": "major cities in canada", "qid": "C055|2|1", "entities": ["longueuil", "ottawa"]}
+{"title": "major cities in canada", "qid": "C055|2|2", "entities": ["saint_john", "moncton"]}
+{"title": "major cities in canada", "qid": "C055|2|3", "entities": ["langley", "moncton"]}
+{"title": "major cities in canada", "qid": "C055|2|4", "entities": ["kitchener", "laval"]}
+{"title": "major cities in canada", "qid": "C055|2|5", "entities": ["longueuil", "brossard"]}
+{"title": "major cities in canada", "qid": "C055|2|6", "entities": ["edmonton", "sarnia"]}
+{"title": "major cities in canada", "qid": "C055|2|7", "entities": ["granby", "oakville"]}
+{"title": "major cities in canada", "qid": "C055|2|8", "entities": ["brantford", "nanaimo"]}
+{"title": "major cities in canada", "qid": "C055|2|9", "entities": ["halifax", "coquitlam"]}
+{"title": "cities in massachussets, us", "qid": "C043|2|0", "entities": ["somerville", "lexington"]}
+{"title": "cities in massachussets, us", "qid": "C043|2|1", "entities": ["gardner", "arlington"]}
+{"title": "cities in massachussets, us", "qid": "C043|2|2", "entities": ["gloucester", "gardner"]}
+{"title": "cities in massachussets, us", "qid": "C043|2|3", "entities": ["chelmsford", "wilmington"]}
+{"title": "cities in massachussets, us", "qid": "C043|2|4", "entities": ["taunton", "falmouth"]}
+{"title": "cities in massachussets, us", "qid": "C043|2|5", "entities": ["worcester", "boston"]}
+{"title": "cities in massachussets, us", "qid": "C043|2|6", "entities": ["hingham", "billerica"]}
+{"title": "cities in massachussets, us", "qid": "C043|2|7", "entities": ["brockton", "taunton"]}
+{"title": "cities in massachussets, us", "qid": "C043|2|8", "entities": ["attleboro", "andover"]}
+{"title": "cities in massachussets, us", "qid": "C043|2|9", "entities": ["brookline", "pittsfield"]}
+{"title": "cities in texas, us", "qid": "C052|2|0", "entities": ["lancaster", "lubbock"]}
+{"title": "cities in texas, us", "qid": "C052|2|1", "entities": ["harlingen", "abilene"]}
+{"title": "cities in texas, us", "qid": "C052|2|2", "entities": ["arlington", "abilene"]}
+{"title": "cities in texas, us", "qid": "C052|2|3", "entities": ["bedford", "mansfield"]}
+{"title": "cities in texas, us", "qid": "C052|2|4", "entities": ["flower_mound", "socorro"]}
+{"title": "cities in texas, us", "qid": "C052|2|5", "entities": ["frisco", "leander"]}
+{"title": "cities in texas, us", "qid": "C052|2|6", "entities": ["grapevine", "laredo"]}
+{"title": "cities in texas, us", "qid": "C052|2|7", "entities": ["cedar_hill", "waco"]}
+{"title": "cities in texas, us", "qid": "C052|2|8", "entities": ["carrollton", "lubbock"]}
+{"title": "cities in texas, us", "qid": "C052|2|9", "entities": ["flower_mound", "keller"]}
+{"title": "cities in florida, us", "qid": "C017|2|0", "entities": ["titusville", "daytona_beach"]}
+{"title": "cities in florida, us", "qid": "C017|2|1", "entities": ["homestead", "deerfield_beach"]}
+{"title": "cities in florida, us", "qid": "C017|2|2", "entities": ["tampa", "orlando"]}
+{"title": "cities in florida, us", "qid": "C017|2|3", "entities": ["broward", "kissimmee"]}
+{"title": "cities in florida, us", "qid": "C017|2|4", "entities": ["sunrise", "orlando"]}
+{"title": "cities in florida, us", "qid": "C017|2|5", "entities": ["lauderhill", "homestead"]}
+{"title": "cities in florida, us", "qid": "C017|2|6", "entities": ["miami_beach", "boca_raton"]}
+{"title": "cities in florida, us", "qid": "C017|2|7", "entities": ["sunrise", "ormond_beach"]}
+{"title": "cities in florida, us", "qid": "C017|2|8", "entities": ["coconut_creek", "apopka"]}
+{"title": "cities in florida, us", "qid": "C017|2|9", "entities": ["jupiter", "panama_city"]}
+{"title": "popular automobile manufacturers", "qid": "C028|2|0", "entities": ["mazda", "holden"]}
+{"title": "popular automobile manufacturers", "qid": "C028|2|1", "entities": ["bmw", "volkswagen"]}
+{"title": "popular automobile manufacturers", "qid": "C028|2|2", "entities": ["saturn", "dodge"]}
+{"title": "popular automobile manufacturers", "qid": "C028|2|3", "entities": ["lamborghini", "mitsubishi"]}
+{"title": "popular automobile manufacturers", "qid": "C028|2|4", "entities": ["chevrolet", "mitsubishi"]}
+{"title": "popular automobile manufacturers", "qid": "C028|2|5", "entities": ["hindustan", "peel"]}
+{"title": "popular automobile manufacturers", "qid": "C028|2|6", "entities": ["rambler", "volkswagen"]}
+{"title": "popular automobile manufacturers", "qid": "C028|2|7", "entities": ["hindustan", "volvo"]}
+{"title": "popular automobile manufacturers", "qid": "C028|2|8", "entities": ["imperial", "chevrolet"]}
+{"title": "popular automobile manufacturers", "qid": "C028|2|9", "entities": ["subaru", "mercury"]}
+{"title": "cities in ohio, us", "qid": "C047|2|0", "entities": ["riverside", "medina"]}
+{"title": "cities in ohio, us", "qid": "C047|2|1", "entities": ["aurora", "oxford"]}
+{"title": "cities in ohio, us", "qid": "C047|2|2", "entities": ["hudson", "marysville"]}
+{"title": "cities in ohio, us", "qid": "C047|2|3", "entities": ["middletown", "clayton"]}
+{"title": "cities in ohio, us", "qid": "C047|2|4", "entities": ["toledo", "bedford"]}
+{"title": "cities in ohio, us", "qid": "C047|2|5", "entities": ["mason", "celina"]}
+{"title": "cities in ohio, us", "qid": "C047|2|6", "entities": ["salem", "dover"]}
+{"title": "cities in ohio, us", "qid": "C047|2|7", "entities": ["avon", "salem"]}
+{"title": "cities in ohio, us", "qid": "C047|2|8", "entities": ["hamilton", "vermilion"]}
+{"title": "cities in ohio, us", "qid": "C047|2|9", "entities": ["coshocton", "youngstown"]}
+{"title": "state capitals of the united states of america", "qid": "INEX_XER-108|2|0", "entities": ["oklahoma_city", "atlanta"]}
+{"title": "state capitals of the united states of america", "qid": "INEX_XER-108|2|1", "entities": ["honolulu", "atlanta"]}
+{"title": "state capitals of the united states of america", "qid": "INEX_XER-108|2|2", "entities": ["salt_lake_city", "denver"]}
+{"title": "state capitals of the united states of america", "qid": "INEX_XER-108|2|3", "entities": ["atlanta", "salt_lake_city"]}
+{"title": "state capitals of the united states of america", "qid": "INEX_XER-108|2|4", "entities": ["indianapolis", "salt_lake_city"]}
+{"title": "state capitals of the united states of america", "qid": "INEX_XER-108|2|5", "entities": ["honolulu", "indianapolis"]}
+{"title": "state capitals of the united states of america", "qid": "INEX_XER-108|2|6", "entities": ["oklahoma_city", "indianapolis"]}
+{"title": "state capitals of the united states of america", "qid": "INEX_XER-108|2|7", "entities": ["honolulu", "denver"]}
+{"title": "state capitals of the united states of america", "qid": "INEX_XER-108|2|8", "entities": ["salt_lake_city", "honolulu"]}
+{"title": "state capitals of the united states of america", "qid": "INEX_XER-108|2|9", "entities": ["oklahoma_city", "honolulu"]}
+{"title": "common english surnames", "qid": "C024|2|0", "entities": ["dale", "barker"]}
+{"title": "common english surnames", "qid": "C024|2|1", "entities": ["stewart", "williamson"]}
+{"title": "common english surnames", "qid": "C024|2|2", "entities": ["townsend", "barker"]}
+{"title": "common english surnames", "qid": "C024|2|3", "entities": ["gill", "pugh"]}
+{"title": "common english surnames", "qid": "C024|2|4", "entities": ["howe", "barker"]}
+{"title": "common english surnames", "qid": "C024|2|5", "entities": ["patel", "day"]}
+{"title": "common english surnames", "qid": "C024|2|6", "entities": ["anderson", "norris"]}
+{"title": "common english surnames", "qid": "C024|2|7", "entities": ["watson", "harris"]}
+{"title": "common english surnames", "qid": "C024|2|8", "entities": ["french", "watson"]}
+{"title": "common english surnames", "qid": "C024|2|9", "entities": ["foster", "alexander"]}
+{"title": "chess world champions", "qid": "INEX_XER-144|2|0", "entities": ["bobby_fischer", "mikhail_botvinnik"]}
+{"title": "chess world champions", "qid": "INEX_XER-144|2|1", "entities": ["bobby_fischer", "world_chess_championship"]}
+{"title": "chess world champions", "qid": "INEX_XER-144|2|2", "entities": ["mikhail_botvinnik", "boris_spassky"]}
+{"title": "chess world champions", "qid": "INEX_XER-144|2|3", "entities": ["susan_polgar", "max_euwe"]}
+{"title": "chess world champions", "qid": "INEX_XER-144|2|4", "entities": ["emanuel_lasker", "mikhail_botvinnik"]}
+{"title": "chess world champions", "qid": "INEX_XER-144|2|5", "entities": ["paul_morphy", "viktor_korchnoi"]}
+{"title": "chess world champions", "qid": "INEX_XER-144|2|6", "entities": ["anatoly_karpov", "mikhail_tal"]}
+{"title": "chess world champions", "qid": "INEX_XER-144|2|7", "entities": ["veselin_topalov", "world_chess_championship"]}
+{"title": "chess world champions", "qid": "INEX_XER-144|2|8", "entities": ["veselin_topalov", "tigran_petrosian"]}
+{"title": "chess world champions", "qid": "INEX_XER-144|2|9", "entities": ["tigran_petrosian", "garry_kasparov"]}
+{"title": "cities in pennsylvania", "qid": "C036|2|0", "entities": ["hazleton", "williamsport"]}
+{"title": "cities in pennsylvania", "qid": "C036|2|1", "entities": ["york", "chester"]}
+{"title": "cities in pennsylvania", "qid": "C036|2|2", "entities": ["easton", "pittsburgh"]}
+{"title": "cities in pennsylvania", "qid": "C036|2|3", "entities": ["altoona", "hermitage"]}
+{"title": "cities in pennsylvania", "qid": "C036|2|4", "entities": ["williamsport", "lancaster"]}
+{"title": "cities in pennsylvania", "qid": "C036|2|5", "entities": ["lebanon", "harrisburg"]}
+{"title": "cities in pennsylvania", "qid": "C036|2|6", "entities": ["altoona", "coatesville"]}
+{"title": "cities in pennsylvania", "qid": "C036|2|7", "entities": ["harrisburg", "pittsburgh"]}
+{"title": "cities in pennsylvania", "qid": "C036|2|8", "entities": ["reading", "altoona"]}
+{"title": "cities in pennsylvania", "qid": "C036|2|9", "entities": ["lebanon", "reading"]}
+{"title": "cities in north carolina, us", "qid": "C049|2|0", "entities": ["statesville", "jacksonville"]}
+{"title": "cities in north carolina, us", "qid": "C049|2|1", "entities": ["asheville", "mooresville"]}
+{"title": "cities in north carolina, us", "qid": "C049|2|2", "entities": ["hickory", "monroe"]}
+{"title": "cities in north carolina, us", "qid": "C049|2|3", "entities": ["durham", "garner"]}
+{"title": "cities in north carolina, us", "qid": "C049|2|4", "entities": ["fayetteville", "kinston"]}
+{"title": "cities in north carolina, us", "qid": "C049|2|5", "entities": ["fayetteville", "huntersville"]}
+{"title": "cities in north carolina, us", "qid": "C049|2|6", "entities": ["boone", "garner"]}
+{"title": "cities in north carolina, us", "qid": "C049|2|7", "entities": ["huntersville", "greensboro"]}
+{"title": "cities in north carolina, us", "qid": "C049|2|8", "entities": ["jacksonville", "kinston"]}
+{"title": "cities in north carolina, us", "qid": "C049|2|9", "entities": ["thomasville", "lumberton"]}
+{"title": "cities in uk", "qid": "C038|2|0", "entities": ["kingston", "cambridge"]}
+{"title": "cities in uk", "qid": "C038|2|1", "entities": ["derry", "derby"]}
+{"title": "cities in uk", "qid": "C038|2|2", "entities": ["norwich", "bath"]}
+{"title": "cities in uk", "qid": "C038|2|3", "entities": ["preston", "chelmsford"]}
+{"title": "cities in uk", "qid": "C038|2|4", "entities": ["carlisle", "exeter"]}
+{"title": "cities in uk", "qid": "C038|2|5", "entities": ["ripon", "swansea"]}
+{"title": "cities in uk", "qid": "C038|2|6", "entities": ["manchester", "salford"]}
+{"title": "cities in uk", "qid": "C038|2|7", "entities": ["derry", "newcastle"]}
+{"title": "cities in uk", "qid": "C038|2|8", "entities": ["londonderry", "newport"]}
+{"title": "cities in uk", "qid": "C038|2|9", "entities": ["dundee", "worcester"]}
+{"title": "us presidents", "qid": "C029|2|0", "entities": ["ronald_reagan", "andrew_johnson"]}
+{"title": "us presidents", "qid": "C029|2|1", "entities": ["martin_van_buren", "william_henry_harrison"]}
+{"title": "us presidents", "qid": "C029|2|2", "entities": ["grover_cleveland", "martin_van_buren"]}
+{"title": "us presidents", "qid": "C029|2|3", "entities": ["jimmy_carter", "john_tyler"]}
+{"title": "us presidents", "qid": "C029|2|4", "entities": ["andrew_johnson", "theodore_roosevelt"]}
+{"title": "us presidents", "qid": "C029|2|5", "entities": ["william_henry_harrison", "calvin_coolidge"]}
+{"title": "us presidents", "qid": "C029|2|6", "entities": ["gerald_ford", "millard_fillmore"]}
+{"title": "us presidents", "qid": "C029|2|7", "entities": ["william_mckinley", "john_tyler"]}
+{"title": "us presidents", "qid": "C029|2|8", "entities": ["richard_nixon", "benjamin_harrison"]}
+{"title": "us presidents", "qid": "C029|2|9", "entities": ["zachary_taylor", "andrew_jackson"]}
+{"title": "countries in the world", "qid": "C015|2|0", "entities": ["south_africa", "angola"]}
+{"title": "countries in the world", "qid": "C015|2|1", "entities": ["tunisia", "fiji"]}
+{"title": "countries in the world", "qid": "C015|2|2", "entities": ["costa_rica", "botswana"]}
+{"title": "countries in the world", "qid": "C015|2|3", "entities": ["oman", "cambodia"]}
+{"title": "countries in the world", "qid": "C015|2|4", "entities": ["denmark", "cuba"]}
+{"title": "countries in the world", "qid": "C015|2|5", "entities": ["pakistan", "jamaica"]}
+{"title": "countries in the world", "qid": "C015|2|6", "entities": ["japan", "zambia"]}
+{"title": "countries in the world", "qid": "C015|2|7", "entities": ["turkmenistan", "thailand"]}
+{"title": "countries in the world", "qid": "C015|2|8", "entities": ["cote_d'ivoire", "cambodia"]}
+{"title": "countries in the world", "qid": "C015|2|9", "entities": ["australia", "tonga"]}
+{"title": "provinces and territories of canada", "qid": "SemSearch_LS-33|2|0", "entities": ["nova_scotia", "canada"]}
+{"title": "provinces and territories of canada", "qid": "SemSearch_LS-33|2|1", "entities": ["british_columbia", "new_brunswick"]}
+{"title": "provinces and territories of canada", "qid": "SemSearch_LS-33|2|2", "entities": ["nova_scotia", "assiniboia"]}
+{"title": "provinces and territories of canada", "qid": "SemSearch_LS-33|2|3", "entities": ["saskatchewan", "yukon"]}
+{"title": "provinces and territories of canada", "qid": "SemSearch_LS-33|2|4", "entities": ["british_columbia", "quebec"]}
+{"title": "provinces and territories of canada", "qid": "SemSearch_LS-33|2|5", "entities": ["new_brunswick", "manitoba"]}
+{"title": "provinces and territories of canada", "qid": "SemSearch_LS-33|2|6", "entities": ["prince_edward_island", "quebec"]}
+{"title": "provinces and territories of canada", "qid": "SemSearch_LS-33|2|7", "entities": ["assiniboia", "prince_edward_island"]}
+{"title": "provinces and territories of canada", "qid": "SemSearch_LS-33|2|8", "entities": ["manitoba", "assiniboia"]}
+{"title": "provinces and territories of canada", "qid": "SemSearch_LS-33|2|9", "entities": ["saskatchewan", "yukon"]}
+{"title": "twelve tribes or sons of israel", "qid": "SemSearch_LS-42|2|0", "entities": ["joseph", "simeon"]}
+{"title": "twelve tribes or sons of israel", "qid": "SemSearch_LS-42|2|1", "entities": ["levi", "asher"]}
+{"title": "twelve tribes or sons of israel", "qid": "SemSearch_LS-42|2|2", "entities": ["levi", "levite"]}
+{"title": "twelve tribes or sons of israel", "qid": "SemSearch_LS-42|2|3", "entities": ["judah", "simeon"]}
+{"title": "twelve tribes or sons of israel", "qid": "SemSearch_LS-42|2|4", "entities": ["joseph", "ephraim"]}
+{"title": "twelve tribes or sons of israel", "qid": "SemSearch_LS-42|2|5", "entities": ["ephraim", "asher"]}
+{"title": "twelve tribes or sons of israel", "qid": "SemSearch_LS-42|2|6", "entities": ["joseph", "judah"]}
+{"title": "twelve tribes or sons of israel", "qid": "SemSearch_LS-42|2|7", "entities": ["joseph", "judah"]}
+{"title": "twelve tribes or sons of israel", "qid": "SemSearch_LS-42|2|8", "entities": ["levite", "issachar"]}
+{"title": "twelve tribes or sons of israel", "qid": "SemSearch_LS-42|2|9", "entities": ["joseph", "levite"]}
+{"title": "colors", "qid": "C023|2|0", "entities": ["maroon", "copper"]}
+{"title": "colors", "qid": "C023|2|1", "entities": ["amber", "gray"]}
+{"title": "colors", "qid": "C023|2|2", "entities": ["cyan", "copper"]}
+{"title": "colors", "qid": "C023|2|3", "entities": ["black", "maroon"]}
+{"title": "colors", "qid": "C023|2|4", "entities": ["coffee", "periwinkle"]}
+{"title": "colors", "qid": "C023|2|5", "entities": ["lavender", "teal"]}
+{"title": "colors", "qid": "C023|2|6", "entities": ["orange", "ruby"]}
+{"title": "colors", "qid": "C023|2|7", "entities": ["brown", "bronze"]}
+{"title": "colors", "qid": "C023|2|8", "entities": ["beige", "violet"]}
+{"title": "colors", "qid": "C023|2|9", "entities": ["pear", "amber"]}
+{"title": "popular tv networks", "qid": "C059|2|0", "entities": ["cnn", "cbs"]}
+{"title": "popular tv networks", "qid": "C059|2|1", "entities": ["mtv", "nbc"]}
+{"title": "popular tv networks", "qid": "C059|2|2", "entities": ["cbs", "mtv"]}
+{"title": "popular tv networks", "qid": "C059|2|3", "entities": ["cinemax", "fox_news"]}
+{"title": "popular tv networks", "qid": "C059|2|4", "entities": ["cinemax", "tbs"]}
+{"title": "popular tv networks", "qid": "C059|2|5", "entities": ["nbc", "tnt"]}
+{"title": "popular tv networks", "qid": "C059|2|6", "entities": ["hbo", "nick"]}
+{"title": "popular tv networks", "qid": "C059|2|7", "entities": ["cnn", "nick"]}
+{"title": "popular tv networks", "qid": "C059|2|8", "entities": ["mtv", "univision"]}
+{"title": "popular tv networks", "qid": "C059|2|9", "entities": ["usa", "cnn"]}
+{"title": "major cities in japan", "qid": "C064|2|0", "entities": ["yamato", "atsugi"]}
+{"title": "major cities in japan", "qid": "C064|2|1", "entities": ["matsumoto", "yamagata"]}
+{"title": "major cities in japan", "qid": "C064|2|2", "entities": ["sendai", "sapporo"]}
+{"title": "major cities in japan", "qid": "C064|2|3", "entities": ["yamato", "kumamoto"]}
+{"title": "major cities in japan", "qid": "C064|2|4", "entities": ["toyama", "yamato"]}
+{"title": "major cities in japan", "qid": "C064|2|5", "entities": ["saga", "morioka"]}
+{"title": "major cities in japan", "qid": "C064|2|6", "entities": ["nagoya", "kawasaki"]}
+{"title": "major cities in japan", "qid": "C064|2|7", "entities": ["kawasaki", "yao"]}
+{"title": "major cities in japan", "qid": "C064|2|8", "entities": ["kumamoto", "nagoya"]}
+{"title": "major cities in japan", "qid": "C064|2|9", "entities": ["atsugi", "saga"]}
+{"title": "formula one world constructors' champions", "qid": "INEX_XER-115|2|0", "entities": ["benetton_formula", "niki_lauda"]}
+{"title": "formula one world constructors' champions", "qid": "INEX_XER-115|2|1", "entities": ["benetton_formula", "mclaren"]}
+{"title": "formula one world constructors' champions", "qid": "INEX_XER-115|2|2", "entities": ["scuderia_ferrari", "jenson_button"]}
+{"title": "formula one world constructors' champions", "qid": "INEX_XER-115|2|3", "entities": ["brawn_gp", "sebastian_vettel"]}
+{"title": "formula one world constructors' champions", "qid": "INEX_XER-115|2|4", "entities": ["red_bull_racing", "jenson_button"]}
+{"title": "formula one world constructors' champions", "qid": "INEX_XER-115|2|5", "entities": ["brabham", "scuderia_ferrari"]}
+{"title": "formula one world constructors' champions", "qid": "INEX_XER-115|2|6", "entities": ["minardi", "scuderia_ferrari"]}
+{"title": "formula one world constructors' champions", "qid": "INEX_XER-115|2|7", "entities": ["scuderia_ferrari", "brawn_gp"]}
+{"title": "formula one world constructors' champions", "qid": "INEX_XER-115|2|8", "entities": ["jenson_button", "sebastian_vettel"]}
+{"title": "formula one world constructors' champions", "qid": "INEX_XER-115|2|9", "entities": ["minardi", "benetton_formula"]}
+{"title": "mode of public transportation", "qid": "C062|2|0", "entities": ["subway", "motorcycle"]}
+{"title": "mode of public transportation", "qid": "C062|2|1", "entities": ["oxen", "minibus"]}
+{"title": "mode of public transportation", "qid": "C062|2|2", "entities": ["van", "pipeline"]}
+{"title": "mode of public transportation", "qid": "C062|2|3", "entities": ["freight", "plane"]}
+{"title": "mode of public transportation", "qid": "C062|2|4", "entities": ["tank", "rocket"]}
+{"title": "mode of public transportation", "qid": "C062|2|5", "entities": ["metro", "camel"]}
+{"title": "mode of public transportation", "qid": "C062|2|6", "entities": ["boat", "donkey"]}
+{"title": "mode of public transportation", "qid": "C062|2|7", "entities": ["taxi", "camel"]}
+{"title": "mode of public transportation", "qid": "C062|2|8", "entities": ["submarine", "airplane"]}
+{"title": "mode of public transportation", "qid": "C062|2|9", "entities": ["taxi", "submarine"]}
+{"title": "big cats", "qid": "C031|2|0", "entities": ["tiger", "cheetah"]}
+{"title": "big cats", "qid": "C031|2|1", "entities": ["tiger", "lion"]}
+{"title": "big cats", "qid": "C031|2|2", "entities": ["jaguar", "leopard"]}
+{"title": "big cats", "qid": "C031|2|3", "entities": ["cougar", "jaguar"]}
+{"title": "big cats", "qid": "C031|2|4", "entities": ["jaguar", "leopard"]}
+{"title": "big cats", "qid": "C031|2|5", "entities": ["cougar", "leopard"]}
+{"title": "big cats", "qid": "C031|2|6", "entities": ["snow_leopard", "cougar"]}
+{"title": "big cats", "qid": "C031|2|7", "entities": ["leopard", "jaguar"]}
+{"title": "big cats", "qid": "C031|2|8", "entities": ["tiger", "lion"]}
+{"title": "big cats", "qid": "C031|2|9", "entities": ["cheetah", "tiger"]}
+{"title": "ten ancient greek city-kingdoms of cyprus", "qid": "SemSearch_LS-39|2|0", "entities": ["cyprus", "arsinoe"]}
+{"title": "ten ancient greek city-kingdoms of cyprus", "qid": "SemSearch_LS-39|2|1", "entities": ["cyprus", "famagusta"]}
+{"title": "ten ancient greek city-kingdoms of cyprus", "qid": "SemSearch_LS-39|2|2", "entities": ["amathus", "ancient_greece"]}
+{"title": "ten ancient greek city-kingdoms of cyprus", "qid": "SemSearch_LS-39|2|3", "entities": ["famagusta", "paphos"]}
+{"title": "ten ancient greek city-kingdoms of cyprus", "qid": "SemSearch_LS-39|2|4", "entities": ["famagusta", "kyrenia"]}
+{"title": "ten ancient greek city-kingdoms of cyprus", "qid": "SemSearch_LS-39|2|5", "entities": ["famagusta", "kyrenia"]}
+{"title": "ten ancient greek city-kingdoms of cyprus", "qid": "SemSearch_LS-39|2|6", "entities": ["ancient_greece", "crete"]}
+{"title": "ten ancient greek city-kingdoms of cyprus", "qid": "SemSearch_LS-39|2|7", "entities": ["kyrenia", "paphos"]}
+{"title": "ten ancient greek city-kingdoms of cyprus", "qid": "SemSearch_LS-39|2|8", "entities": ["crete", "famagusta"]}
+{"title": "ten ancient greek city-kingdoms of cyprus", "qid": "SemSearch_LS-39|2|9", "entities": ["cyprus", "ancient_greece"]}
+{"title": "counties in indiana, us", "qid": "C080|2|0", "entities": ["wabash", "floyd"]}
+{"title": "counties in indiana, us", "qid": "C080|2|1", "entities": ["dearborn", "knox"]}
+{"title": "counties in indiana, us", "qid": "C080|2|2", "entities": ["bartholomew", "lagrange"]}
+{"title": "counties in indiana, us", "qid": "C080|2|3", "entities": ["clark", "jay"]}
+{"title": "counties in indiana, us", "qid": "C080|2|4", "entities": ["ohio", "greene"]}
+{"title": "counties in indiana, us", "qid": "C080|2|5", "entities": ["carroll", "steuben"]}
+{"title": "counties in indiana, us", "qid": "C080|2|6", "entities": ["lawrence", "boone"]}
+{"title": "counties in indiana, us", "qid": "C080|2|7", "entities": ["dearborn", "henry"]}
+{"title": "counties in indiana, us", "qid": "C080|2|8", "entities": ["knox", "owen"]}
+{"title": "counties in indiana, us", "qid": "C080|2|9", "entities": ["washington", "clay"]}
+{"title": "fruit", "qid": "C020|2|0", "entities": ["blueberry", "mulberry"]}
+{"title": "fruit", "qid": "C020|2|1", "entities": ["tomato", "blackberry"]}
+{"title": "fruit", "qid": "C020|2|2", "entities": ["tangerine", "clementine"]}
+{"title": "fruit", "qid": "C020|2|3", "entities": ["melon", "watermelon"]}
+{"title": "fruit", "qid": "C020|2|4", "entities": ["melon", "blueberry"]}
+{"title": "fruit", "qid": "C020|2|5", "entities": ["raspberry", "orange"]}
+{"title": "fruit", "qid": "C020|2|6", "entities": ["jujube", "pineapple"]}
+{"title": "fruit", "qid": "C020|2|7", "entities": ["lychee", "jackfruit"]}
+{"title": "fruit", "qid": "C020|2|8", "entities": ["sugarcane", "apricot"]}
+{"title": "fruit", "qid": "C020|2|9", "entities": ["papaya", "banana"]}
+{"title": "states and territories of australia", "qid": "C056|2|0", "entities": ["australian_antarctic_territory", "norfolk_island"]}
+{"title": "states and territories of australia", "qid": "C056|2|1", "entities": ["queensland", "northern_territory"]}
+{"title": "states and territories of australia", "qid": "C056|2|2", "entities": ["northern_territory", "norfolk_island"]}
+{"title": "states and territories of australia", "qid": "C056|2|3", "entities": ["tasmania", "northern_territory"]}
+{"title": "states and territories of australia", "qid": "C056|2|4", "entities": ["northern_territory", "queensland"]}
+{"title": "states and territories of australia", "qid": "C056|2|5", "entities": ["victoria", "western_australia"]}
+{"title": "states and territories of australia", "qid": "C056|2|6", "entities": ["northern_territory", "norfolk_island"]}
+{"title": "states and territories of australia", "qid": "C056|2|7", "entities": ["norfolk_island", "victoria"]}
+{"title": "states and territories of australia", "qid": "C056|2|8", "entities": ["victoria", "australian_antarctic_territory"]}
+{"title": "states and territories of australia", "qid": "C056|2|9", "entities": ["tasmania", "western_australia"]}
+{"title": "cities in south korea", "qid": "C019|2|0", "entities": ["miryang", "jinju"]}
+{"title": "cities in south korea", "qid": "C019|2|1", "entities": ["seoul", "ulsan"]}
+{"title": "cities in south korea", "qid": "C019|2|2", "entities": ["suncheon", "osan"]}
+{"title": "cities in south korea", "qid": "C019|2|3", "entities": ["mokpo", "incheon"]}
+{"title": "cities in south korea", "qid": "C019|2|4", "entities": ["yangsan", "ansan"]}
+{"title": "cities in south korea", "qid": "C019|2|5", "entities": ["chuncheon", "suwon"]}
+{"title": "cities in south korea", "qid": "C019|2|6", "entities": ["suwon", "suncheon"]}
+{"title": "cities in south korea", "qid": "C019|2|7", "entities": ["suwon", "cheonan"]}
+{"title": "cities in south korea", "qid": "C019|2|8", "entities": ["yangsan", "donghae"]}
+{"title": "cities in south korea", "qid": "C019|2|9", "entities": ["ulsan", "donghae"]}
+{"title": "major cities in china", "qid": "C005|2|0", "entities": ["jinan", "harbin"]}
+{"title": "major cities in china", "qid": "C005|2|1", "entities": ["taiyuan", "xi'an"]}
+{"title": "major cities in china", "qid": "C005|2|2", "entities": ["jinan", "macau"]}
+{"title": "major cities in china", "qid": "C005|2|3", "entities": ["wuhan", "nanjing"]}
+{"title": "major cities in china", "qid": "C005|2|4", "entities": ["lhasa", "yinchuan"]}
+{"title": "major cities in china", "qid": "C005|2|5", "entities": ["shanghai", "lanzhou"]}
+{"title": "major cities in china", "qid": "C005|2|6", "entities": ["chongqing", "zhengzhou"]}
+{"title": "major cities in china", "qid": "C005|2|7", "entities": ["lanzhou", "nanjing"]}
+{"title": "major cities in china", "qid": "C005|2|8", "entities": ["lhasa", "nanjing"]}
+{"title": "major cities in china", "qid": "C005|2|9", "entities": ["haikou", "hohhot"]}
+{"title": "capital cities in the world", "qid": "C008|2|0", "entities": ["sarajevo", "riyadh"]}
+{"title": "capital cities in the world", "qid": "C008|2|1", "entities": ["lisbon", "canberra"]}
+{"title": "capital cities in the world", "qid": "C008|2|2", "entities": ["abidjan", "quito"]}
+{"title": "capital cities in the world", "qid": "C008|2|3", "entities": ["lusaka", "yamoussoukro"]}
+{"title": "capital cities in the world", "qid": "C008|2|4", "entities": ["quito", "gaborone"]}
+{"title": "capital cities in the world", "qid": "C008|2|5", "entities": ["apia", "valletta"]}
+{"title": "capital cities in the world", "qid": "C008|2|6", "entities": ["tbilisi", "caracas"]}
+{"title": "capital cities in the world", "qid": "C008|2|7", "entities": ["apia", "podgorica"]}
+{"title": "capital cities in the world", "qid": "C008|2|8", "entities": ["helsinki", "bangkok"]}
+{"title": "capital cities in the world", "qid": "C008|2|9", "entities": ["berlin", "madrid"]}
+{"title": "chemical elements that are named after people", "qid": "INEX_XER-147|2|0", "entities": ["lawrencium", "curium"]}
+{"title": "chemical elements that are named after people", "qid": "INEX_XER-147|2|1", "entities": ["periodic_table", "tantalum"]}
+{"title": "chemical elements that are named after people", "qid": "INEX_XER-147|2|2", "entities": ["lawrencium", "tantalum"]}
+{"title": "chemical elements that are named after people", "qid": "INEX_XER-147|2|3", "entities": ["gallium", "lawrencium"]}
+{"title": "chemical elements that are named after people", "qid": "INEX_XER-147|2|4", "entities": ["samarium", "gadolinium"]}
+{"title": "chemical elements that are named after people", "qid": "INEX_XER-147|2|5", "entities": ["periodic_table", "lawrencium"]}
+{"title": "chemical elements that are named after people", "qid": "INEX_XER-147|2|6", "entities": ["lawrencium", "nobelium"]}
+{"title": "chemical elements that are named after people", "qid": "INEX_XER-147|2|7", "entities": ["tantalum", "curium"]}
+{"title": "chemical elements that are named after people", "qid": "INEX_XER-147|2|8", "entities": ["einsteinium", "nobelium"]}
+{"title": "chemical elements that are named after people", "qid": "INEX_XER-147|2|9", "entities": ["gadolinium", "samarium"]}
+{"title": "major cities in india", "qid": "C044|2|0", "entities": ["parbhani", "meerut"]}
+{"title": "major cities in india", "qid": "C044|2|1", "entities": ["anantapur", "ghaziabad"]}
+{"title": "major cities in india", "qid": "C044|2|2", "entities": ["rampur", "howrah"]}
+{"title": "major cities in india", "qid": "C044|2|3", "entities": ["ghaziabad", "mumbai"]}
+{"title": "major cities in india", "qid": "C044|2|4", "entities": ["salem", "ujjain"]}
+{"title": "major cities in india", "qid": "C044|2|5", "entities": ["firozabad", "noida"]}
+{"title": "major cities in india", "qid": "C044|2|6", "entities": ["solapur", "jaipur"]}
+{"title": "major cities in india", "qid": "C044|2|7", "entities": ["rewa", "salem"]}
+{"title": "major cities in india", "qid": "C044|2|8", "entities": ["bardhaman", "bhilwara"]}
+{"title": "major cities in india", "qid": "C044|2|9", "entities": ["udaipur", "visakhapatnam"]}
+{"title": "animals", "qid": "C058|2|0", "entities": ["crocodile", "serval"]}
+{"title": "animals", "qid": "C058|2|1", "entities": ["skunk", "gerbil"]}
+{"title": "animals", "qid": "C058|2|2", "entities": ["gator", "platypus"]}
+{"title": "animals", "qid": "C058|2|3", "entities": ["whale", "mosquito"]}
+{"title": "animals", "qid": "C058|2|4", "entities": ["locust", "reindeer"]}
+{"title": "animals", "qid": "C058|2|5", "entities": ["deer", "snail"]}
+{"title": "animals", "qid": "C058|2|6", "entities": ["badger", "fox"]}
+{"title": "animals", "qid": "C058|2|7", "entities": ["fox", "bird"]}
+{"title": "animals", "qid": "C058|2|8", "entities": ["bronco", "tiger"]}
+{"title": "animals", "qid": "C058|2|9", "entities": ["pug", "crab"]}
+{"title": "major gods in norse mythology", "qid": "C066|2|0", "entities": ["loki", "hod"]}
+{"title": "major gods in norse mythology", "qid": "C066|2|1", "entities": ["hod", "loki"]}
+{"title": "major gods in norse mythology", "qid": "C066|2|2", "entities": ["frigg", "hod"]}
+{"title": "major gods in norse mythology", "qid": "C066|2|3", "entities": ["loki", "freyr"]}
+{"title": "major gods in norse mythology", "qid": "C066|2|4", "entities": ["loki", "freyr"]}
+{"title": "major gods in norse mythology", "qid": "C066|2|5", "entities": ["hod", "freyr"]}
+{"title": "major gods in norse mythology", "qid": "C066|2|6", "entities": ["freyr", "loki"]}
+{"title": "major gods in norse mythology", "qid": "C066|2|7", "entities": ["nanna", "loki"]}
+{"title": "major gods in norse mythology", "qid": "C066|2|8", "entities": ["odin", "freyr"]}
+{"title": "major gods in norse mythology", "qid": "C066|2|9", "entities": ["odin", "nanna"]}
+{"title": "seas", "qid": "C035|2|0", "entities": ["sulu_sea", "adriatic_sea"]}
+{"title": "seas", "qid": "C035|2|1", "entities": ["great_australian_bight", "red_sea"]}
+{"title": "seas", "qid": "C035|2|2", "entities": ["tasman_sea", "amundsen_sea"]}
+{"title": "seas", "qid": "C035|2|3", "entities": ["caribbean_sea", "persian_gulf"]}
+{"title": "seas", "qid": "C035|2|4", "entities": ["kara_sea", "philippine_sea"]}
+{"title": "seas", "qid": "C035|2|5", "entities": ["tyrrhenian_sea", "persian_gulf"]}
+{"title": "seas", "qid": "C035|2|6", "entities": ["andaman_sea", "sulu_sea"]}
+{"title": "seas", "qid": "C035|2|7", "entities": ["coral_sea", "bass_strait"]}
+{"title": "seas", "qid": "C035|2|8", "entities": ["caspian_sea", "chukchi_sea"]}
+{"title": "seas", "qid": "C035|2|9", "entities": ["chesapeake_bay", "caspian_sea"]}
+{"title": "cities in british columbia, canada", "qid": "C054|2|0", "entities": ["surrey", "nelson"]}
+{"title": "cities in british columbia, canada", "qid": "C054|2|1", "entities": ["terrace", "merritt"]}
+{"title": "cities in british columbia, canada", "qid": "C054|2|2", "entities": ["langley", "nelson"]}
+{"title": "cities in british columbia, canada", "qid": "C054|2|3", "entities": ["abbotsford", "nanaimo"]}
+{"title": "cities in british columbia, canada", "qid": "C054|2|4", "entities": ["merritt", "kimberley"]}
+{"title": "cities in british columbia, canada", "qid": "C054|2|5", "entities": ["maple_ridge", "nanaimo"]}
+{"title": "cities in british columbia, canada", "qid": "C054|2|6", "entities": ["greenwood", "nelson"]}
+{"title": "cities in british columbia, canada", "qid": "C054|2|7", "entities": ["merritt", "langley"]}
+{"title": "cities in british columbia, canada", "qid": "C054|2|8", "entities": ["coquitlam", "nelson"]}
+{"title": "cities in british columbia, canada", "qid": "C054|2|9", "entities": ["trail", "greenwood"]}
+{"title": "counties in massachusetts, us", "qid": "C007|2|0", "entities": ["worcester", "plymouth"]}
+{"title": "counties in massachusetts, us", "qid": "C007|2|1", "entities": ["middlesex", "hampden"]}
+{"title": "counties in massachusetts, us", "qid": "C007|2|2", "entities": ["middlesex", "plymouth"]}
+{"title": "counties in massachusetts, us", "qid": "C007|2|3", "entities": ["worcester", "plymouth"]}
+{"title": "counties in massachusetts, us", "qid": "C007|2|4", "entities": ["norfolk", "middlesex"]}
+{"title": "counties in massachusetts, us", "qid": "C007|2|5", "entities": ["worcester", "nantucket"]}
+{"title": "counties in massachusetts, us", "qid": "C007|2|6", "entities": ["berkshire", "hampden"]}
+{"title": "counties in massachusetts, us", "qid": "C007|2|7", "entities": ["suffolk", "essex"]}
+{"title": "counties in massachusetts, us", "qid": "C007|2|8", "entities": ["hampden", "hampshire"]}
+{"title": "counties in massachusetts, us", "qid": "C007|2|9", "entities": ["bristol", "plymouth"]}
+{"title": "cities in california, us", "qid": "C018|2|0", "entities": ["livermore", "san_leandro"]}
+{"title": "cities in california, us", "qid": "C018|2|1", "entities": ["san_leandro", "gardena"]}
+{"title": "cities in california, us", "qid": "C018|2|2", "entities": ["newark", "dublin"]}
+{"title": "cities in california, us", "qid": "C018|2|3", "entities": ["laguna_niguel", "rocklin"]}
+{"title": "cities in california, us", "qid": "C018|2|4", "entities": ["anaheim", "sacramento"]}
+{"title": "cities in california, us", "qid": "C018|2|5", "entities": ["huntington_park", "pleasanton"]}
+{"title": "cities in california, us", "qid": "C018|2|6", "entities": ["san_bernardino", "mission_viejo"]}
+{"title": "cities in california, us", "qid": "C018|2|7", "entities": ["roseville", "danville"]}
+{"title": "cities in california, us", "qid": "C018|2|8", "entities": ["san_luis_obispo", "garden_grove"]}
+{"title": "cities in california, us", "qid": "C018|2|9", "entities": ["san_rafael", "corona"]}
+{"title": "province-level divisions of china", "qid": "C004|2|0", "entities": ["taiwan", "beijing"]}
+{"title": "province-level divisions of china", "qid": "C004|2|1", "entities": ["hainan", "anhui"]}
+{"title": "province-level divisions of china", "qid": "C004|2|2", "entities": ["inner_mongolia", "heilongjiang"]}
+{"title": "province-level divisions of china", "qid": "C004|2|3", "entities": ["jiangsu", "tianjin"]}
+{"title": "province-level divisions of china", "qid": "C004|2|4", "entities": ["hong_kong", "yunnan"]}
+{"title": "province-level divisions of china", "qid": "C004|2|5", "entities": ["fujian", "shandong"]}
+{"title": "province-level divisions of china", "qid": "C004|2|6", "entities": ["qinghai", "inner_mongolia"]}
+{"title": "province-level divisions of china", "qid": "C004|2|7", "entities": ["hainan", "heilongjiang"]}
+{"title": "province-level divisions of china", "qid": "C004|2|8", "entities": ["hainan", "zhejiang"]}
+{"title": "province-level divisions of china", "qid": "C004|2|9", "entities": ["hubei", "gansu"]}
+{"title": "counties in ohio, us", "qid": "C048|2|0", "entities": ["huron", "guernsey"]}
+{"title": "counties in ohio, us", "qid": "C048|2|1", "entities": ["logan", "licking"]}
+{"title": "counties in ohio, us", "qid": "C048|2|2", "entities": ["union", "licking"]}
+{"title": "counties in ohio, us", "qid": "C048|2|3", "entities": ["richland", "union"]}
+{"title": "counties in ohio, us", "qid": "C048|2|4", "entities": ["hancock", "harrison"]}
+{"title": "counties in ohio, us", "qid": "C048|2|5", "entities": ["trumbull", "mercer"]}
+{"title": "counties in ohio, us", "qid": "C048|2|6", "entities": ["huron", "ottawa"]}
+{"title": "counties in ohio, us", "qid": "C048|2|7", "entities": ["stark", "delaware"]}
+{"title": "counties in ohio, us", "qid": "C048|2|8", "entities": ["coshocton", "licking"]}
+{"title": "counties in ohio, us", "qid": "C048|2|9", "entities": ["henry", "erie"]}
+{"title": "counties in illinois, us", "qid": "C082|2|0", "entities": ["union", "warren"]}
+{"title": "counties in illinois, us", "qid": "C082|2|1", "entities": ["dewitt", "jefferson"]}
+{"title": "counties in illinois, us", "qid": "C082|2|2", "entities": ["scott", "wabash"]}
+{"title": "counties in illinois, us", "qid": "C082|2|3", "entities": ["white", "stark"]}
+{"title": "counties in illinois, us", "qid": "C082|2|4", "entities": ["lake", "peoria"]}
+{"title": "counties in illinois, us", "qid": "C082|2|5", "entities": ["union", "jefferson"]}
+{"title": "counties in illinois, us", "qid": "C082|2|6", "entities": ["hamilton", "lawrence"]}
+{"title": "counties in illinois, us", "qid": "C082|2|7", "entities": ["effingham", "jefferson"]}
+{"title": "counties in illinois, us", "qid": "C082|2|8", "entities": ["douglas", "mercer"]}
+{"title": "counties in illinois, us", "qid": "C082|2|9", "entities": ["calhoun", "jefferson"]}
+{"title": "us states", "qid": "C013|2|0", "entities": ["oregon", "alabama"]}
+{"title": "us states", "qid": "C013|2|1", "entities": ["pennsylvania", "georgia"]}
+{"title": "us states", "qid": "C013|2|2", "entities": ["wyoming", "iowa"]}
+{"title": "us states", "qid": "C013|2|3", "entities": ["arkansas", "montana"]}
+{"title": "us states", "qid": "C013|2|4", "entities": ["wisconsin", "tennessee"]}
+{"title": "us states", "qid": "C013|2|5", "entities": ["delaware", "oregon"]}
+{"title": "us states", "qid": "C013|2|6", "entities": ["arkansas", "florida"]}
+{"title": "us states", "qid": "C013|2|7", "entities": ["arizona", "california"]}
+{"title": "us states", "qid": "C013|2|8", "entities": ["nevada", "new_york"]}
+{"title": "us states", "qid": "C013|2|9", "entities": ["nevada", "nebraska"]}
+{"title": "counties of england", "qid": "C001|2|0", "entities": ["devon", "essex"]}
+{"title": "counties of england", "qid": "C001|2|1", "entities": ["buckinghamshire", "kent"]}
+{"title": "counties of england", "qid": "C001|2|2", "entities": ["norfolk", "cambridgeshire"]}
+{"title": "counties of england", "qid": "C001|2|3", "entities": ["cornwall", "lancashire"]}
+{"title": "counties of england", "qid": "C001|2|4", "entities": ["essex", "cumbria"]}
+{"title": "counties of england", "qid": "C001|2|5", "entities": ["essex", "nottinghamshire"]}
+{"title": "counties of england", "qid": "C001|2|6", "entities": ["durham", "cornwall"]}
+{"title": "counties of england", "qid": "C001|2|7", "entities": ["bristol", "leicestershire"]}
+{"title": "counties of england", "qid": "C001|2|8", "entities": ["bristol", "lancashire"]}
+{"title": "counties of england", "qid": "C001|2|9", "entities": ["surrey", "warwickshire"]}
+{"title": "cities in new jersey, us", "qid": "C012|2|0", "entities": ["bergenfield", "winslow"]}
+{"title": "cities in new jersey, us", "qid": "C012|2|1", "entities": ["kearny", "howell"]}
+{"title": "cities in new jersey, us", "qid": "C012|2|2", "entities": ["hackensack", "jackson"]}
+{"title": "cities in new jersey, us", "qid": "C012|2|3", "entities": ["lacey", "evesham"]}
+{"title": "cities in new jersey, us", "qid": "C012|2|4", "entities": ["galloway", "lawrence"]}
+{"title": "cities in new jersey, us", "qid": "C012|2|5", "entities": ["piscataway", "galloway"]}
+{"title": "cities in new jersey, us", "qid": "C012|2|6", "entities": ["jackson", "camden"]}
+{"title": "cities in new jersey, us", "qid": "C012|2|7", "entities": ["new_brunswick", "marlboro"]}
+{"title": "cities in new jersey, us", "qid": "C012|2|8", "entities": ["trenton", "belleville"]}
+{"title": "cities in new jersey, us", "qid": "C012|2|9", "entities": ["camden", "bridgewater"]}
+{"title": "musical instruments", "qid": "C089|2|0", "entities": ["dulcimer", "cimbalom"]}
+{"title": "musical instruments", "qid": "C089|2|1", "entities": ["cimbalom", "flugelhorn"]}
+{"title": "musical instruments", "qid": "C089|2|2", "entities": ["piccolo", "lyre"]}
+{"title": "musical instruments", "qid": "C089|2|3", "entities": ["zither", "bouzouki"]}
+{"title": "musical instruments", "qid": "C089|2|4", "entities": ["timpani", "tuba"]}
+{"title": "musical instruments", "qid": "C089|2|5", "entities": ["cimbalom", "bandura"]}
+{"title": "musical instruments", "qid": "C089|2|6", "entities": ["timpani", "euphonium"]}
+{"title": "musical instruments", "qid": "C089|2|7", "entities": ["whistle", "grand_piano"]}
+{"title": "musical instruments", "qid": "C089|2|8", "entities": ["synthesizer", "mandolin"]}
+{"title": "musical instruments", "qid": "C089|2|9", "entities": ["whistle", "bass_drum"]}
