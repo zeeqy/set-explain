@@ -43,7 +43,7 @@ def merge_task(task_list, args):
         with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
             doc = f.readlines()
         f.close()
-        
+
         for item in doc:
             item_dict = json.loads(item)
             raw_tokenized = tokenizer.tokenize(item_dict['text'].split())
@@ -67,7 +67,7 @@ def main():
     parser.add_argument('--input_dir', type=str, default='', help='json document directory')
     parser.add_argument('--output_dir', type=str, default='', help='output directory')
     parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
-    parser.add_argument('--entity_dir', type=int, default=2, help='entity files directory')
+    parser.add_argument('--entity_dir', type=str, default='', help='entity files directory')
     
     args = parser.parse_args()
 
