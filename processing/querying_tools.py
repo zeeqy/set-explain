@@ -34,7 +34,7 @@ class matching_tools(object):
 
 	def loadSent(self):
 		if self.load_sent == False:
-			with open('{}/SENTENCE_ENTITY.txt'.format(self.sentence_dir, fname), 'r') as f:
+			with open('{}/SENTENCE_ENTITY.txt'.format(self.sentence_dir), 'r') as f:
 				for line in f:
 					self.sent_json.update(json.loads(line))
 			f.close()
