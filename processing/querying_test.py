@@ -20,12 +20,18 @@ def main():
 
     mtools = matching_tools(args.entity_dir, args.inverted_dir, args.sentence_dir)
 
+    print("initialization finished")
+    sys.stdout.flush()
+
     mentioned_keys = mtools.entityMentioned(args.query_entity)
+
+    print("search for entity mention finished")
+    sys.stdout.flush()
 
     content = mtools.key2Text(mentioned_keys)
 
     with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-        f.write('\n'.join(context))
+        f.write('\n'.join(content))
     f.close()
 
 if __name__ == '__main__':
