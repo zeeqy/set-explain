@@ -17,13 +17,13 @@ def merge_task(task_list, args):
     entityset = set(raw_list)
 
     with open('{}/entity2id.txt'.format(args.entity_dir), 'r') as f:
-        raw_entity2id = f.readlines()
+        raw_entity2id = f.read()
     f.close()
 
     entity2id = json.loads(raw_entity2id)
 
     with open('{}/id2entity.txt'.format(args.entity_dir), 'r') as f:
-        raw_id2entity = f.readlines()
+        raw_id2entity = f.read()
     f.close()
 
     id2entity = json.loads(raw_id2entity)
