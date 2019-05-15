@@ -1,5 +1,5 @@
 import json, sys, os
-import argparse
+from querying_tools import matching_tools
 
 """
 find entities mentioned in each sentence
@@ -10,25 +10,22 @@ def main():
     parser.add_argument('--sentence_dir', type=str, default='', help='sentence document directory')
     parser.add_argument('--entity_dir', type=str, default='', help='entity document directory')
     parser.add_argument('--inverted_dir', type=str, default='', help='entity document directory')
-    parser.add_argument('--input_entity', type=str, default='', help='querying entity')
+    parser.add_argument('--query_entity', type=str, default='', help='querying entity')
     parser.add_argument('--output_dir', type=str, default='', help='output directory')
     
     args = parser.parse_args()
 
-    with open('{}/INVERTED_INDEX.json'.format(args.inverted_dir), 'r') as f:
-        raw_index = f.read()
+    outputname = 'query_test_output.txt'
+
+    mtools = matching_tools(args.entity_dir, args.inverted_dir, args.sentence_dir)
+
+    mentioned_keys = mtools.entityMentioned(args.query_entity)
+
+    content = mtools.key2Text(mentioned_keys)
+
+    with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
+        f.write('\n'.join(context))
     f.close()
-    inverted_index = json.loads(raw_index)
-
-    with open('{}/entity2id.txt'.format(args.entity_dir), 'r') as f:
-        raw_entity2id = f.read()
-    f.close()
-
-    entity2id = json.loads(raw_entity2id)
-
-    eid = '{}'.format(entity2id[args.input_entity])
-
-    print(inverted_index[eid])
 
 if __name__ == '__main__':
     main()
