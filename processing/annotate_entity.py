@@ -30,7 +30,7 @@ def merge_task(task_list, args):
 
     tokenizer = MWETokenizer(separator=' ')
 
-    for e in entity_list:
+    for e in entityset:
         tokenizer.add_mwe(e.split())
 
     print("successfully read entity file and initialized tokenizer")
