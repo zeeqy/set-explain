@@ -16,7 +16,11 @@ def main():
 
     task_list = os.listdir(args.input_dir)
 
+    num_file = len(task_list)
+
     entity_dict = {}
+
+    count = 0
 
     for fname in task_list:
 
@@ -36,8 +40,9 @@ def main():
                     entity_dict[eid].append(seid)
                 else:
                     entity_dict.update({eid:[seid]})
-
-        print("finished processing {}".format(fname))
+        
+        count += 1
+        print("finished processing {}, {}/{}".format(fname, count, num_file))
         sys.stdout.flush()
 
 if __name__ == '__main__':
