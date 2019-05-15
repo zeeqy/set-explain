@@ -9,8 +9,6 @@ def main():
     parser = argparse.ArgumentParser(description="Keep json format and clean text ")
     parser.add_argument('--input_dir', type=str, default='', help='json document directory')
     parser.add_argument('--output_dir', type=str, default='', help='output directory')
-    parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
-    parser.add_argument('--entity_dir', type=str, default='', help='entity files directory')
     
     args = parser.parse_args()
 
@@ -19,6 +17,8 @@ def main():
     num_file = len(task_list)
 
     entity_dict = {}
+
+    outputname = 'INVERTED_INDEX.json'
 
     count = 0
 
@@ -44,6 +44,10 @@ def main():
         count += 1
         print("finished processing {}, {}/{}".format(fname, count, num_file))
         sys.stdout.flush()
+    
+    with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
+        f.write(json.dumps(entity_dict))
+    f.close()
 
 if __name__ == '__main__':
     main()
