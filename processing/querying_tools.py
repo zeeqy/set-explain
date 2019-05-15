@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 import json, sys, os
+import threading
+import queue
 
 class matching_tools(object):
-	def __init__(self, entity_dir, inverted_dir, sentence_dir):
+	def __init__(self, entity_dir, inverted_dir, sentence_dir, num_process):
 		self.entity_dir = entity_dir
 		self.inverted_dir = inverted_dir
 		self.sentence_dir = sentence_dir
+		self.num_process = num_process
 
 		with open('{}/INVERTED_INDEX.json'.format(self.inverted_dir), 'r') as f:
 			raw_index = f.read()
@@ -43,17 +46,19 @@ class matching_tools(object):
 		else:
 			return False
 
-	def key2Text(self, mentionedKeys):
-		task_list = os.listdir(self.sentence_dir)
+	def _split(self, a, n):
+		k, m = divmod(len(a), n)
+		return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
-		mentionedSet = set(mentionedKeys)
+	def storeInQueue(self, f):
+		def wrapper(*args):
+			my_queue.put(f(*args))
+		return wrapper
 
+	@storeInQueue
+	def merge_task(self, task_list, mentionedSet):
 		content = []
-
 		for fname in task_list:
-			
-			if len(mentionedSet) == 0:
-				break
 
 			sent_json = {}
 			
@@ -65,10 +70,24 @@ class matching_tools(object):
 			key_set = set(sent_json.keys())
 			inter = mentionedSet.intersection(key_set)
 
-			if inter != set():
-				for key in inter:
-					content.append(json.dumps({key:sent_json[key]}))
-				mentionedSet = mentionedSet - inter
+			for key in inter:
+				content.append(json.dumps({key:sent_json[key]}))
+		return content
+
+	def key2Text(self, mentionedKeys):
+		task_list = os.listdir(self.sentence_dir)
+
+		mentionedSet = set(mentionedKeys)
+
+		content = []
+
+		tasks = list(self._split(task_list, self.num_process))
+
+		sent_queue = queue.Queue()
+
+		for i in range(self.num_process):
+			t = threading.Thread(target=self.merge_task, args=(tasks[i], mentionedSet, ))
+			t.start()
+			content += sent_queue.get()
 
 		return content
-			

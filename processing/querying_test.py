@@ -13,13 +13,13 @@ def main():
     parser.add_argument('--inverted_dir', type=str, default='', help='inverted document directory')
     parser.add_argument('--query_entity', type=str, default='', help='querying entity')
     parser.add_argument('--output_dir', type=str, default='', help='output directory')
-    #parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
+    parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
     
     args = parser.parse_args()
 
     outputname = 'query_test_output.txt'
 
-    mtools = matching_tools(args.entity_dir, args.inverted_dir, args.sentence_dir)
+    mtools = matching_tools(args.entity_dir, args.inverted_dir, args.sentence_dir, args.num_process)
 
     print("initialization finished")
     sys.stdout.flush()
