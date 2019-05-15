@@ -10,7 +10,7 @@ break document level json to paragraph level json
 
 def merge_task(task_list, args):
 	for fname in task_list:
-		outputname = 'PARAGRAPH_{}'.format(fname.split('_')[1])
+		outputname = 'PARAGRAPH_{}'.format(fname.split('_')[-1])
 		context = []
 
 		with open('{}/{}'.format(args.input_dir,fname), 'r') as f:

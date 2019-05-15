@@ -11,7 +11,7 @@ break document level json to sentence level json
 
 def merge_task(task_list, args):
 	for fname in task_list:
-		outputname = 'SENTENCE_{}'.format(fname.split('_')[1])
+		outputname = 'SENTENCE_{}'.format(fname.split('_')[-1])
 		context = []
 
 		with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
