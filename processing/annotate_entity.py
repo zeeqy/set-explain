@@ -10,19 +10,19 @@ find entities mentioned in each sentence
 """
 
 def merge_task(task_list, args):
-    with open('{}/entitylist.txt'.format(args.entity_dir,fname), 'r') as f:
+    with open('{}/entitylist.txt'.format(args.entity_dir), 'r') as f:
         raw_list = f.readlines()
     f.close()
 
     entityset = set(raw_list)
 
-    with open('{}/entity2id.txt'.format(args.entity_dir,fname), 'r') as f:
+    with open('{}/entity2id.txt'.format(args.entity_dir), 'r') as f:
         raw_entity2id = f.readlines()
     f.close()
 
     entity2id = json.loads(raw_entity2id)
 
-    with open('{}/id2entity.txt'.format(args.entity_dir,fname), 'r') as f:
+    with open('{}/id2entity.txt'.format(args.entity_dir), 'r') as f:
         raw_id2entity = f.readlines()
     f.close()
 
