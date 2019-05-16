@@ -11,7 +11,7 @@ class matching_tools(object):
 
 		self.inverted_index = pd.read_csv('{}/inverted_index.csv'.format(self.inverted_dir),
 								delimiter='\t', error_bad_lines=False,
-								header=None, names=['eid','mid'], dtype={'eid':str, 'mid':str})
+								header=None, names=['eid','mid'], dtype=['str', 'str'])
 
 		with open('{}/entity2id.txt'.format(self.entity_dir), 'r') as f:
 			raw_entity2id = f.read()
@@ -35,9 +35,9 @@ class matching_tools(object):
 		if self.load_sent == False:
 
 			self.sent_index = pd.read_csv('{}/sentence_entity.csv'.format(self.sentence_dir),
-								delimiter='<nowiki>', error_bad_lines=False,
+								delimiter='|', error_bad_lines=False,
 								header=None, names=['mid','title','did', 'pid', 'sid', 'mentioned', 'text'],
-								dtype={'mid':str, 'title':str, 'did':str, 'pid':str, 'sid':str, 'mentioned':str, 'text':str})
+								dtype=['str','str','str','str','str','str','str'])
 			self.load_sent = True
 
 	def validEntity(self, entity):
@@ -58,7 +58,7 @@ class matching_tools(object):
 		content = []
 
 		for key in mentionedSet:
-			rec = '<nowiki>'.join(self.sent_index.loc[self.sent_index['mid'] == key].values[0].tolist())
+			rec = '|'.join(self.sent_index.loc[self.sent_index['mid'] == key].values[0].tolist())
 			content.append(rec)
 
 		return content

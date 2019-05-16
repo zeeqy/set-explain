@@ -36,7 +36,7 @@ def main():
             mid = list(item_dict.keys())[0]
             if len(item_dict[mid]['mentioned']) != 0:
                 mentioned = ','.join([str(eid) for eid in item_dict[mid]['mentioned']])
-                test = item_dict[mid]['text'].replace('|','')
+                text = item_dict[mid]['text'].replace('|','')
                 ln = """{}|{}|{}|{}|{}|{}|{}""".format(mid, item_dict[mid]['title'], item_dict[mid]['did'], item_dict[mid]['pid'], item_dict[mid]['sid'], mentioned, text)
                 context.append(ln)
 
