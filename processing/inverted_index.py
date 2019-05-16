@@ -18,7 +18,7 @@ def main():
 
     entity_dict = {}
 
-    outputname = 'INVERTED_INDEX.txt'
+    outputname = 'INVERTED_INDEX.csv'
 
     count = 0
 
@@ -48,7 +48,7 @@ def main():
     context = []
 
     for eid in entity_dict.keys():
-        context.append(json.dumps({eid:entity_dict[eid]}))
+        context.append('{}\t{}'.format(eid, ','.join(entity_dict[eid])))
     
     with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
         f.write('\n'.join(context))
