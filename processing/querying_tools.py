@@ -11,7 +11,7 @@ class matching_tools(object):
 
 		self.inverted_index = pd.read_csv('{}/inverted_index.csv'.format(self.inverted_dir),
 								delimiter='\t', error_bad_lines=False,
-								header=None, names=['eid','mid'], dtype=['str', 'str'])
+								header=None, names=['eid','mid'], dtype={'eid':str,'eid':str})
 
 		with open('{}/entity2id.txt'.format(self.entity_dir), 'r') as f:
 			raw_entity2id = f.read()
@@ -37,7 +37,7 @@ class matching_tools(object):
 			self.sent_index = pd.read_csv('{}/sentence_entity.csv'.format(self.sentence_dir),
 								delimiter='|', error_bad_lines=False,
 								header=None, names=['mid','title','did', 'pid', 'sid', 'mentioned', 'text'],
-								dtype=['str','str','str','str','str','str','str'])
+								dtype={'mid':str,'title':str,'did':str, 'pid':str, 'sid':str, 'mentioned':str, 'text':str})
 			self.load_sent = True
 
 	def validEntity(self, entity):
