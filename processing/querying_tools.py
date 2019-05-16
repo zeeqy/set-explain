@@ -36,7 +36,7 @@ class matching_tools(object):
 
 			self.sent_index = pd.read_csv('{}/sentence_entity.csv'.format(self.sentence_dir),
 								delimiter='<nowiki>', error_bad_lines=False,
-								header=None, names=['mid','title','did','pid','sid','mentioned','text'],
+								header=None, names=['mid','title','did', 'pid', 'sid', 'mentioned', 'text'],
 								dtype={'mid':str, 'title':str, 'did':str, 'pid':str, 'sid':str, 'mentioned':str, 'text':str})
 			self.load_sent = True
 
