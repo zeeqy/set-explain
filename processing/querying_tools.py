@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json, sys, os
+import pandas as pd
 
 class matching_tools(object):
 	def __init__(self, entity_dir, inverted_dir, sentence_dir):
@@ -7,12 +8,10 @@ class matching_tools(object):
 		self.inverted_dir = inverted_dir
 		self.sentence_dir = sentence_dir
 		self.load_sent = False
-		self.sent_json = {}
 
-		with open('{}/INVERTED_INDEX.json'.format(self.inverted_dir), 'r') as f:
-			raw_index = f.read()
-		f.close()
-		self.inverted_index = json.loads(raw_index)
+		self.inverted_index = pd.read_csv('{}/inverted_index.csv'.format(self.inverted_dir),
+								delimiter='\t', error_bad_lines=False,
+								header=None, names=['eid','mid'], dtype={'eid':str, 'mid':str})
 
 		with open('{}/entity2id.txt'.format(self.entity_dir), 'r') as f:
 			raw_entity2id = f.read()
@@ -34,10 +33,12 @@ class matching_tools(object):
 
 	def loadSent(self):
 		if self.load_sent == False:
-			with open('{}/SENTENCE_ENTITY.txt'.format(self.sentence_dir), 'r') as f:
-				for line in f:
-					self.sent_json.update(json.loads(line))
-			f.close()
+
+			self.sent_index = pd.read_csv('{}/sentence_entity.csv'.format(self.sentence_dir),
+								delimiter='<nowiki>', error_bad_lines=False,
+								header=None, names=['mid','title','did','pid','sid','mentioned','text'],
+								dtype={'mid':str, 'title':str, 'did':str, 'pid'::str, 'sid':str, 'mentioned':str, 'text':str})
+			self.load_sent = True
 
 	def validEntity(self, entity):
 		return True if entity in self.entityset else False
@@ -48,7 +49,7 @@ class matching_tools(object):
 	def entityMentioned(self, entity):
 		if self.validEntity(entity):
 			eid = '{}'.format(self.eidFinder(entity))
-			return self.inverted_index[eid]
+			return self.inverted_index.loc[self.inverted_index['eid'] == eid].mid.tolist()
 		else:
 			return False
 
@@ -57,6 +58,7 @@ class matching_tools(object):
 		content = []
 
 		for key in mentionedSet:
-			content.append(json.dumps({key:self.sent_json[key]}))
+			rec = '<nowiki>'.join(self.sent_index.loc[self.sent_index['mid'] == key].values[0].tolist())
+			content.append(rec)
 
 		return content
