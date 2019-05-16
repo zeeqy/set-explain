@@ -44,7 +44,7 @@ def split(a, n):
 	return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
 def main():
-	parser = argparse.ArgumentParser(description="Keep json format and clean text ")
+	parser = argparse.ArgumentParser(description="Break document level json")
 	parser.add_argument('--input_dir', type=str, default='', help='json document directory')
 	parser.add_argument('--output_dir', type=str, default='', help='output directory')
 	parser.add_argument('--num_process', type=int, default=2, help='number of parallel')

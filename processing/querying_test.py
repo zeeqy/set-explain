@@ -4,11 +4,11 @@ import time
 from querying_tools import matching_tools
 
 """
-find entities mentioned in each sentence
+query testing
 
 """
 def main():
-    parser = argparse.ArgumentParser(description="Keep json format and clean text ")
+    parser = argparse.ArgumentParser(description="Query testing")
     parser.add_argument('--sentence_dir', type=str, default='', help='sentence document directory')
     parser.add_argument('--entity_dir', type=str, default='', help='entity document directory')
     parser.add_argument('--inverted_dir', type=str, default='', help='inverted document directory')

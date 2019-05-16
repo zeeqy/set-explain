@@ -2,11 +2,11 @@ import json, sys, os
 import argparse
 
 """
-create inverted index
+convert sentence json to csv
 
 """
 def main():
-    parser = argparse.ArgumentParser(description="Create inverted index")
+    parser = argparse.ArgumentParser(description="Convert sentence json to csv")
     parser.add_argument('--input_dir', type=str, default='', help='json document directory')
     parser.add_argument('--output_dir', type=str, default='', help='output directory')
     
@@ -16,9 +16,9 @@ def main():
 
     num_file = len(task_list)
 
-    entity_dict = {}
+    outputname = 'SENTENCE_ENTITY.csv'
 
-    outputname = 'INVERTED_INDEX.csv'
+    context = []
 
     count = 0
 
@@ -33,22 +33,14 @@ def main():
 
         for item in doc:
             item_dict = json.loads(item)
-            seid = list(item_dict.keys())[0]
-            mentioned2id = item_dict[seid]['mentioned']
-            for eid in mentioned2id:
-                if eid in entity_dict.keys():
-                    entity_dict[eid].append(seid)
-                else:
-                    entity_dict.update({eid:[seid]})
-        
+            mid = list(item_dict.keys())[0]
+            mentioned = ','.join(item_dict[mid]['mentioned'])
+            ln = '{}<nowiki>{}<nowiki>{}<nowiki>{}<nowiki>{}<nowiki>{}<nowiki>{}'.format(mid, item_dict[mid]['title'], item_dict[mid]['did'], item_dict[mid]['pid'], item_dict[mid]['sid'], mentioned, item_dict[mid]['text'])
+            context.append(ln)
+
         count += 1
         print("finished processing {}, {}/{}".format(fname, count, num_file))
         sys.stdout.flush()
-
-    context = []
-
-    for eid in entity_dict.keys():
-        context.append('{}\t{}'.format(eid, ','.join(entity_dict[eid])))
     
     with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
         f.write('\n'.join(context))
