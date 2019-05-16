@@ -2,7 +2,7 @@ import json, sys, os
 import argparse
 
 """
-find entities mentioned in each sentence
+create inverted index
 
 """
 def main():
@@ -18,7 +18,7 @@ def main():
 
     entity_dict = {}
 
-    outputname = 'INVERTED_INDEX.json'
+    outputname = 'INVERTED_INDEX.txt'
 
     count = 0
 
@@ -44,9 +44,14 @@ def main():
         count += 1
         print("finished processing {}, {}/{}".format(fname, count, num_file))
         sys.stdout.flush()
+
+    context = []
+
+    for eid in entity_dict.keys():
+        context.append(json.dumps({eid:entity_dict[eid]}))
     
     with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-        f.write(json.dumps(entity_dict))
+        f.write('\n'.join(context))
     f.close()
 
 if __name__ == '__main__':
