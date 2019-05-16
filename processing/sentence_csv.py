@@ -16,13 +16,13 @@ def main():
 
     num_file = len(task_list)
 
-    outputname = 'SENTENCE_ENTITY.csv'
-
-    context = []
-
     count = 0
 
     for fname in task_list:
+
+        context = []
+
+        outputname = 'SENTENCE_ENTITY_{}.csv'.format(fname.split('_')[-1])
 
         print("start processing {}".format(fname))
         sys.stdout.flush()
@@ -42,9 +42,9 @@ def main():
         print("finished processing {}, {}/{}".format(fname, count, num_file))
         sys.stdout.flush()
     
-    with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-        f.write('\n'.join(context))
-    f.close()
+        with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
+            f.write('\n'.join(context))
+        f.close()
 
 if __name__ == '__main__':
     main()
