@@ -49,19 +49,13 @@ class matching_tools(object):
     def entityMentioned(self, entity):
         if self.validEntity(entity):
             eid = '{}'.format(self.eidFinder(entity))
-            return self.inverted_index.loc[self.inverted_index['eid'] == eid].mid.tolist()
+            return self.inverted_index.loc[self.inverted_index['eid'] == eid].mid.tolist()[0].split(',')
         else:
             return False
 
     def key2Text(self, mentionedKeys):
         mentionedSet = set(mentionedKeys)
-        content = []
-
-        for key in mentionedSet:
-            rec = '|'.join(self.sent_index.loc[self.sent_index['mid'] == key].values[0].tolist())
-            content.append(rec)
-
-        return content
+        return self.sent_index.loc[self.sent_index.mid.isin(mentionedSet)]
 
     def parseMentions(self, mlist):
         mentions = {}
