@@ -2,7 +2,7 @@ import json, sys, os, re
 import argparse
 import bisect
 import spacy
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_sm", disable=['ner'])
 import threading
 
 """
