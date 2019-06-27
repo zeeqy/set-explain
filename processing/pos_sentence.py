@@ -23,6 +23,7 @@ def merge_task(task_list, args):
 			item_dict = json.loads(item)
 			doc = nlp(item_dict['text'])
 			item_dict['nsubj'] = ','.join([chunk.text for chunk in doc.noun_chunks if chunk.root.dep_ == 'nsubj'])
+			context.append(json.dumps(item_dict))
 		
 		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
 			f.write('\n'.join(context))
