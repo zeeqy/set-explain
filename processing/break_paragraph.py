@@ -44,8 +44,8 @@ def more_clean(text):
 	new_text = new_text.replace(' ? ', '? ')
 	new_text = new_text.replace(' ; ', '; ')
 	new_text = new_text.replace(' : ', ': ')
-	new_text = re.sub(r'<.*?>', '', next_text)
-	next_text = next_text.encode("ascii", errors="ignore").decode()
+	new_text = re.sub(r'<.*?>', '', new_text)
+	new_text = new_text.encode("ascii", errors="ignore").decode()
 	return new_text.strip()
 
 def split(a, n):
