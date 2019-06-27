@@ -27,13 +27,26 @@ def merge_task(task_list, args):
 				para_json['title'] = title
 				para_json['did'] = item_dict['id']
 				para_json['pid'] = pid
-				para_json['text'] = p.lower()
+				para_json['text'] = more_clean(p.lower())
 				pid += 1
 				context.append(json.dumps(para_json))
 		
 		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
 			f.write('\n'.join(context))
 		f.close()
+
+# this can merge into json_clean.py
+def more_clean(text):
+	new_text = re.sub(r'\([^)]*\)', '', text)
+	new_text = new_text.replace(' , ', ', ')
+	new_text = new_text.replace(' . ', '. ')
+	new_text = new_text.replace(' ! ', '! ')
+	new_text = new_text.replace(' ? ', '? ')
+	new_text = new_text.replace(' ; ', '; ')
+	new_text = new_text.replace(' : ', ': ')
+	new_text = re.sub(r'<.*?>', '', next_text)
+	next_text = next_text.encode("ascii", errors="ignore").decode()
+	return new_text.strip()
 
 def split(a, n):
 	k, m = divmod(len(a), n)
