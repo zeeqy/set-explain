@@ -20,7 +20,7 @@ def extract_np(psent):
 	np_list = []
 	if psent.label() == 'NP':
 		np_str = ' '.join(psent.leaves()).replace('``','"').replace("''",'"')
-		np_str = re.sub(r'\s+([?.!,:; @#$%^&*()]|(\'s))', r'\1', np_str).replace(' " ',' "')
+		np_str = re.sub(r'\s+([?.!,:; @#$%^&*()]|(\'s))', r'\1', np_str)
 		doubleq = re.findall(r'\"(.+?)\"',np_str)
 		for st in doubleq:
 			np_str = np_str.replace(st, st.strip())
