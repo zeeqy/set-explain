@@ -20,7 +20,7 @@ def merge_task(task_list, args):
 			doc = f.readlines()
 		f.close()
 
-		for item in tqdm(doc, desc='{}'.format(fname), mininterval=300):
+		for item in tqdm(doc, desc='{}'.format(fname), mininterval=30):
 			item_dict = json.loads(item)
 			doc = nlp(item_dict['text'])
 			item_dict['nsubj'] = [{'npsubj':chunk.text, 'nproot':chunk.root.text} for chunk in doc.noun_chunks if chunk.root.dep_ == 'nsubj']
