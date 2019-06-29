@@ -39,12 +39,12 @@ def findNPRange(nps, text):
 		nprange.append([nphrase, start_idx, end_idx])
 	return nprange
 
-def findNsubj(basicDep):
+def findNsubj(basicDep, tokens):
 	nsubj = []
 	for parsed in [depparsed for depparsed in basicDep if depparsed['dep'] == 'nsubj']:
 		text = parsed['dependentGloss']
 		index = basicDep.index(parsed) - 1
-		token = content['sentences'][0]['tokens'][index]
+		token = tokens[index]
 		nsubj.append([text,token['characterOffsetBegin'], token['characterOffsetEnd']])
 	return nsubj
 
@@ -66,7 +66,7 @@ def merge_task(task_list, args):
 			tree = nltk.tree.ParentedTree.fromstring(content['sentences'][0]['parse'])
 			
 			nps = extract_np(tree)
-			nsubj = findNsubj(content['sentences'][0]['basicDependencies'])
+			nsubj = findNsubj(content['sentences'][0]['basicDependencies'], content['sentences'][0]['tokens'])
 			nprange = findNPRange(nps, text)
 			
 			if len(nsubj) == 0:
