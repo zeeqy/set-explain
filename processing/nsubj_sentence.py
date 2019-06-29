@@ -61,7 +61,7 @@ def merge_task(task_list, args):
 
 		for item in doc:
 			item_dict = json.loads(item)
-			text = re.sub(r'\s+([?.!,:;"\' @#$%^&*()])', r'\1', item_dict['text'])
+			text = re.sub(r'\s+([?.!,:; @#$%^&*()]|(\'s))', r'\1', item_dict['text'])
 			item_dict['text'] = text
 			r = requests.post(URL, data=text)
 			content = r.json()
