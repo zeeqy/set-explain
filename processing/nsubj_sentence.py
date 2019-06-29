@@ -20,7 +20,7 @@ def extract_np(psent):
 	np_list = []
 	if psent.label() == 'NP':
 		np_str = ' '.join(psent.leaves())
-		return re.sub(r'\s([?.!"](?:\s|$))', r'\1', np_str)
+		return re.sub(r'\s+([?.!,:;"])', r'\1', np_str)
 	else:
 		for child in psent:
 			rec = extract_np(child)
@@ -34,7 +34,7 @@ def extract_np(psent):
 def findNPRange(nps, text):
 	nprange = []
 	for nphrase in nps:
-		print(text, nphrase)
+		#print(text, nphrase)
 		start_idx = text.index(nphrase)
 		end_idx = start_idx + len(nphrase)
 		nprange.append([nphrase, start_idx, end_idx])
