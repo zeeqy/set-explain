@@ -19,8 +19,8 @@ def extract_np(psent):
 	
 	np_list = []
 	if psent.label() == 'NP':
-		np_str = ' '.join(psent.leaves())
-		return re.sub(r'\s+([?.!,:;"\' @#$%^&*()])', r'\1', np_str)
+		np_str = ' '.join(psent.leaves()).replace('``','"').replace("''",'"')
+		return re.sub(r'\s+([?.!,:;" @#$%^&*()]|(\'s))', r'\1', np_str)
 	else:
 		for child in psent:
 			rec = extract_np(child)
