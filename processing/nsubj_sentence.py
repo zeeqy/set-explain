@@ -110,7 +110,7 @@ if __name__ == '__main__':
 	stop_command = 'pkill -f StanfordCoreNLPServer'
 	print("Run CoreNLP Server")
 	sys.stdout.flush()
-	subprocess.Popen(start_command.split())
+	subprocess.Popen(start_command, shell=True)
 	print("Wait for loading")
 	sys.stdout.flush()
 	time.sleep(180)
@@ -118,6 +118,6 @@ if __name__ == '__main__':
 	sys.stdout.flush()
 	main()
 	print("Stop CoreNLP Server")
-	subprocess.Popen(stop_command.split())
+	subprocess.Popen(stop_command, shell=True)
 	print("Done!")
 	sys.stdout.flush()
