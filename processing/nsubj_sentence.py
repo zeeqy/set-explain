@@ -4,6 +4,7 @@ import bisect
 import nltk
 import threading
 import subprocess
+from tqdm import tqdm
 
 URL = 'http://localhost:9071/?properties={"annotators": "parse", "outputFormat": "json"}'
 
@@ -64,7 +65,9 @@ def merge_task(task_list, args):
 			doc = f.readlines()
 		f.close()
 
-		for item in doc:
+		#for item in doc:
+		for i in tqdm(range(len(doc)), desc='{}'.format(fname)):
+			item = doc[i]
 			item_dict = json.loads(item)
 			text = re.sub(r'\s+([?.!,:; @+-=<>{}#$%^&*()]|(\'s))', r'\1', item_dict['text'])
 			item_dict['text'] = text
@@ -116,7 +119,7 @@ def main():
 		t.start()
 
 if __name__ == '__main__':
-	start_command = 'java -Xmx20G -cp "/mnt/nfs/work1/allan/zhiqihuang/stanford-corenlp-full-2018-10-05/*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9071 -timeout 60000 -threads 8 -maxCharLength 100000 -quiet True -preload tokenize,ssplit,pos,lemma,ner,parse,depparse,coref,openie'
+	start_command = ''
 	stop_command = 'pkill -f StanfordCoreNLPServer'
 	print("Run CoreNLP Server")
 	sys.stdout.flush()
