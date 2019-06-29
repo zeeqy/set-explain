@@ -20,7 +20,7 @@ def extract_np(psent):
 	np_list = []
 	if psent.label() == 'NP':
 		np_str = ' '.join(psent.leaves()).replace('``','"').replace("''",'"')
-		np_str = re.sub(r'\s+([?.!,:; @#$%^&*()]|(\'s))', r'\1', np_str)
+		np_str = re.sub(r'\s+([?.!,:; @+-=<>{}#$%^&*()]|(\'s))', r'\1', np_str)
 		doubleq = re.findall(r'\"(.+?)\"',np_str)
 		for st in doubleq:
 			np_str = np_str.replace(st, st.strip())
@@ -38,8 +38,9 @@ def extract_np(psent):
 def findNPRange(nps, text):
 	nprange = []
 	for nphrase in nps:
-		print(text, nphrase)
-		start_idx = text.index(nphrase)
+		start_idx = text.find(nphrase)
+		if start_idx == -1:
+			continue
 		end_idx = start_idx + len(nphrase)
 		nprange.append([nphrase, start_idx, end_idx])
 	return nprange
@@ -65,7 +66,7 @@ def merge_task(task_list, args):
 
 		for item in doc:
 			item_dict = json.loads(item)
-			text = re.sub(r'\s+([?.!,:; @#$%^&*()]|(\'s))', r'\1', item_dict['text'])
+			text = re.sub(r'\s+([?.!,:; @+-=<>{}#$%^&*()]|(\'s))', r'\1', item_dict['text'])
 			item_dict['text'] = text
 			r = requests.post(URL, data=text)
 			content = r.json()
