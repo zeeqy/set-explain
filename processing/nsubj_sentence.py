@@ -113,7 +113,7 @@ if __name__ == '__main__':
 	subprocess.Popen(start_command.split())
 	print("Wait for loading")
 	sys.stdout.flush()
-	time.sleep(40)
+	time.sleep(180)
 	print("Main function start")
 	sys.stdout.flush()
 	main()
