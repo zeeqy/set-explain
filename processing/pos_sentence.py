@@ -2,7 +2,8 @@ import json, sys, os, re
 import argparse
 import bisect
 import spacy
-nlp = spacy.load("en_core_web_sm", disable=['ner'])
+from tqdm import tqdm
+nlp = spacy.load("en_core_web_lg", disable=['ner'])
 import threading
 
 """
@@ -19,10 +20,11 @@ def merge_task(task_list, args):
 			doc = f.readlines()
 		f.close()
 
-		for item in doc:
+		for i in tqdm(range(len(doc)), desc='{}'.format(fname)):
+			item = doc[i]
 			item_dict = json.loads(item)
 			doc = nlp(item_dict['text'])
-			item_dict['nsubj'] = ','.join([chunk.text for chunk in doc.noun_chunks if chunk.root.dep_ == 'nsubj'])
+			item_dict['nsubj'] = [{'npsubj':chunk.text, 'nproot':chunk.root.text}for chunk in doc.noun_chunks if chunk.root.dep_ == 'nsubj']
 			context.append(json.dumps(item_dict))
 		
 		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
