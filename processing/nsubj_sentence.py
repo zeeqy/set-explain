@@ -34,6 +34,7 @@ def extract_np(psent):
 def findNPRange(nps, text):
 	nprange = []
 	for nphrase in nps:
+		print(text, nphrase)
 		start_idx = text.index(nphrase)
 		end_idx = start_idx + len(nphrase)
 		nprange.append([nphrase, start_idx, end_idx])
