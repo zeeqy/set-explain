@@ -69,7 +69,10 @@ def merge_task(task_list, args):
 			text = re.sub(r'\s+([?.!,:; @+-=<>{}#$%^&*()]|(\'s))', r'\1', item_dict['text'])
 			item_dict['text'] = text
 			r = requests.post(URL, data=text)
-			content = r.json()
+			try:
+				content = r.json()
+			except json.decoder.JSONDecodeError:
+				continue
 			tree = nltk.tree.ParentedTree.fromstring(content['sentences'][0]['parse'])
 			
 			nps = extract_np(tree)
