@@ -5,7 +5,7 @@ import nltk
 import threading
 import subprocess
 
-URL = 'http://127.0.0.1:9071/?properties={"annotators": "parse", "outputFormat": "json"}'
+URL = 'http://0.0.0.0:9071/?properties={"annotators": "parse", "outputFormat": "json"}'
 
 """
 add nsubj tag to sentence level json
