@@ -74,11 +74,11 @@ def merge_task(task_list, args):
 			
 			np_subj = []
 			for ns in nsubj:
-    			np_subj += [npr[0] for npr in nprange if npr[2] >= ns[2] and npr[1] <= ns[1]]
+				np_subj += [npr[0] for npr in nprange if npr[2] >= ns[2] and npr[1] <= ns[1]]
 
-    		item_dict['npsubj'] = np_subj
+			item_dict['npsubj'] = np_subj
 
-    		context.append(item_dict)
+			context.append(item_dict)
 
 		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
 			f.write('\n'.join(context))
