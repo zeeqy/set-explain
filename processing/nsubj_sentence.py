@@ -102,6 +102,8 @@ def split(a, n):
 	return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
 def main():
+	print("Main function start")
+	sys.stdout.flush()
 	parser = argparse.ArgumentParser(description="Break document level json")
 	parser.add_argument('--input_dir', type=str, default='', help='json document directory')
 	parser.add_argument('--output_dir', type=str, default='', help='output directory')
@@ -119,18 +121,4 @@ def main():
 		t.start()
 
 if __name__ == '__main__':
-	start_command = ''
-	stop_command = 'pkill -f StanfordCoreNLPServer'
-	print("Run CoreNLP Server")
-	sys.stdout.flush()
-	#subprocess.Popen(start_command, shell=True)
-	print("Wait for loading")
-	sys.stdout.flush()
-	#time.sleep(120)
-	print("Main function start")
-	sys.stdout.flush()
 	main()
-	#print("Stop CoreNLP Server")
-	#subprocess.Popen(stop_command, shell=True)
-	print("Done!")
-	sys.stdout.flush()
