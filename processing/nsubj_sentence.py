@@ -5,7 +5,7 @@ import nltk
 import threading
 import subprocess
 
-URL = 'http://localhost:9071/?properties={"annotators": "parse", "outputFormat": "json"}'
+URL = 'http://0:0:0:0:0:0:0:0:9071/?properties={"annotators": "parse", "outputFormat": "json"}'
 
 """
 add nsubj tag to sentence level json
@@ -113,7 +113,7 @@ if __name__ == '__main__':
 	subprocess.Popen(start_command, shell=True)
 	print("Wait for loading")
 	sys.stdout.flush()
-	time.sleep(180)
+	time.sleep(120)
 	print("Main function start")
 	sys.stdout.flush()
 	main()
