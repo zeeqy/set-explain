@@ -3,8 +3,7 @@ import argparse
 import bisect
 import spacy
 from tqdm import tqdm
-nlp = spacy.load("en_core_web_lg", disable=['ner'])
-import threading
+import multiprocessing as mp
 
 """
 add special POS to sentence level json
@@ -12,6 +11,7 @@ add special POS to sentence level json
 """
 
 def merge_task(task_list, args):
+	nlp = spacy.load("en_core_web_lg", disable=['ner'])
 	for fname in task_list:
 		outputname = 'SPECIAL_SENTENCE_{}'.format(fname.split('_')[-1])
 		context = []
@@ -45,11 +45,13 @@ def main():
 	input_dir = os.listdir(args.input_dir)
 	tasks = list(split(input_dir, args.num_process))
 
-	threads = []
-	for i in range(args.num_process):
-		t = threading.Thread(target=merge_task, args=(tasks[i], args, ))
-		threads.append(t)
-		t.start()
+	processes = [mp.Process(target=merge_task, args=(tasks[i], args)) for i in range(args.num_process)]
+
+	for p in processes:
+		p.start()
+
+	for p in processes:
+		p.join()
 
 if __name__ == '__main__':
 	main()
