@@ -3,7 +3,7 @@ import argparse
 import bisect
 import spacy
 from tqdm import tqdm
-import multiprocessing as mp
+import threading
 
 """
 add special POS to sentence level json
@@ -45,13 +45,11 @@ def main():
 	input_dir = os.listdir(args.input_dir)
 	tasks = list(split(input_dir, args.num_process))
 
-	processes = [mp.Process(target=merge_task, args=(tasks[i], args)) for i in range(args.num_process)]
-
-	for p in processes:
-		p.start()
-
-	for p in processes:
-		p.join()
+	threads = []
+	for i in range(args.num_process):
+		t = threading.Thread(target=merge_task, args=(tasks[i], args, ))
+		threads.append(t)
+		t.start()
 
 if __name__ == '__main__':
 	main()
