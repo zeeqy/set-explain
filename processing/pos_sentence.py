@@ -3,7 +3,7 @@ import argparse
 import bisect
 import spacy
 from tqdm import tqdm
-nlp = spacy.load("en_core_web_sm", disable=['ner'])
+nlp = spacy.load("en_core_web_lg", disable=['ner'])
 import threading
 
 """

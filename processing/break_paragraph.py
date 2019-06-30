@@ -38,13 +38,9 @@ def merge_task(task_list, args):
 # this can merge into json_clean.py
 def more_clean(text):
 	new_text = re.sub(r'\([^)]*\)', '', text)
-	new_text = new_text.replace(' , ', ', ')
-	new_text = new_text.replace(' . ', '. ')
-	new_text = new_text.replace(' ! ', '! ')
-	new_text = new_text.replace(' ? ', '? ')
-	new_text = new_text.replace(' ; ', '; ')
-	new_text = new_text.replace(' : ', ': ')
+	new_text = re.sub(r'\s+([?.!,:; @+-=<>{}#$%^&*()]|(\'s))', r'\1', new_text)
 	new_text = re.sub(r'<.*?>', '', new_text)
+	new_text.replace('(', '').replace(')','').replace('[', '').replace(']', '').replace('{', '').replace('}', '')
 	new_text = new_text.encode("ascii", errors="ignore").decode()
 	return new_text.strip()
 
