@@ -1,7 +1,7 @@
 import json, sys, os, re
 import argparse
 import bisect
-import threading
+import multiprocessing as mp
 
 """
 break document level json to paragraph level json
@@ -38,7 +38,7 @@ def merge_task(task_list, args):
 # this can merge into json_clean.py
 def more_clean(text):
 	new_text = re.sub(r'\([^)]*\)', '', text)
-	new_text = re.sub(r'\s+([?.!,:; @+-=<>{}#$%^&*()]|(\'s))', r'\1', new_text)
+	new_text = re.sub(r'\s+([?.!,:; @+\-=<>{}#$%^&*()]|(\'s))', r'\1', new_text)
 	new_text = re.sub(r'<.*?>', '', new_text)
 	new_text.replace('(', '').replace(')','').replace('[', '').replace(']', '').replace('{', '').replace('}', '')
 	new_text = new_text.encode("ascii", errors="ignore").decode()
@@ -59,11 +59,13 @@ def main():
 	input_dir = os.listdir(args.input_dir)
 	tasks = list(split(input_dir, args.num_process))
 
-	threads = []
-	for i in range(args.num_process):
-		t = threading.Thread(target=merge_task, args=(tasks[i], args, ))
-		threads.append(t)
-		t.start()
+	processes = [mp.Process(target=merge_task, args=(tasks[i], args)) for i in range(args.num_process)]
+
+	for p in processes:
+		p.start()
+
+	for p in processes:
+		p.join()
 
 if __name__ == '__main__':
 	main()
