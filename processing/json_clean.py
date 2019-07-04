@@ -86,11 +86,13 @@ def main():
 	dump_dir = os.listdir(args.input_dir)
 	tasks = list(split(dump_dir, args.num_process))
 
-	threads = []
-	for i in range(args.num_process):
-		t = threading.Thread(target=merge_task, args=(tasks[i], invalid, args, ))
-		threads.append(t)
-		t.start()
+	processes = [mp.Process(target=merge_task, args=(tasks[i], invalid, args)) for i in range(args.num_process)]
+
+	for p in processes:
+		p.start()
+
+	for p in processes:
+		p.join()
 
 if __name__ == '__main__':
 	main()
