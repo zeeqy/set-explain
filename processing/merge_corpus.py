@@ -1,85 +1,53 @@
 import json, sys, os, re
 import argparse
 import bisect
-import threading
+import multiprocessing as mp
+from tqdm import tqdm
 
 """
-Merge wiki dump json into corpus
+merge paragraph to corpus
 
 """
 
-def merge_task(task_list, invalid, args):
-	for folder in task_list:
+def merge_task(task_list, args):
+	for fname in task_list:
+		outputname = 'CORPUS_{}'.format(fname.split('_')[-1])
 		context = []
-		outputname = 'CONCAT_{}'.format(folder) 
-		working_dir = '{}/{}'.format(args.input_dir,folder)
-		for fname in os.listdir(working_dir):
-			with open('{}/{}'.format(working_dir,fname), 'r') as f:
-				raw = f.readlines()
-			f.close()
-			for item in raw:
-				item_dict = json.loads(item)
-				if item_dict['title'] in invalid:
-					continue
-				else:
-					paragraph = parse(item_dict['text'])
-					context.append(paragraph)
-		if context != []:
-			with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-				f.write('\n'.join(context))
-			f.close()
+
+		with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
+			doc = f.readlines()
+		f.close()
+
+		for item in tqdm(doc, desc='{}'.format(fname), mininterval=30):
+			item_dict = json.loads(item)
+			context.append(item_dict['text'].strip())
+
+		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
+			f.write('\n'.join(context))
+		f.close()
 
 def split(a, n):
 	k, m = divmod(len(a), n)
 	return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
-def parse(text):
-	new_text = text.replace('<br>','\n')
-	new_text = new_text.replace('\n\n',' ')
-	new_text = new_text.replace('\n',' ')
-	new_text = new_text.replace('<nowiki>','')
-	new_text = new_text.replace('</nowiki>','')
-	new_text = new_text.replace('<onlyinclude>','')
-	new_text = new_text.replace('</onlyinclude>','')
-	new_text = new_text.replace('()','')
-	new_text = new_text.replace('  ',' ')
-	new_text = new_text.replace('  ',' ')
-	new_text = re.sub(r'\[\[\bCategory:\b.*?\]\]', '', new_text)
-	new_text = re.sub(r'\[\[(?:[^\]|]*\|)?([^\]|]*)\]\]', r'\1', new_text)
-	new_text = re.sub(r'\[\[\bFile:\b.*?\|\bthumb\b\|.*?\]\]\ ', '', new_text)
-	new_text = new_text.replace('\n',' ')
-	new_text = new_text.replace('  ',' ')
-	new_text = new_text.replace('  ',' ')
-	new_text = new_text.replace('[...]','')
-	new_text = new_text.replace('( )','')
-	new_text = new_text.replace('\n',' ')
-	new_text = new_text.replace('  ',' ')
-	new_text = new_text.replace('  ',' ')
-	return new_text.strip()
-
 def main():
-	parser = argparse.ArgumentParser(description="Merge json in to corpus")
-	parser.add_argument('--input_dir', type=str, default='', help='dump file directory')
+	parser = argparse.ArgumentParser(description="Break document level json")
+	parser.add_argument('--input_dir', type=str, default='', help='json document directory')
 	parser.add_argument('--output_dir', type=str, default='', help='output directory')
 	parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
-	parser.add_argument('--invlaid_list', type=str, default='', help='list of invalid pages')
 	
 	args = parser.parse_args()
 
-	with open(args.invlaid_list, 'r') as f:
-		invalid = f.read()
-	f.close()
+	input_dir = os.listdir(args.input_dir)
+	tasks = list(split(input_dir, args.num_process))
 
-	invalid = set(invalid.split('\n'))
+	processes = [mp.Process(target=merge_task, args=(tasks[i], args)) for i in range(args.num_process)]
 
-	dump_dir = os.listdir(args.input_dir)
-	tasks = list(split(dump_dir, args.num_process))
+	for p in processes:
+		p.start()
 
-	threads = []
-	for i in range(args.num_process):
-		t = threading.Thread(target=merge_task, args=(tasks[i], invalid, args, ))
-		threads.append(t)
-		t.start()
+	for p in processes:
+		p.join()
 
 if __name__ == '__main__':
 	main()
