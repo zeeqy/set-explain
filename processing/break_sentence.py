@@ -3,6 +3,7 @@ import argparse
 import bisect
 import nltk
 import multiprocessing as mp
+from tqdm import tqdm
 
 """
 break document level json to sentence level json
@@ -18,7 +19,7 @@ def merge_task(task_list, args):
 			doc = f.readlines()
 		f.close()
 
-		for item in doc:
+		for item in tqdm(doc, desc='{}'.format(fname), mininterval=30):
 			item_dict = json.loads(item)
 			title = item_dict['title']
 			did = item_dict['did']

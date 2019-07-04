@@ -1,7 +1,8 @@
 import json, sys, os, re
 import argparse
 import bisect
-import threading
+import multiprocessing as mp
+from tqdm import tqdm
 
 """
 keep json format and clean text 
@@ -17,7 +18,7 @@ def merge_task(task_list, invalid, args):
 			with open('{}/{}'.format(working_dir,fname), 'r') as f:
 				raw = f.readlines()
 			f.close()
-			for item in raw:
+			for item in tqdm(raw, desc='{}'.format(fname), mininterval=30):
 				item_dict = json.loads(item)
 				if item_dict['title'] in invalid:
 					continue # filter out invalid documents
@@ -43,7 +44,6 @@ def parse(text):
 	new_text = new_text.replace('</nowiki>','')
 	new_text = new_text.replace('<onlyinclude>','')
 	new_text = new_text.replace('</onlyinclude>','')
-	new_text = re.sub(r'(<.*>)', '', new_text)
 	new_text = new_text.replace('()','')
 	new_text = new_text.replace('  ',' ')
 	new_text = new_text.replace('  ',' ')
@@ -61,6 +61,11 @@ def parse(text):
 	new_text = new_text.replace('  ',' ')
 	new_text = new_text.replace('  ',' ')
 	new_text = new_text.replace('\n\n','\n')
+	new_text = re.sub(r'\([^)]*\)', '', new_text)
+	new_text = re.sub(r'\s+([?.!,:; @+\-=<>{}#%^&*()]|(\'s))', r'\1', new_text)
+	new_text = re.sub(r'<.*?>', '', new_text)
+	new_text.replace('(', '').replace(')','').replace('[', '').replace(']', '').replace('{', '').replace('}', '')
+	new_text = new_text.encode("ascii", errors="ignore").decode()
 	return new_text.strip()
 
 def main():
