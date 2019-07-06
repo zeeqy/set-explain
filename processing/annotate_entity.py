@@ -1,7 +1,8 @@
 import json, sys, os, re
 import argparse
 import bisect
-import threading
+import multiprocessing as mp
+from tqdm import tqdm
 from nltk.tokenize import MWETokenizer
 
 """
@@ -10,23 +11,11 @@ find entities mentioned in each sentence
 """
 
 def merge_task(task_list, args):
-    with open('{}/entitylist.txt'.format(args.entity_dir), 'r') as f:
+    with open('{}/wiki_quality.txt'.format(args.entity_dir), 'r') as f:
         raw_list = f.read()
     f.close()
 
     entityset = set(raw_list.split('\n'))
-
-    with open('{}/entity2id.txt'.format(args.entity_dir), 'r') as f:
-        raw_entity2id = f.read()
-    f.close()
-
-    entity2id = json.loads(raw_entity2id)
-
-    with open('{}/id2entity.txt'.format(args.entity_dir), 'r') as f:
-        raw_id2entity = f.read()
-    f.close()
-
-    id2entity = json.loads(raw_id2entity)
 
     tokenizer = MWETokenizer(separator=' ')
 
@@ -44,15 +33,14 @@ def merge_task(task_list, args):
             doc = f.readlines()
         f.close()
 
-        for item in doc:
+        for item in tqdm(doc, desc='{}'.format(fname), mininterval=30):
             item_dict = json.loads(item)
             raw_tokenized = tokenizer.tokenize(item_dict['text'].split())
             tokenized_set = set(raw_tokenized)
-            mentioned_entity = tokenized_set.intersection(entityset)
-            mentioned2id = [entity2id[e] for e in mentioned_entity]
-            label = "{}-{}-{}".format(item_dict['did'],item_dict['pid'],item_dict['sid'])
-            item_dict.update({'mentioned':mentioned2id})
-            context.append(json.dumps({label:item_dict}))
+            mentioned_entity = list(tokenized_set.intersection(entityset))
+            if len(mentioned_entity) != 0:
+                item_dict.update({'entityMentioned':mentioned_entity})
+                context.append(json.dumps(item_dict))
 
         with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
             f.write('\n'.join(context))
@@ -74,11 +62,13 @@ def main():
     input_dir = os.listdir(args.input_dir)
     tasks = list(split(input_dir, args.num_process))
 
-    threads = []
-    for i in range(args.num_process):
-        t = threading.Thread(target=merge_task, args=(tasks[i], args, ))
-        threads.append(t)
-        t.start()
+    processes = [mp.Process(target=merge_task, args=(tasks[i], args)) for i in range(args.num_process)]
+
+    for p in processes:
+        p.start()
+
+    for p in processes:
+        p.join()
 
 if __name__ == '__main__':
     main()
