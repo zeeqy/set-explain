@@ -28,7 +28,7 @@ def merge_task(task_list, args):
         
         if context != []:
             with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-                f.write('\n'.join(context))
+                f.write('\n'.join(json.dumps(context)))
             f.close()
 
 def split(a, n):
