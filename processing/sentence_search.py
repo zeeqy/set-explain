@@ -13,7 +13,7 @@ search sentence based on keywords
 def merge_task(task_list, args):
     keywords = set(args.keywords.split(','))
     for fname in task_list:
-        outputname = '{}_{}'.format(args.output_prefix,fname)
+        outputname = '{}_{}'.format(args.output_prefix,fname.split('_')[-1])
         context = []
 
         with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
@@ -22,14 +22,14 @@ def merge_task(task_list, args):
 
         for item in tqdm(doc, desc='{}'.format(fname), mininterval=30):
             item_dict = json.loads(item)
-            entity_text = set([em['text'] for em in item_dict['np_chunks']])
+            entity_text = set([em for em in item_dict['entityMentioned']])
             if entity_text.intersection(keywords) == keywords:
-                context.append(item_dict['tokens'])
+                context.append(json.dumps(item_dict))
         
         if context != []:
 
             with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-                f.write('\n'.join([json.dumps(sent) for sent in context]))
+                f.write('\n'.join(context))
             f.close()
 
 def split(a, n):
