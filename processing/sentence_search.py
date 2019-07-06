@@ -23,7 +23,7 @@ def merge_task(task_list, args):
         for item in tqdm(doc, desc='{}'.format(fname), mininterval=30):
             item_dict = json.loads(item)
             entity_text = set([em['text'] for em in item_dict['entityMentions']])
-            if entity_text.intersectionn(keywords) == keywords:
+            if entity_text.intersection(keywords) == keywords:
                 context.append(item_dict['tokens'])
         
         if context != []:
