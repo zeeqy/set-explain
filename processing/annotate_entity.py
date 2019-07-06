@@ -3,6 +3,7 @@ import argparse
 import bisect
 import multiprocessing as mp
 from tqdm import tqdm
+import string
 from nltk.tokenize import MWETokenizer
 
 """
@@ -35,7 +36,8 @@ def merge_task(task_list, args):
 
         for item in tqdm(doc, desc='{}'.format(fname), mininterval=30):
             item_dict = json.loads(item)
-            raw_tokenized = tokenizer.tokenize(item_dict['text'].split())
+            sent = item_dict['text'].translate(str.maketrans('', '', string.punctuation))
+            raw_tokenized = tokenizer.tokenize(sent.split())
             tokenized_set = set(raw_tokenized)
             mentioned_entity = list(tokenized_set.intersection(entityset))
             if len(mentioned_entity) != 0:
