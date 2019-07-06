@@ -13,7 +13,7 @@ search sentence based on keywords
 def merge_task(task_list, args):
     keywords = set(args.keywords.split(','))
     for fname in task_list:
-        outputname = '{}_{}'.format(args.outputname,fname)
+        outputname = '{}_{}'.format(args.output_prefix,fname)
         context = []
 
         with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
