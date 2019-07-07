@@ -32,7 +32,7 @@ def merge_task(task_list, args, outputs):
             if entity_text.intersection(keywords) == keywords:
                 doc = nlp(item_dict['text'])
                 nsubj = [chunk.text for chunk in doc.noun_chunks if chunk.root.dep_ == 'nsubj']
-                if keywords[0] in nsubj:
+                if list(keywords)[0] in nsubj:
                     context.append(item_dict)
 
     outputs.put(context)
