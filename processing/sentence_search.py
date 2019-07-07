@@ -20,7 +20,12 @@ def merge_task(task_list, args, outputs):
         f.close()
 
         for item in tqdm(doc, desc='{}'.format(fname), mininterval=30):
-            item_dict = json.loads(item)
+            try:
+                item_dict = json.loads(item)
+            except:
+                print(fname, item)
+                sys.stdout.flush()
+                continue
             entity_text = set([em for em in item_dict['entityMentioned']])
             if entity_text.intersection(keywords) == keywords:
                 context.append(item_dict)
