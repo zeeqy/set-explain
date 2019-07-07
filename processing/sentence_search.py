@@ -3,7 +3,7 @@ import argparse
 import bisect
 import nltk
 import multiprocessing as mp
-import spacy
+import collections
 from tqdm import tqdm
 
 """
@@ -12,9 +12,7 @@ search sentence based on keywords
 """
 
 def merge_task(task_list, args, outputs):
-    nlp = spacy.load("en_core_web_lg", disable=['ner'])
-    kwlt = args.keywords.split(',')
-    kwset = set(kwlt)
+    keywords = set(args.keywords.split(','))
     context = []
     for fname in task_list:
 
@@ -30,11 +28,8 @@ def merge_task(task_list, args, outputs):
                 sys.stdout.flush()
                 continue
             entity_text = set([em for em in item_dict['entityMentioned']])
-            if entity_text.intersection(kwset) == kwset:
-                doc = nlp(item_dict['text'])
-                nsubj = [chunk.text for chunk in doc.noun_chunks if chunk.root.dep_ == 'nsubj']
-                if kwlt[0] in nsubj:
-                    context.append(item_dict)
+            if entity_text.intersection(keywords) == keywords:
+                context.append(item_dict)
 
     outputs.put(context)
 
@@ -68,8 +63,12 @@ def main():
     for p in processes:
         p.join()
         
+    #rank sentence
+    count = collections.Counter([res['title'] for res in search_results])
+    most_common = count.most_common()[0][0]
+
     with open('{}/{}'.format(args.output_dir, args.output_prefix), "w+") as f:
-        f.write('\n'.join([json.dumps(res) for res in search_results]))
+        f.write('\n'.join([json.dumps(res) for res in search_results if res['title'] == most_common]))
     f.close()
 
 if __name__ == '__main__':
