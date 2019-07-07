@@ -56,14 +56,12 @@ def main():
 
     for p in processes:
         p.start()
+        search_results += outputs.get()
         
 
     for p in processes:
         p.join()
-
-    for p in processes:
-        search_results += outputs.get()
-
+        
     with open('{}/{}'.format(args.output_dir, args.output_prefix), "w+") as f:
         f.write('\n'.join([json.loads(res) for res in search_results]))
     f.close()
