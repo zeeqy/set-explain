@@ -10,11 +10,10 @@ search sentence based on keywords
 
 """
 
-def merge_task(task_list, args):
+def merge_task(task_list, args, outputs):
     keywords = set(args.keywords.split(','))
+    context = []
     for fname in task_list:
-        outputname = '{}_{}'.format(args.output_prefix,fname.split('_')[-1])
-        context = []
 
         with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
             doc = f.readlines()
@@ -24,13 +23,9 @@ def merge_task(task_list, args):
             item_dict = json.loads(item)
             entity_text = set([em for em in item_dict['entityMentioned']])
             if entity_text.intersection(keywords) == keywords:
-                context.append(json.dumps(item_dict))
-        
-        if context != []:
+                context.append(item_dict)
 
-            with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-                f.write('\n'.join(context))
-            f.close()
+    output.put(context)
 
 def split(a, n):
     k, m = divmod(len(a), n)
@@ -46,16 +41,27 @@ def main():
     
     args = parser.parse_args()
 
+    outputs = mp.Queue()
+    search_results = []
+
     input_dir = os.listdir(args.input_dir)
     tasks = list(split(input_dir, args.num_process))
 
-    processes = [mp.Process(target=merge_task, args=(tasks[i], args)) for i in range(args.num_process)]
+    processes = [mp.Process(target=merge_task, args=(tasks[i], args, outputs)) for i in range(args.num_process)]
 
     for p in processes:
         p.start()
+        
 
     for p in processes:
         p.join()
+
+    for p in processes:
+        search_results += outputs.get()
+
+    with open('{}/{}'.format(args.output_dir, args.output_prefix), "w+") as f:
+        f.write('\n'.join([json.loads(res) for res in search_results]))
+    f.close()
 
 if __name__ == '__main__':
     main()
