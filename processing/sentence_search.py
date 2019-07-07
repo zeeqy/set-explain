@@ -13,7 +13,8 @@ search sentence based on keywords
 
 def merge_task(task_list, args, outputs):
     nlp = spacy.load("en_core_web_lg", disable=['ner'])
-    keywords = set(args.keywords.split(','))
+    kwlt = args.keywords.split(',')
+    kwset = set(kwlt)
     context = []
     for fname in task_list:
 
@@ -29,10 +30,10 @@ def merge_task(task_list, args, outputs):
                 sys.stdout.flush()
                 continue
             entity_text = set([em for em in item_dict['entityMentioned']])
-            if entity_text.intersection(keywords) == keywords:
+            if entity_text.intersection(kwset) == kwset:
                 doc = nlp(item_dict['text'])
                 nsubj = [chunk.text for chunk in doc.noun_chunks if chunk.root.dep_ == 'nsubj']
-                if list(keywords)[0] in nsubj:
+                if kwlt[0] in nsubj:
                     context.append(item_dict)
 
     outputs.put(context)
