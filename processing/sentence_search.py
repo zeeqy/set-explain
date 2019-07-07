@@ -63,7 +63,7 @@ def main():
         p.join()
         
     with open('{}/{}'.format(args.output_dir, args.output_prefix), "w+") as f:
-        f.write('\n'.join([json.loads(res) for res in search_results]))
+        f.write('\n'.join([json.dumps(res) for res in search_results]))
     f.close()
 
 if __name__ == '__main__':
