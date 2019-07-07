@@ -25,7 +25,7 @@ def merge_task(task_list, args, outputs):
             if entity_text.intersection(keywords) == keywords:
                 context.append(item_dict)
 
-    output.put(context)
+    outputs.put(context)
 
 def split(a, n):
     k, m = divmod(len(a), n)
