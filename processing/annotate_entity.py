@@ -5,6 +5,7 @@ import multiprocessing as mp
 from tqdm import tqdm
 import string
 from nltk.tokenize import MWETokenizer
+import nltk
 
 """
 find entities mentioned in each sentence
@@ -21,7 +22,7 @@ def merge_task(task_list, args):
     tokenizer = MWETokenizer(separator=' ')
 
     for e in entityset:
-        tokenizer.add_mwe(e.split())
+        tokenizer.add_mwe(nltk.word_tokenize(e))
 
     print("successfully read entity file and initialized tokenizer")
     sys.stdout.flush()
@@ -36,8 +37,8 @@ def merge_task(task_list, args):
 
         for item in tqdm(doc, desc='{}'.format(fname), mininterval=30):
             item_dict = json.loads(item)
-            sent = item_dict['text'].translate(str.maketrans('', '', string.punctuation))
-            raw_tokenized = tokenizer.tokenize(sent.split())
+            sent = nltk.word_tokenize(item_dict['text'])
+            raw_tokenized = tokenizer.tokenize(sent)
             tokenized_set = set(raw_tokenized)
             mentioned_entity = list(tokenized_set.intersection(entityset))
             if len(mentioned_entity) != 0:
