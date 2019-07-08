@@ -27,9 +27,12 @@ def merge_task(task_list, args, outputs):
                 print(fname, item)
                 sys.stdout.flush()
                 continue
-            entity_text = set([em for em in item_dict['entityMentioned']])
-            if entity_text.intersection(keywords) == keywords:
-                context.append(item_dict)
+            if item_dict['pid'] != 0:
+                continue
+            else:
+                entity_text = set([em for em in item_dict['entityMentioned']])
+                if entity_text.intersection(keywords) == keywords:
+                    context.append(item_dict)
 
     outputs.put(context)
 
@@ -63,12 +66,12 @@ def main():
     for p in processes:
         p.join()
         
-    #rank sentence
-    count = collections.Counter([res['title'] for res in search_results])
-    most_common = count.most_common()[0][0]
+    # #rank sentence
+    # count = collections.Counter([res['title'] for res in search_results])
+    # most_common = count.most_common()[0][0]
 
     with open('{}/{}'.format(args.output_dir, args.output_prefix), "w+") as f:
-        f.write('\n'.join([json.dumps(res) for res in search_results if res['title'] == most_common]))
+        f.write('\n'.join([json.dumps(res) for res in search_results]))
     f.close()
 
 if __name__ == '__main__':
