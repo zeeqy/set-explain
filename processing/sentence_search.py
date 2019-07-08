@@ -27,12 +27,10 @@ def merge_task(task_list, args, outputs):
                 print(fname, item)
                 sys.stdout.flush()
                 continue
-            if item_dict['pid'] != 0:
-                continue
-            else:
-                entity_text = set([em for em in item_dict['entityMentioned']])
-                if entity_text.intersection(keywords) == keywords:
-                    context.append(item_dict)
+
+            entity_text = set([em for em in item_dict['entityMentioned']])
+            if entity_text.intersection(keywords) == keywords:
+                context.append(item_dict)
 
     outputs.put(context)
 
