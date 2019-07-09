@@ -5,15 +5,22 @@ import nltk
 import multiprocessing as mp
 import collections
 from tqdm import tqdm
+import copy
 
 """
 search sentence based on keywords
 
 """
 
-def merge_task(task_list, args, outputs):
-    keywords = set(args.keywords.split(','))
-    context = []
+def merge_task(task_list, args, keywords_dict, outputs):
+    context = copy.deepcopy(keywords_dict)
+    
+    for index in range(len(context)):
+        query = context[index]
+        for ent in query['entities']:
+            query.update({ent:[]})
+        context[index] = query
+
     for fname in task_list:
 
         with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
@@ -29,8 +36,12 @@ def merge_task(task_list, args, outputs):
                 continue
 
             entity_text = set([em for em in item_dict['entityMentioned']])
-            if entity_text.intersection(keywords) == keywords:
-                context.append(item_dict)
+            for index in range(len(context)):
+                query = context[index]
+                for ent in query['entities']:
+                    cooccur = set(query['keywords'] + [ent])
+                    if entity_text.intersection(cooccur) == cooccur:
+                        context[index][ent].append(item_dict)
 
     outputs.put(context)
 
@@ -43,33 +54,55 @@ def main():
     parser.add_argument('--input_dir', type=str, default='', help='autophrase parsed directory')
     parser.add_argument('--output_dir', type=str, default='', help='output directory')
     parser.add_argument('--output_prefix', type=str, default='', help='output filename')
-    parser.add_argument('--keywords', type=str, default='', help='search keywords')
+    parser.add_argument('--keywords_file', type=str, default='', help='search keywords')
     parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
     
     args = parser.parse_args()
 
     outputs = mp.Queue()
-    search_results = []
 
     input_dir = os.listdir(args.input_dir)
     tasks = list(split(input_dir, args.num_process))
 
-    processes = [mp.Process(target=merge_task, args=(tasks[i], args, outputs)) for i in range(args.num_process)]
+    with open('{}'.format(args.keywords_file), 'r') as f:
+        doc = f.readlines()
+    f.close()
+
+    keywords_dict = []
+    for item in doc:
+        keywords_dict.append(json.loads(item))
+
+    search_results = []
+    
+    processes = [mp.Process(target=merge_task, args=(tasks[i], args, keywords_dict, outputs)) for i in range(args.num_process)]
 
     for p in processes:
         p.start()
-        search_results += outputs.get()
-        
-
+        search_results.append(outputs.get())
+    
     for p in processes:
         p.join()
+
+
+    merge_results = search_results[0]
+
+    for pid in range(1, len(search_results)):
+        res = search_results[pid]
+        for qid in range(len(res)):
+            for ent in merge_results[qid]['entities']:
+                merge_results[qid][ent] += res[qid][ent]
+
         
     #rank sentence
-    count = collections.Counter([res['title'] for res in search_results])
-    most_common = count.most_common()[0][0]
+    for qid in range(len(merge_results)):
+        for ent in merge_results[qid]['entities']:
+            sents = merge_results[qid]['entities'][ent]
+            count = collections.Counter([s['title'] for s in sents])
+            most_common = count.most_common()[0][0]
+            merge_results[qid]['entities'][ent] = [s for s in sents if s['title'] == most_common]
 
     with open('{}/{}'.format(args.output_dir, args.output_prefix), "w+") as f:
-        f.write('\n'.join([json.dumps(res) for res in search_results if res['title'] == most_common]))
+        f.write('\n'.join([json.dumps(res) for res in merge_results]))
     f.close()
 
 if __name__ == '__main__':
