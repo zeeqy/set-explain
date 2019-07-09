@@ -64,12 +64,12 @@ def main():
     for p in processes:
         p.join()
         
-    # #rank sentence
-    # count = collections.Counter([res['title'] for res in search_results])
-    # most_common = count.most_common()[0][0]
+    #rank sentence
+    count = collections.Counter([res['title'] for res in search_results])
+    most_common = count.most_common()[0][0]
 
     with open('{}/{}'.format(args.output_dir, args.output_prefix), "w+") as f:
-        f.write('\n'.join([json.dumps(res) for res in search_results]))
+        f.write('\n'.join([json.dumps(res) for res in search_results if res['title'] == most_common]))
     f.close()
 
 if __name__ == '__main__':
