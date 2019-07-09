@@ -96,10 +96,10 @@ def main():
     #rank sentence
     for qid in range(len(merge_results)):
         for ent in merge_results[qid]['entities']:
-            sents = merge_results[qid]['entities'][ent]
+            sents = merge_results[qid][ent]
             count = collections.Counter([s['title'] for s in sents])
             most_common = count.most_common()[0][0]
-            merge_results[qid]['entities'][ent] = [s for s in sents if s['title'] == most_common]
+            merge_results[qid][ent] = [s for s in sents if s['title'] == most_common]
 
     with open('{}/{}'.format(args.output_dir, args.output_prefix), "w+") as f:
         f.write('\n'.join([json.dumps(res) for res in merge_results]))
