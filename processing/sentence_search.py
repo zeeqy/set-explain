@@ -3,6 +3,7 @@ import argparse
 import bisect
 import nltk
 import multiprocessing as mp
+from multiprocessing import Pool
 import collections
 from tqdm import tqdm
 import copy
@@ -15,7 +16,7 @@ search sentence based on keywords
 def jaccard_similarity(s1, s2):
     return len(s1.intersection(s2)) / len(s1.union(s2))
 
-def merge_task(task_list, args, keywords_dict, outputs):
+def merge_task(task_list, args, keywords_dict):
     context = copy.deepcopy(keywords_dict)
     
     for index in range(len(context)):
@@ -47,7 +48,7 @@ def merge_task(task_list, args, keywords_dict, outputs):
                         item_dict['score'] = jaccard_similarity(cooccur, entity_text)
                         context[index][ent].append(item_dict)
 
-    outputs.put(context)
+    return context
 
 def split(a, n):
     k, m = divmod(len(a), n)
@@ -63,8 +64,6 @@ def main():
     
     args = parser.parse_args()
 
-    outputs = mp.Queue()
-
     input_dir = os.listdir(args.input_dir)
     tasks = list(split(input_dir, args.num_process))
 
@@ -76,18 +75,11 @@ def main():
     for item in doc:
         keywords_dict.append(json.loads(item))
 
-    search_results = []
+    inputs = [(tasks[i], args, keywords_dict) for i in range(args.num_process)]
+
+    with Pool(args.num_process) as p:
+        search_results = p.map(merge_task, inputs)
     
-    processes = [mp.Process(target=merge_task, args=(tasks[i], args, keywords_dict, outputs)) for i in range(args.num_process)]
-
-    for p in processes:
-        p.start()
-        search_results.append(outputs.get())
-    
-    for p in processes:
-        p.join()
-
-
     merge_results = search_results[0]
 
     for pid in range(1, len(search_results)):
