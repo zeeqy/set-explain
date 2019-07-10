@@ -16,7 +16,9 @@ search sentence based on keywords
 def jaccard_similarity(s1, s2):
     return len(s1.intersection(s2)) / len(s1.union(s2))
 
-def merge_task(task_list, args, keywords_dict):
+def merge_task(params):
+    (task_list, args, keywords_dict) = params
+
     context = copy.deepcopy(keywords_dict)
     
     for index in range(len(context)):
@@ -75,7 +77,7 @@ def main():
     for item in doc:
         keywords_dict.append(json.loads(item))
 
-    inputs = [(tasks[i], args, keywords_dict, ) for i in range(args.num_process)]
+    inputs = [(tasks[i], args, keywords_dict) for i in range(args.num_process)]
 
     with Pool(args.num_process) as p:
         search_results = p.map(merge_task, inputs)
