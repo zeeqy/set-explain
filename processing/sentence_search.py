@@ -38,9 +38,6 @@ def merge_task(task_list, args, keywords_dict, outputs):
                 sys.stdout.flush()
                 continue
 
-            if item_dict['pid'] != 0:
-                continue
-
             entity_text = set([em for em in item_dict['entityMentioned']])
             for index in range(len(context)):
                 query = context[index]
@@ -107,11 +104,11 @@ def main():
             count = collections.Counter([s['title'] for s in sents])
             most_common = count.most_common()[0][0]
             doc_sents = [s for s in sents if s['title'] == most_common]
-            # if len(doc_sents) > 3:
-            #     sorted_sents = sorted(doc_sents, key = lambda s: s['score'], reverse=True) 
-            #     merge_results[qid][ent] = sorted_sents[0:3]
-            # else:
-            merge_results[qid][ent] = doc_sents
+            if len(doc_sents) > 3:
+                sorted_sents = sorted(doc_sents, key = lambda s: s['score'], reverse=True) 
+                merge_results[qid][ent] = sorted_sents[0:3]
+            else:
+                merge_results[qid][ent] = doc_sents
 
     with open('{}/{}'.format(args.output_dir, args.output_prefix), "w+") as f:
         f.write('\n'.join([json.dumps(res) for res in merge_results]))
