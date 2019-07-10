@@ -41,6 +41,7 @@ def merge_task(task_list, args, keywords_dict, outputs):
                 for ent in query['entities']:
                     cooccur = set(query['keywords'] + [ent])
                     if entity_text.intersection(cooccur) == cooccur:
+                        item_dict['score'] = len(cooccur) / len(entity_text)
                         context[index][ent].append(item_dict)
 
     outputs.put(context)
@@ -97,9 +98,10 @@ def main():
     for qid in range(len(merge_results)):
         for ent in merge_results[qid]['entities']:
             sents = merge_results[qid][ent]
-            count = collections.Counter([s['title'] for s in sents])
-            most_common = count.most_common()[0][0]
-            merge_results[qid][ent] = [s for s in sents if s['title'] == most_common]
+            sorted_sents = sorted(sents, key = lambda s: s['score'], reverse=True) 
+            #count = collections.Counter([s['title'] for s in sents])
+            #most_common = count.most_common()[0][0]
+            merge_results[qid][ent] = [s for s in sorted_sents[0:3]]
 
     with open('{}/{}'.format(args.output_dir, args.output_prefix), "w+") as f:
         f.write('\n'.join([json.dumps(res) for res in merge_results]))
