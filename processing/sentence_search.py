@@ -39,7 +39,7 @@ def merge_task(task_list, args, keywords_dict, outputs):
             for index in range(len(context)):
                 query = context[index]
                 for ent in query['entities']:
-                    cooccur = set(query['keywords'] + [ent])
+                    cooccur = set(query['keywords'] + [ent.replace('_', ' ')])
                     if entity_text.intersection(cooccur) == cooccur:
                         item_dict['score'] = len(cooccur) / len(entity_text)
                         context[index][ent].append(item_dict)
