@@ -46,7 +46,7 @@ def merge_task(task_list, args, keywords_dict, outputs):
                 query = context[index]
                 for ent in query['entities']:
                     cooccur = set(query['keywords'] + [ent.replace('_', ' ')])
-                    if ent.replace('_', ' ') in entity_text && len(entity_text.intersection(cooccur)) >= 2:
+                    if ent.replace('_', ' ') in entity_text and len(entity_text.intersection(cooccur)) >= 2:
                         item_dict['score'] = jaccard_similarity(cooccur, entity_text)
                         context[index][ent].append(item_dict)
 
