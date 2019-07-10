@@ -75,7 +75,7 @@ def main():
     for item in doc:
         keywords_dict.append(json.loads(item))
 
-    inputs = [(tasks[i], args, keywords_dict) for i in range(args.num_process)]
+    inputs = [(tasks[i], args, keywords_dict, ) for i in range(args.num_process)]
 
     with Pool(args.num_process) as p:
         search_results = p.map(merge_task, inputs)
