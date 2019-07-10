@@ -105,7 +105,7 @@ def main():
                 sorted_sents = sorted(doc_sents, key = lambda s: s['score'], reverse=True) 
                 merge_results[qid][ent] = sorted_sents[0:3]
             else:
-                merge_results[qid][ent] doc_sents
+                merge_results[qid][ent] = doc_sents
 
     with open('{}/{}'.format(args.output_dir, args.output_prefix), "w+") as f:
         f.write('\n'.join([json.dumps(res) for res in merge_results]))
