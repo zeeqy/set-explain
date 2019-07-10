@@ -12,6 +12,9 @@ search sentence based on keywords
 
 """
 
+def jaccard_similarity(s1, s2):
+    return len(s1.intersection(s2)) / len(s1.union(s2))
+
 def merge_task(task_list, args, keywords_dict, outputs):
     context = copy.deepcopy(keywords_dict)
     
@@ -43,8 +46,8 @@ def merge_task(task_list, args, keywords_dict, outputs):
                 query = context[index]
                 for ent in query['entities']:
                     cooccur = set(query['keywords'] + [ent.replace('_', ' ')])
-                    if entity_text.intersection(cooccur) == cooccur:
-                        item_dict['score'] = len(cooccur) / len(entity_text)
+                    if ent.replace('_', ' ') in entity_text && len(entity_text.intersection(cooccur)) >= 2:
+                        item_dict['score'] = jaccard_similarity(cooccur, entity_text)
                         context[index][ent].append(item_dict)
 
     outputs.put(context)
