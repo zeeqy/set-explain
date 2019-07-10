@@ -125,7 +125,7 @@ def main():
         transform_res.append({'context': context, 'target': target})
 
     with open('{}/{}_pair.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
-        f.write('\n'.join([json.dumps(res) for res in merge_results]))
+        f.write('\n'.join([json.dumps(res) for res in transform_res]))
     f.close()
 
 if __name__ == '__main__':
