@@ -110,7 +110,21 @@ def main():
             else:
                 merge_results[qid][ent] = doc_sents
 
-    with open('{}/{}'.format(args.output_dir, args.output_prefix), "w+") as f:
+    with open('{}/{}_full.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
+        f.write('\n'.join([json.dumps(res) for res in merge_results]))
+    f.close()
+
+    transform_res = []
+    for res in merge_results:
+        target = res['title']
+        context = ''
+        for ent in res['entities']:
+            if len(res[ent]) != 0:
+                context += ' '.join([s['text'] for s in res[ent]])
+                context += ' '
+        transform_res.append({'context': context, 'target': target})
+
+    with open('{}/{}_pair.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
         f.write('\n'.join([json.dumps(res) for res in merge_results]))
     f.close()
 
