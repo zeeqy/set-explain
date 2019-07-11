@@ -6,6 +6,7 @@ import multiprocessing as mp
 from multiprocessing import Pool
 import collections
 from tqdm import tqdm
+from random import shuffle
 import copy
 
 """
@@ -116,10 +117,36 @@ def main():
             if len(res[ent]) != 0:
                 context += ' '.join([s['text'] for s in res[ent]])
                 context += ' '
-        transform_res.append({'context': context, 'target': target})
+        transform_res.append({'context': context.strip(), 'target': target})
 
-    with open('{}/{}_pair.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
-        f.write('\n'.join([json.dumps(res) for res in transform_res]))
+    shuffle(transform_res)
+
+    valid_set = transform_res[0:int(len(transform_res) * 0.2)]
+    test_set = transform_res[int(len(transform_res) * 0.2) : 2 * int(len(transform_res) * 0.2)]
+    train_set = transform_res[2 * int(len(transform_res) * 0.2):]
+
+    with open('{}/{}_train_data.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
+        f.write('\n'.join([res['context'] for res in train_set]))
+    f.close()
+
+    with open('{}/{}_train_target.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
+        f.write('\n'.join([res['target'] for res in train_set]))
+    f.close()
+
+    with open('{}/{}_val_data.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
+        f.write('\n'.join([res['context'] for res in valid_set]))
+    f.close()
+
+    with open('{}/{}_val_target.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
+        f.write('\n'.join([res['target'] for res in valid_set]))
+    f.close()
+
+    with open('{}/{}_test_data.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
+        f.write('\n'.join([res['context'] for res in test_set]))
+    f.close()
+
+    with open('{}/{}_test_target.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
+        f.write('\n'.join([res['target'] for res in test_set]))
     f.close()
 
 if __name__ == '__main__':
