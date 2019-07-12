@@ -62,7 +62,7 @@ def parse(text):
 	new_text = new_text.replace('  ',' ')
 	new_text = new_text.replace('\n\n','\n')
 	new_text = re.sub(r'\([^)]*\)', '', new_text)
-	new_text = re.sub(r'\s+([?.!,:; @+\-=<>{}#%^&*()]|(\'s))', r'\1', new_text)
+	new_text = re.sub(r'\s+([?.!,:; @+\-=<>{}#%^*()]|(\'s))', r'\1', new_text)
 	new_text = re.sub(r'<.*?>', '', new_text)
 	new_text.replace('(', '').replace(')','').replace('[', '').replace(']', '').replace('{', '').replace('}', '')
 	new_text = new_text.encode("ascii", errors="ignore").decode()
