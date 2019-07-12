@@ -96,9 +96,9 @@ def main():
     for qid in range(len(merge_results)):
         for ent in merge_results[qid]['entities']:
             sents = merge_results[qid][ent]
-            #count = collections.Counter([s['title'] for s in sents])
-            #most_common = count.most_common()[0][0]
-            doc_sents = [s for s in sents] #if s['title'] == most_common]
+            count = collections.Counter([s['title'] for s in sents])
+            most_common = [common[0] for common in count.most_common(2)]
+            doc_sents = [s for s in sents if s['title'] in most_common]
             if len(doc_sents) > 3:
                 sorted_sents = sorted(doc_sents, key = lambda s: s['score'], reverse=True) 
                 merge_results[qid][ent] = sorted_sents[0:3]
