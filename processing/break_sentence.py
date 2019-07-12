@@ -28,14 +28,15 @@ def merge_task(task_list, args):
 			doc = nlp(item_dict['text'])
 			sid = 0
 			for s in doc.sents:
-				sent_json = {}
-				sent_json['title'] = title
-				sent_json['did'] = did
-				sent_json['pid'] = pid
-				sent_json['sid'] = sid
-				sent_json['text'] = s.text
-				sid += 1
-				context.append(json.dumps(sent_json))
+				if len(s) > 5:
+					sent_json = {}
+					sent_json['title'] = title
+					sent_json['did'] = did
+					sent_json['pid'] = pid
+					sent_json['sid'] = sid
+					sent_json['text'] = s.text
+					sid += 1
+					context.append(json.dumps(sent_json))
 		
 		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
 			f.write('\n'.join(context))
