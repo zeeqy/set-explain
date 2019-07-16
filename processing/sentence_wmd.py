@@ -12,7 +12,7 @@ import wmd
 from itertools import product
 
 """
-search sentence based on keywords
+search sentence based on wmd
 
 """
 
@@ -53,9 +53,8 @@ def merge_task(params):
                 for ent in query['entities']:
                     doc = nlp(item_dict['text'])
                     nsubj = [{'npsubj':chunk.text, 'nproot':chunk.root.text} for chunk in doc.noun_chunks if chunk.root.dep_ in ['nsubjpass', 'nsubj']]
-                    ent = keyword.replace('_', ' ')
                     for ns in nsubj:
-                        if ent == ns['nproot']:
+                        if ent.replace('_', ' ') == ns['nproot']:
                             item_dict['text'] = doc
                             context[index][ent].append(item_dict)
     return context
@@ -65,7 +64,7 @@ def split(a, n):
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
 def main():
-    parser = argparse.ArgumentParser(description="search sentence based on keywords")
+    parser = argparse.ArgumentParser(description="search sentence based on wmd")
     parser.add_argument('--input_dir', type=str, default='', help='autophrase parsed directory')
     parser.add_argument('--output_dir', type=str, default='', help='output directory')
     parser.add_argument('--output_prefix', type=str, default='', help='output filename')
