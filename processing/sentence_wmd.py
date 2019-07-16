@@ -20,7 +20,6 @@ def merge_task(params):
     (task_list, args, queries_dict) = params
 
     nlp = spacy.load('en_core_web_lg')
-    nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
 
     context = copy.deepcopy(queries_dict)
     
@@ -58,7 +57,6 @@ def merge_task(params):
                     nsubj = [{'npsubj':chunk.text, 'nproot':chunk.root.text} for chunk in doc.noun_chunks if chunk.root.dep_ in ['nsubjpass', 'nsubj']]
                     for ns in nsubj:
                         if key == ns['nproot']:
-                            item_dict['doc'] = doc
                             context[index][ent].append(item_dict)
     return context
 
@@ -75,6 +73,9 @@ def main():
     parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
     
     args = parser.parse_args()
+    
+    nlp = spacy.load('en_core_web_lg')
+    nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
 
     input_dir = os.listdir(args.input_dir)
     tasks = list(split(input_dir, args.num_process))
@@ -110,9 +111,11 @@ def main():
             current_wmd = 0
             for index in range(len(pairs)-1):
                 try:
-                    current_wmd += pairs[index]['doc'].similarity(pairs[index+1]['doc'])
+                    doc1 = nlp(pairs[index]['text'])
+                    doc2 = nlp(pairs[index+1]['text'])
+                    current_wmd += doc1.similarity(doc2)
                 except:
-                    print(pairs[index]['doc'].text, pairs[index+1]['doc'].text)
+                    print(pairs[index]['text'], pairs[index+1]['text'])
             if current_wmd < best_wmd:
                 best_wmd = current_wmd
                 best_pair = pairs
