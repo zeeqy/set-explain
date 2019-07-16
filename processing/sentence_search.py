@@ -1,7 +1,6 @@
 import json, sys, os, re
 import argparse
 import bisect
-import nltk
 import multiprocessing as mp
 from multiprocessing import Pool
 import collections
