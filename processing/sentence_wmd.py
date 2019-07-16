@@ -109,7 +109,10 @@ def main():
         for pairs in prod:
             current_wmd = 0
             for index in range(len(pairs)-1):
-                current_wmd += pairs[index]['doc'].similarity(pairs[index+1]['doc'])
+                try:
+                    current_wmd += pairs[index]['doc'].similarity(pairs[index+1]['doc'])
+                except:
+                    print(pairs[index]['doc'].text, pairs[index+1]['doc'].text)
             if current_wmd < best_wmd:
                 best_wmd = current_wmd
                 best_pair = pairs
