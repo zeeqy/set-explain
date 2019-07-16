@@ -58,7 +58,7 @@ def merge_task(params):
                     nsubj = [{'npsubj':chunk.text, 'nproot':chunk.root.text} for chunk in doc.noun_chunks if chunk.root.dep_ in ['nsubjpass', 'nsubj']]
                     for ns in nsubj:
                         if key == ns['nproot']:
-                            item_dict['text'] = doc
+                            item_dict['doc'] = doc
                             context[index][ent].append(item_dict)
     return context
 
@@ -109,12 +109,11 @@ def main():
         for pairs in prod:
             current_wmd = 0
             for index in range(len(pairs)-1):
-                current_wmd += pairs[index]['text'].similarity(pairs[index+1]['text'])
+                current_wmd += pairs[index]['doc'].similarity(pairs[index+1]['doc'])
             if current_wmd < best_wmd:
                 best_wmd = current_wmd
                 best_pair = pairs
         for index in range(len(merge_results[qid]['entities'])):
-            best_pair[index]['text'] = best_pair[index]['text'].text
             merge_results[qid][merge_results[qid]['entities'][index]] = [best_pair[index]]
 
 
