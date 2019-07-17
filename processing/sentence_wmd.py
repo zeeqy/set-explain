@@ -68,21 +68,21 @@ def merge_wmd(params):
     nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
     (qid, sents) = params
     filtered = [s for s in sents if s != []]
-    prod = list(product(*filtered))
+    index_list = [range(len(s)) for s in filtered]
+    prod = list(product(*index_list))
     best_wmd = 1e10
     best_pair = []
-    for pairs in tqdm(prod, desc='wmd-{}'.format(qid), mininterval=30):
+    for pair in tqdm(prod, desc='wmd-{}'.format(qid), mininterval=30):
+        sents_pair = [filtered[index][pair[index]] for index in range(len(pair))]
         current_wmd = 0
-        for index in range(len(pairs)-1):
-            try:
-                doc1 = nlp(pairs[index]['text'])
-                doc2 = nlp(pairs[index+1]['text'])
-                current_wmd += doc1.similarity(doc2)
-            except:
-                print(pairs[index]['text'], pairs[index+1]['text'])
+        for index in range(len(sents_pair)-1):
+            doc1 = nlp(sents_pair[index]['text'])
+            doc2 = nlp(sents_pair[index+1]['text'])
+            current_wmd += doc1.similarity(doc2)
+
         if current_wmd < best_wmd:
             best_wmd = current_wmd
-            best_pair = pairs
+            best_pair = sents_pair
     return (qid, best_pair)
 
 
@@ -138,10 +138,9 @@ def main():
     for res in merge_results:
         target = res['title']
         context = ''
-        for ent in res['best_context']:
-            if len(res[ent]) != 0:
-                context += ' '.join([s['text'] for s in res[ent]])
-                context += ' '
+        for sents in res['best_context']:
+            if len(sents) != 0:
+                context = ' '.join([s['text'] for s in sents])
         transform_res.append({'context': context.strip(), 'target': target})
 
     shuffle(transform_res)
