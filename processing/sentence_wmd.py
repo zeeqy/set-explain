@@ -105,7 +105,7 @@ def main():
     #wmd all sentence
     for qid in range(len(merge_results)):
         prod = product(*[merge_results[qid][ent] for ent in merge_results[qid]['entities']])
-        best_wmd = 100
+        best_wmd = 1e10
         best_pair = []
         for pairs in prod:
             current_wmd = 0
@@ -119,8 +119,6 @@ def main():
             if current_wmd < best_wmd:
                 best_wmd = current_wmd
                 best_pair = pairs
-
-        print(best_pair)
         for index in range(len(merge_results[qid]['entities'])):
             merge_results[qid][merge_results[qid]['entities'][index]] = [best_pair[index]]
 
