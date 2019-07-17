@@ -120,21 +120,23 @@ def main():
             for ent in merge_results[qid]['entities']:
                 merge_results[qid][ent] += res[qid][ent]
 
+
     #wmd all sentence
     pool = Pool(args.num_process)
-    asyres = []
+    results = []
     for qid in range(len(merge_results)):
         inputs = (qid, [merge_results[qid][ent] for ent in merge_results[qid]['entities']])
 
-        asyres.append(pool.apply_async(merge_wmd(inputs)))
+        results.append(pool.apply_async(merge_wmd(inputs)).get())
     
     pool.close()
     pool.join()
 
-    for results in asyres:
-        res = results.get()
+    for res in results:
         for index in range(len(res[1])):
             merge_results[res[0]][merge_results[res[0]]['entities'][index]] = [res[1][index]]
+
+
 
     with open('{}/{}_full.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
         f.write('\n'.join([json.dumps(res) for res in merge_results]))
