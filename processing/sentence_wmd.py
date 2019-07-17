@@ -134,45 +134,45 @@ def main():
         f.write('\n'.join([json.dumps({k: v for k, v in res.items() if k in ['title', 'entities', 'best_context']}) for res in merge_results]))
     f.close()
 
-    # transform_res = []
-    # for res in merge_results:
-    #     target = res['title']
-    #     context = ''
-    #     for ent in res['entities']:
-    #         if len(res[ent]) != 0:
-    #             context += ' '.join([s['text'] for s in res[ent]])
-    #             context += ' '
-    #     transform_res.append({'context': context.strip(), 'target': target})
+    transform_res = []
+    for res in merge_results:
+        target = res['title']
+        context = ''
+        for ent in res['best_context']:
+            if len(res[ent]) != 0:
+                context += ' '.join([s['text'] for s in res[ent]])
+                context += ' '
+        transform_res.append({'context': context.strip(), 'target': target})
 
-    # shuffle(transform_res)
+    shuffle(transform_res)
 
-    # valid_set = transform_res[0:int(len(transform_res) * 0.2)]
-    # test_set = transform_res[int(len(transform_res) * 0.2) : 2 * int(len(transform_res) * 0.2)]
-    # train_set = transform_res[2 * int(len(transform_res) * 0.2):]
+    valid_set = transform_res[0:int(len(transform_res) * 0.2)]
+    test_set = transform_res[int(len(transform_res) * 0.2) : 2 * int(len(transform_res) * 0.2)]
+    train_set = transform_res[2 * int(len(transform_res) * 0.2):]
 
-    # with open('{}/{}_train_data.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
-    #     f.write('\n'.join([res['context'] for res in train_set]))
-    # f.close()
+    with open('{}/{}_train_data.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
+        f.write('\n'.join([res['context'] for res in train_set]))
+    f.close()
 
-    # with open('{}/{}_train_target.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
-    #     f.write('\n'.join([res['target'] for res in train_set]))
-    # f.close()
+    with open('{}/{}_train_target.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
+        f.write('\n'.join([res['target'] for res in train_set]))
+    f.close()
 
-    # with open('{}/{}_val_data.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
-    #     f.write('\n'.join([res['context'] for res in valid_set]))
-    # f.close()
+    with open('{}/{}_val_data.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
+        f.write('\n'.join([res['context'] for res in valid_set]))
+    f.close()
 
-    # with open('{}/{}_val_target.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
-    #     f.write('\n'.join([res['target'] for res in valid_set]))
-    # f.close()
+    with open('{}/{}_val_target.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
+        f.write('\n'.join([res['target'] for res in valid_set]))
+    f.close()
 
-    # with open('{}/{}_test_data.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
-    #     f.write('\n'.join([res['context'] for res in test_set]))
-    # f.close()
+    with open('{}/{}_test_data.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
+        f.write('\n'.join([res['context'] for res in test_set]))
+    f.close()
 
-    # with open('{}/{}_test_target.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
-    #     f.write('\n'.join([res['target'] for res in test_set]))
-    # f.close()
+    with open('{}/{}_test_target.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
+        f.write('\n'.join([res['target'] for res in test_set]))
+    f.close()
 
 if __name__ == '__main__':
     main()
