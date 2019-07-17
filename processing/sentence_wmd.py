@@ -129,6 +129,8 @@ def main():
     with Pool(args.num_process) as p:
         wmd_results = p.map(merge_wmd, inputs)
 
+    print(wmd_results)
+
     for res in wmd_results:
         for index in range(len(res[1])):
             merge_results[res[0]][merge_results[res[0]]['entities'][index]] = [res[1][index]]
