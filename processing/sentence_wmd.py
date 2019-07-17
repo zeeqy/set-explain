@@ -119,8 +119,11 @@ def main():
             if current_wmd < best_wmd:
                 best_wmd = current_wmd
                 best_pair = pairs
+
+        print(best_pair)
         for index in range(len(merge_results[qid]['entities'])):
             merge_results[qid][merge_results[qid]['entities'][index]] = [best_pair[index]]
+
 
 
     with open('{}/{}_full.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
