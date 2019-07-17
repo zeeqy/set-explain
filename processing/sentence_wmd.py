@@ -83,7 +83,7 @@ def merge_wmd(params):
         if current_wmd < best_wmd:
             best_wmd = current_wmd
             best_pair = pairs
-    return (qid, best_pair)
+    return list(qid, best_pair)
 
 
 def main():
