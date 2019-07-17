@@ -120,25 +120,20 @@ def main():
             for ent in merge_results[qid]['entities']:
                 merge_results[qid][ent] += res[qid][ent]
 
-
     #wmd all sentence
     pool = Pool(args.num_process)
-    results = []
     inputs = [(qid, [merge_results[qid][ent] for ent in merge_results[qid]['entities']]) for qid in range(len(merge_results))]
     
     with Pool(args.num_process) as p:
         wmd_results = p.map(merge_wmd, inputs)
 
-    print(wmd_results)
-
     for res in wmd_results:
-        for index in range(len(res[1])):
-            merge_results[res[0]][merge_results[res[0]]['entities'][index]] = [res[1][index]]
+        merge_results[res[0]]['best_context'] = res[1]
 
-
+    select_results = {k: v for k, v in merge_results.items() if k in ['title', 'entities', 'best_context']}
 
     with open('{}/{}_full.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
-        f.write('\n'.join([json.dumps(res) for res in merge_results]))
+        f.write('\n'.join([json.dumps(res) for res in select_results]))
     f.close()
 
     # transform_res = []
