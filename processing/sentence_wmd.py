@@ -50,13 +50,12 @@ def merge_task(params):
             for index in range(len(context)):
                 query = context[index]
                 for ent in query['entities']:
-                    key = ent.replace('_', ' ')
-                    if key not in entity_text:
+                    if ent not in entity_text:
                         continue
                     doc = nlp(item_dict['text'])
                     nsubj = [{'npsubj':chunk.text, 'nproot':chunk.root.text} for chunk in doc.noun_chunks if chunk.root.dep_ in ['nsubjpass', 'nsubj']]
                     for ns in nsubj:
-                        if key == ns['nproot']:
+                        if ent == ns['nproot'] or ent == ns['npsubj']:
                             context[index][ent].append(item_dict)
     return context
 
