@@ -107,7 +107,7 @@ def main():
         prod = product(*[merge_results[qid][ent] for ent in merge_results[qid]['entities']])
         best_wmd = 1e10
         best_pair = []
-        for pairs in prod:
+        for pairs in tqdm(prod, desc='wmd', mininterval=30):
             current_wmd = 0
             for index in range(len(pairs)-1):
                 try:
