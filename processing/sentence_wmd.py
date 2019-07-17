@@ -129,11 +129,9 @@ def main():
 
     for res in wmd_results:
         merge_results[res[0]]['best_context'] = res[1]
-
-    select_results = {k: v for k, v in merge_results.items() if k in ['title', 'entities', 'best_context']}
-
+        
     with open('{}/{}_full.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
-        f.write('\n'.join([json.dumps(res) for res in select_results]))
+        f.write('\n'.join([json.dumps({k: v for k, v in res.items() if k in ['title', 'entities', 'best_context']}) for res in merge_results]))
     f.close()
 
     # transform_res = []
