@@ -71,7 +71,7 @@ def merge_wmd(params):
     prod = list(product(*filtered))
     best_wmd = 1e10
     best_pair = []
-    for pairs in tqdm(prod, desc='wmd-{}'.format(pid), mininterval=30):
+    for pairs in tqdm(prod, desc='wmd-{}'.format(qid), mininterval=30):
         current_wmd = 0
         for index in range(len(pairs)-1):
             try:
