@@ -138,10 +138,9 @@ def main():
     for res in merge_results:
         target = res['title']
         context = ''
-        for sents in res['best_context']:
-            if len(sents) != 0:
-                context = ' '.join([s['text'] for s in sents])
-        transform_res.append({'context': context.strip(), 'target': target})
+        if len(res['best_context']) != 0:
+            context = ' '.join([s['text'] for s in res['best_context']])
+            transform_res.append({'context': context.strip(), 'target': target})
 
     shuffle(transform_res)
 
