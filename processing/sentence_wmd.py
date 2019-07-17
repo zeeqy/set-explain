@@ -83,7 +83,7 @@ def merge_wmd(params):
         if current_wmd < best_wmd:
             best_wmd = current_wmd
             best_pair = pairs
-    return [qid, best_pair]
+    return (qid, best_pair)
 
 
 def main():
@@ -124,15 +124,12 @@ def main():
     #wmd all sentence
     pool = Pool(args.num_process)
     results = []
-    for qid in range(len(merge_results)):
-        inputs = (qid, [merge_results[qid][ent] for ent in merge_results[qid]['entities']])
-
-        results.append(pool.apply_async(merge_wmd(inputs)).get())
+    inputs = [(qid, [merge_results[qid][ent] for ent in merge_results[qid]['entities']]) for qid in range(len(merge_results))]
     
-    pool.close()
-    pool.join()
+    with Pool(args.num_process) as p:
+        wmd_results = p.map(merge_wmd, inputs)
 
-    for res in results:
+    for res in wmd_results:
         for index in range(len(res[1])):
             merge_results[res[0]][merge_results[res[0]]['entities'][index]] = [res[1][index]]
 
