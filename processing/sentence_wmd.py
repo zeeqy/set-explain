@@ -63,6 +63,29 @@ def split(a, n):
     k, m = divmod(len(a), n)
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
+def merge_wmd(params):
+    nlp = spacy.load('en_core_web_lg')
+    nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
+    (qid, sents) = params
+    filtered = [s for s in sents if s != []]
+    prod = list(product(*filtered))
+    best_wmd = 1e10
+    best_pair = []
+    for pairs in tqdm(prod, desc='wmd', mininterval=30):
+        current_wmd = 0
+        for index in range(len(pairs)-1):
+            try:
+                doc1 = nlp(pairs[index]['text'])
+                doc2 = nlp(pairs[index+1]['text'])
+                current_wmd += doc1.similarity(doc2)
+            except:
+                print(pairs[index]['text'], pairs[index+1]['text'])
+        if current_wmd < best_wmd:
+            best_wmd = current_wmd
+            best_pair = pairs
+    return (qid, best_pair)
+
+
 def main():
     parser = argparse.ArgumentParser(description="search sentence based on wmd")
     parser.add_argument('--input_dir', type=str, default='', help='autophrase parsed directory')
@@ -73,9 +96,6 @@ def main():
     
     args = parser.parse_args()
     
-    nlp = spacy.load('en_core_web_lg')
-    nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
-
     input_dir = os.listdir(args.input_dir)
     tasks = list(split(input_dir, args.num_process))
 
@@ -103,25 +123,19 @@ def main():
     print(merge_results)
 
     #wmd all sentence
+    pool = Pool(args.num_process)
+    results = []
     for qid in range(len(merge_results)):
-        prod = product(*[merge_results[qid][ent] for ent in merge_results[qid]['entities']])
-        best_wmd = 1e10
-        best_pair = []
-        for pairs in tqdm(prod, desc='wmd', mininterval=30):
-            current_wmd = 0
-            for index in range(len(pairs)-1):
-                try:
-                    doc1 = nlp(pairs[index]['text'])
-                    doc2 = nlp(pairs[index+1]['text'])
-                    current_wmd += doc1.similarity(doc2)
-                except:
-                    print(pairs[index]['text'], pairs[index+1]['text'])
-            if current_wmd < best_wmd:
-                best_wmd = current_wmd
-                best_pair = pairs
-        print(best_pair)
-        for index in range(len(merge_results[qid]['entities'])):
-            merge_results[qid][merge_results[qid]['entities'][index]] = [best_pair[index]]
+        inputs = (qid, [merge_results[qid][ent] for ent in merge_results[qid]['entities']])
+
+        results.append(pool.apply_async(merge_wmd(inputs)))
+    
+    pool.close()
+    pool.join()
+
+    for res in results:
+        for index in range(len(res[1])):
+            merge_results[res[0]][merge_results[res[0]]['entities'][index]] = [res[1][index]]
 
 
 
