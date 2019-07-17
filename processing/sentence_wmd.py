@@ -120,8 +120,6 @@ def main():
             for ent in merge_results[qid]['entities']:
                 merge_results[qid][ent] += res[qid][ent]
 
-    print(merge_results)
-
     #wmd all sentence
     pool = Pool(args.num_process)
     results = []
