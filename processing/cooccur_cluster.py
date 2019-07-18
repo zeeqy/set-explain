@@ -73,6 +73,7 @@ def main():
     merge_results = search_results[0]
 
     query = args.query_string.split(',')
+    print(query)
 
     for pid in range(1, len(search_results)):
         res = search_results[pid]
@@ -84,6 +85,7 @@ def main():
         tmp = set()
         for sent in merge_results[ent]:
             tmp.union(set(sent['entityMentioned']))
+        print(ent, len(tmp))
         entityMentioned.update({ent:tmp})
 
     cooccur = entityMentioned[query[0]]
