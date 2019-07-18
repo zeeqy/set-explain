@@ -83,21 +83,21 @@ def main():
     print(merge_results)
     entityMentioned = {}
     for ent in query:
-        tmp = []
+        tmp = set()
         for sent in merge_results[ent]:
-            tmp += sent['entityMentioned']
-        print(ent, len(set(tmp)))
-        entityMentioned.update({ent:set(tmp)})
+            tmp = tmp.union(set([em for em in sent['entityMentioned']]))
+        print(ent, len(tmp))
+        entityMentioned.update({ent:tmp})
 
     cooccur = entityMentioned[query[0]]
     for ent in query:
-        cooccur.intersection(entityMentioned[ent])
+        cooccur = cooccur.intersection(entityMentioned[ent])
 
+    print(cooccur)
     inputs = [(ent, merge_results) for ent in cooccur]
     with Pool(args.num_process) as p:
         cooccur_results = p.map(cooccur_search, inputs)
 
-    print(cooccur)
     with open('cooccur_test.txt', "w+") as f:
         f.write('\n'.join([json.dumps(res) for res in cooccur_results]))
     f.close()
