@@ -32,7 +32,7 @@ def sent_search(params):
                 sys.stdout.flush()
                 continue
 
-            entity_text = set(item_dict['entityMentioned'])
+            entity_text = set([em for em in item_dict['entityMentioned']])
 
             for ent in query:
                 if ent not in entity_text:
@@ -80,11 +80,12 @@ def main():
         for ent in query:
             merge_results[ent] += res[ent]
 
+    print(merge_results)
     entityMentioned = {}
     for ent in query:
         tmp = set()
         for sent in merge_results[ent]:
-            tmp.union(set(sent['entityMentioned']))
+            tmp.union(set([em for em in sent['entityMentioned']]))
         print(ent, len(tmp))
         entityMentioned.update({ent:tmp})
 
