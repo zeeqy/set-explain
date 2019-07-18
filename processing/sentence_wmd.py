@@ -121,7 +121,6 @@ def main():
                 merge_results[qid][ent] += res[qid][ent]
 
     #wmd all sentence
-    pool = Pool(args.num_process)
     inputs = [(qid, [merge_results[qid][ent] for ent in merge_results[qid]['entities']]) for qid in range(len(merge_results))]
     
     with Pool(args.num_process) as p:
