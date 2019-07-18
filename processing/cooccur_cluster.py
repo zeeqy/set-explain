@@ -96,7 +96,7 @@ def main():
 
     print(cooccur)
     with open('cooccur_test.txt', "w+") as f:
-        f.write('\n'.join([json.dumps(res) for res in cooccur_results])
+        f.write('\n'.join([json.dumps(res) for res in cooccur_results]))
     f.close()
 
 if __name__ == '__main__':
