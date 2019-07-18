@@ -83,11 +83,11 @@ def main():
     print(merge_results)
     entityMentioned = {}
     for ent in query:
-        tmp = set()
+        tmp = []
         for sent in merge_results[ent]:
-            tmp.union(set([em for em in sent['entityMentioned']]))
-        print(ent, len(tmp))
-        entityMentioned.update({ent:tmp})
+            tmp += sent['entityMentioned']
+        print(ent, len(set(tmp)))
+        entityMentioned.update({ent:set(tmp)})
 
     cooccur = entityMentioned[query[0]]
     for ent in query:
