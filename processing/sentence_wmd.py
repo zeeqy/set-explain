@@ -121,10 +121,14 @@ def main():
                 merge_results[qid][ent] += res[qid][ent]
 
     #wmd all sentence
+    wmd_results = []
     inputs = [(qid, [merge_results[qid][ent] for ent in merge_results[qid]['entities']]) for qid in range(len(merge_results))]
-    
-    with Pool(args.num_process) as p:
-        wmd_results = p.map(merge_wmd, inputs)
+    tasks = list(split(inputs, args.num_process))
+
+    for task in tasks:
+        with Pool(args.num_process) as p:
+            task_results = p.map(merge_wmd, inputs)
+        wmd_results.append(task_results)
 
     for res in wmd_results:
         merge_results[res[0]]['best_context'] = res[1]
