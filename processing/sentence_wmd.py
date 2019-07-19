@@ -126,8 +126,10 @@ def main():
     tasks = list(split(inputs, args.num_process))
 
     for task in tasks:
-        with Pool(args.num_process) as p:
-            task_results = p.map(merge_wmd, inputs)
+        pool = Pool(args.num_process)
+        task_results = pool.map(merge_wmd, inputs)
+        pool.close()
+        pool.join()
         wmd_results.append(task_results)
 
     for res in wmd_results:
