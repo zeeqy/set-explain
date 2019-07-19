@@ -19,7 +19,7 @@ search sentence based on wmd
 def merge_task(params):
     (task_list, args, queries_dict) = params
 
-    nlp = spacy.load('en_core_web_lg')
+    nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
     context = copy.deepcopy(queries_dict)
     
@@ -64,26 +64,61 @@ def split(a, n):
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
 def merge_wmd(params):
-    nlp = spacy.load('en_core_web_lg')
+    nlp = spacy.load('en_core_web_lg', disable=['ner'])
     nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
     (qid, sents) = params
     filtered = [s for s in sents if s != []]
     index_list = [range(len(s)) for s in filtered]
-    prod = list(product(*index_list))
-    best_wmd = 1e10
+    best_wmd = 1e6
     best_pair = []
-    for pair in tqdm(prod, desc='wmd-{}'.format(qid), mininterval=30):
-        sents_pair = [filtered[index][pair[index]] for index in range(len(pair))]
-        current_wmd = 0
-        for index in range(len(sents_pair)-1):
-            doc1 = nlp(sents_pair[index]['text'])
-            doc2 = nlp(sents_pair[index+1]['text'])
-            current_wmd += doc1.similarity(doc2)
 
-        if current_wmd < best_wmd:
-            best_wmd = current_wmd
-            best_pair = sents_pair
+    if len(filtered) == 3:
+        # first layer
+        for i in tqdm(index_list[0], desc='wmd-{}-3layer'.format(qid), mininterval=30):
+            # last layer
+            for j in index_list[1]:
+                # suppose 3 layer
+                for k in index_list[2]:
+                    doc1 = nlp(filtered[0][i]['text'])
+                    doc2 = nlp(filtered[1][j]['text'])
+                    doc3 = nlp(filtered[2][k]['text'])
+                    dist = doc1.similarity(doc2) + doc2.similarity(doc3)
+                    if dist < best_wmd:
+                        best_wmd = dist
+                        best_pair = [filtered[0][i],filtered[1][j],filtered[2][k]]
+    
+    elif len(filtered) == 2:
+        # first layer
+        for i in tqdm(index_list[0], desc='wmd-{}-2layer'.format(qid), mininterval=30):
+            # last layer
+            for j in index_list[2]:
+                doc1 = nlp(filtered[0][i]['text'])
+                doc2 = nlp(filtered[1][j]['text'])
+                dist = doc1.similarity(doc2)
+                if dist < best_wmd:
+                    dist = best_wmd
+                    best_pair = [filtered[0][i],filtered[1][j]]
+
+    else:
+        best_pair = [filtered[0][0]]
+
     return (qid, best_pair)
+
+    # prod = list(product(*index_list))
+    # best_wmd = 1e10
+    # best_pair = []
+    # for pair in tqdm(prod, desc='wmd-{}'.format(qid), mininterval=30):
+    #     sents_pair = [filtered[index][pair[index]] for index in range(len(pair))]
+    #     current_wmd = 0
+    #     for index in range(len(sents_pair)-1):
+    #         doc1 = nlp(sents_pair[index]['text'])
+    #         doc2 = nlp(sents_pair[index+1]['text'])
+    #         current_wmd += doc1.similarity(doc2)
+
+    #     if current_wmd < best_wmd:
+    #         best_wmd = current_wmd
+    #         best_pair = sents_pair
+    # return (qid, best_pair)
 
 
 def main():
