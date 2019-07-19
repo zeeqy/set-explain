@@ -91,7 +91,7 @@ def merge_wmd(params):
         # first layer
         for i in tqdm(index_list[0], desc='wmd-{}-2layer'.format(qid), mininterval=30):
             # last layer
-            for j in index_list[2]:
+            for j in index_list[1]:
                 doc1 = nlp(filtered[0][i]['text'])
                 doc2 = nlp(filtered[1][j]['text'])
                 dist = doc1.similarity(doc2)
