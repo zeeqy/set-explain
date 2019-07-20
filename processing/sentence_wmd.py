@@ -184,6 +184,8 @@ def main():
 
     transform_res = []
     for res in merge_results:
+        if 'best_context' not in res.keys():
+            continue
         target = res['title']
         context = ''
         if len(res['best_context']) != 0:
