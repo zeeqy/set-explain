@@ -163,7 +163,7 @@ def main():
     for ti in range(len(tasks)):
         print('processing task {}/{}'.format(ti+1,len(tasks)))
         pool = Pool(args.num_process)
-        task_results = pool.map(merge_wmd, task)
+        task_results = pool.map(merge_wmd, tasks[ti])
         pool.close()
         pool.join()
         wmd_results.append(task_results)
