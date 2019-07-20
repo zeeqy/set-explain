@@ -126,7 +126,7 @@ def merge_wmd(params):
 
         context.append([qid, best_pair])
         
-    return (qid, best_pair)
+    return context
 
 
 def main():
