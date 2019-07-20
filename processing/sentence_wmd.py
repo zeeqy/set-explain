@@ -74,54 +74,59 @@ def merge_wmd(params):
         best_wmd = 1e6
         best_pair = []
 
-        if len(filtered) == 3:
-            # first layer
-            for i in tqdm(index_list[0], desc='wmd-{}-3layer'.format(qid), mininterval=30):
-                # last layer
-                for j in index_list[1]:
-                    # suppose 3 layer
-                    for k in index_list[2]:
-                        doc1 = nlp(filtered[0][i]['text'])
-                        doc2 = nlp(filtered[1][j]['text'])
-                        doc3 = nlp(filtered[2][k]['text'])
-                        dist = doc1.similarity(doc2) + doc2.similarity(doc3)
-                        if dist < best_wmd:
-                            best_wmd = dist
-                            best_pair = [filtered[0][i],filtered[1][j],filtered[2][k]]
+    #     if len(filtered) == 3:
+    #         # first layer
+    #         for i in tqdm(index_list[0], desc='wmd-{}-3layer'.format(qid), mininterval=30):
+    #             # last layer
+    #             for j in index_list[1]:
+    #                 # suppose 3 layer
+    #                 for k in index_list[2]:
+    #                     doc1 = nlp(filtered[0][i]['text'])
+    #                     doc2 = nlp(filtered[1][j]['text'])
+    #                     doc3 = nlp(filtered[2][k]['text'])
+    #                     dist = doc1.similarity(doc2) + doc2.similarity(doc3)
+    #                     if dist < best_wmd:
+    #                         best_wmd = dist
+    #                         best_pair = [filtered[0][i],filtered[1][j],filtered[2][k]]
         
-        elif len(filtered) == 2:
-            # first layer
-            for i in tqdm(index_list[0], desc='wmd-{}-2layer'.format(qid), mininterval=30):
-                # last layer
-                for j in index_list[1]:
-                    doc1 = nlp(filtered[0][i]['text'])
-                    doc2 = nlp(filtered[1][j]['text'])
-                    dist = doc1.similarity(doc2)
-                    if dist < best_wmd:
-                        dist = best_wmd
-                        best_pair = [filtered[0][i],filtered[1][j]]
+    #     elif len(filtered) == 2:
+    #         # first layer
+    #         for i in tqdm(index_list[0], desc='wmd-{}-2layer'.format(qid), mininterval=30):
+    #             # last layer
+    #             for j in index_list[1]:
+    #                 doc1 = nlp(filtered[0][i]['text'])
+    #                 doc2 = nlp(filtered[1][j]['text'])
+    #                 dist = doc1.similarity(doc2)
+    #                 if dist < best_wmd:
+    #                     dist = best_wmd
+    #                     best_pair = [filtered[0][i],filtered[1][j]]
 
-        elif len(filtered) == 1:
-            best_pair = [filtered[0][0]]
+    #     elif len(filtered) == 1:
+    #         best_pair = [filtered[0][0]]
+
+    #     context.append([qid, best_pair])
+    # return context
+
+        prod = list(product(*index_list))
+        
+        if len(prod) > 1000000 or len(filtered) < 2:
+            continue
+        
+        for pair in tqdm(prod, desc='wmd-{}'.format(qid), mininterval=30):
+            sents_pair = [filtered[index][pair[index]] for index in range(len(pair))]
+            current_wmd = 0
+            for index in range(len(sents_pair)-1):
+                doc1 = nlp(sents_pair[index]['text'])
+                doc2 = nlp(sents_pair[index+1]['text'])
+                current_wmd += doc1.similarity(doc2)
+
+            if current_wmd < best_wmd:
+                best_wmd = current_wmd
+                best_pair = sents_pair
 
         context.append([qid, best_pair])
-    return context
-
-    # prod = list(product(*index_list))
-    # best_wmd = 1e10
-    # best_pair = []
-    # for pair in tqdm(prod, desc='wmd-{}'.format(qid), mininterval=30):
-    #     sents_pair = [filtered[index][pair[index]] for index in range(len(pair))]
-    #     current_wmd = 0
-    #     for index in range(len(sents_pair)-1):
-    #         doc1 = nlp(sents_pair[index]['text'])
-    #         doc2 = nlp(sents_pair[index+1]['text'])
-    #         current_wmd += doc1.similarity(doc2)
-
-    #     if current_wmd < best_wmd:
-    #         best_wmd = current_wmd
-    #         best_pair = sents_pair
-    # return (qid, best_pair)
+        
+    return (qid, best_pair)
 
 
 def main():
