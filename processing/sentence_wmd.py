@@ -179,7 +179,7 @@ def main():
         merge_results[res[0]]['best_context'] = res[1]
         
     with open('{}/{}_full.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
-        f.write('\n'.join([json.dumps({k: v for k, v in res.items() if k in ['title', 'entities', 'best_context']}) for res in merge_results if res['best_context'] != []]))
+        f.write('\n'.join([json.dumps({k: v for k, v in res.items() if k in ['title', 'entities', 'best_context']}) for res in merge_results if 'best_context' in res.keys()]))
     f.close()
 
     transform_res = []
