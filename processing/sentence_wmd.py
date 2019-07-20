@@ -158,11 +158,12 @@ def main():
     #wmd all sentence
     wmd_results = []
     inputs = [(qid, [merge_results[qid][ent] for ent in merge_results[qid]['entities']]) for qid in range(len(merge_results))]
-    tasks = list(split(inputs, args.num_process))
+    tasks = [inputs[i * args.num_process:(i + 1) * args.num_process] for i in range((len(inputs) + args.num_process - 1) // args.num_process )]  
 
-    for task in tasks:
+    for ti in range(len(tasks)):
+        print('processing task {}/{}'.format(ti+1,len(tasks)))
         pool = Pool(args.num_process)
-        task_results = pool.map(merge_wmd, inputs)
+        task_results = pool.map(merge_wmd, task)
         pool.close()
         pool.join()
         wmd_results.append(task_results)
