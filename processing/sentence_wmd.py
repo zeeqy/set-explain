@@ -99,7 +99,7 @@ def merge_wmd(params):
                     dist = best_wmd
                     best_pair = [filtered[0][i],filtered[1][j]]
 
-    else:
+    elif len(filtered) == 1:
         best_pair = [filtered[0][0]]
 
     return (qid, best_pair)
@@ -172,7 +172,7 @@ def main():
         merge_results[res[0]]['best_context'] = res[1]
         
     with open('{}/{}_full.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
-        f.write('\n'.join([json.dumps({k: v for k, v in res.items() if k in ['title', 'entities', 'best_context']}) for res in merge_results]))
+        f.write('\n'.join([json.dumps({k: v for k, v in res.items() if k in ['title', 'entities', 'best_context']}) for res in merge_results if res['best_context'] != []]))
     f.close()
 
     transform_res = []
