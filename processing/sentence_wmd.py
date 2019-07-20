@@ -66,43 +66,46 @@ def split(a, n):
 def merge_wmd(params):
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
     nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
-    (qid, sents) = params
-    filtered = [s for s in sents if s != []]
-    index_list = [range(len(s)) for s in filtered]
-    best_wmd = 1e6
-    best_pair = []
+    context = []
+    for param in params:
+        (qid, sents) = param
+        filtered = [s for s in sents if s != []]
+        index_list = [range(len(s)) for s in filtered]
+        best_wmd = 1e6
+        best_pair = []
 
-    if len(filtered) == 3:
-        # first layer
-        for i in tqdm(index_list[0], desc='wmd-{}-3layer'.format(qid), mininterval=30):
-            # last layer
-            for j in index_list[1]:
-                # suppose 3 layer
-                for k in index_list[2]:
+        if len(filtered) == 3:
+            # first layer
+            for i in tqdm(index_list[0], desc='wmd-{}-3layer'.format(qid), mininterval=30):
+                # last layer
+                for j in index_list[1]:
+                    # suppose 3 layer
+                    for k in index_list[2]:
+                        doc1 = nlp(filtered[0][i]['text'])
+                        doc2 = nlp(filtered[1][j]['text'])
+                        doc3 = nlp(filtered[2][k]['text'])
+                        dist = doc1.similarity(doc2) + doc2.similarity(doc3)
+                        if dist < best_wmd:
+                            best_wmd = dist
+                            best_pair = [filtered[0][i],filtered[1][j],filtered[2][k]]
+        
+        elif len(filtered) == 2:
+            # first layer
+            for i in tqdm(index_list[0], desc='wmd-{}-2layer'.format(qid), mininterval=30):
+                # last layer
+                for j in index_list[1]:
                     doc1 = nlp(filtered[0][i]['text'])
                     doc2 = nlp(filtered[1][j]['text'])
-                    doc3 = nlp(filtered[2][k]['text'])
-                    dist = doc1.similarity(doc2) + doc2.similarity(doc3)
+                    dist = doc1.similarity(doc2)
                     if dist < best_wmd:
-                        best_wmd = dist
-                        best_pair = [filtered[0][i],filtered[1][j],filtered[2][k]]
-    
-    elif len(filtered) == 2:
-        # first layer
-        for i in tqdm(index_list[0], desc='wmd-{}-2layer'.format(qid), mininterval=30):
-            # last layer
-            for j in index_list[1]:
-                doc1 = nlp(filtered[0][i]['text'])
-                doc2 = nlp(filtered[1][j]['text'])
-                dist = doc1.similarity(doc2)
-                if dist < best_wmd:
-                    dist = best_wmd
-                    best_pair = [filtered[0][i],filtered[1][j]]
+                        dist = best_wmd
+                        best_pair = [filtered[0][i],filtered[1][j]]
 
-    elif len(filtered) == 1:
-        best_pair = [filtered[0][0]]
+        elif len(filtered) == 1:
+            best_pair = [filtered[0][0]]
 
-    return (qid, best_pair)
+        context.append([qid, best_pair])
+    return context
 
     # prod = list(product(*index_list))
     # best_wmd = 1e10
@@ -158,15 +161,12 @@ def main():
     #wmd all sentence
     wmd_results = []
     inputs = [(qid, [merge_results[qid][ent] for ent in merge_results[qid]['entities']]) for qid in range(len(merge_results))]
-    tasks = [inputs[i * args.num_process:(i + 1) * args.num_process] for i in range((len(inputs) + args.num_process - 1) // args.num_process )]  
+    tasks = list(split(inputs, args.num_process))
 
-    for ti in range(len(tasks)):
-        print('processing task {}/{}'.format(ti+1,len(tasks)))
-        pool = Pool(args.num_process)
-        task_results = pool.map(merge_wmd, tasks[ti])
-        pool.close()
-        pool.join()
-        wmd_results.append(task_results)
+    with Pool(args.num_process) as p:
+        wmd_results = p.map(merge_wmd, inputs)
+
+    wmd_results = [item for sublist in l for item in wmd_results]
 
     for res in wmd_results:
         merge_results[res[0]]['best_context'] = res[1]
