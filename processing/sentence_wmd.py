@@ -168,7 +168,7 @@ def main():
     with Pool(args.num_process) as p:
         wmd_results = p.map(merge_wmd, inputs)
 
-    wmd_results = [item for sublist in l for item in wmd_results]
+    wmd_results = [item for sublist in wmd_results for item in sublist]
 
     for res in wmd_results:
         merge_results[res[0]]['best_context'] = res[1]
