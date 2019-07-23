@@ -170,33 +170,36 @@ def main():
                 merge_results[qid][ent] += res[qid][ent]
 
     #wmd all sentence
+    batch_combined = []
     wmd_results = []
     minibatch = 800
 
     chunks = [merge_results[i * minibatch:(i + 1) * minibatch] for i in range((len(merge_results) + minibatch - 1) // minibatch )]
 
     for batch in chunks:
-        tasks = list(split(range(len(chunks)), args.num_process))
+        tasks = list(split(range(len(batch)), args.num_process))
         inputs = []
         for i in range(args.num_process):
-            inputs.append([(qid, [merge_results[qid][ent] for ent in merge_results[qid]['entities']])  for qid in tasks[i]])
+            inputs.append([(qid, [batch[qid][ent] for ent in batch[qid]['entities']])  for qid in tasks[i]])
 
         pool = Pool(args.num_process)
-        wmd_results += pool.map(merge_wmd, inputs)
+        wmd_results = pool.map(merge_wmd, inputs)
         pool.close()
         pool.join()
 
-    wmd_results = [item for sublist in wmd_results for item in sublist]
+        wmd_results = [item for sublist in wmd_results for item in sublist]
 
-    for res in wmd_results:
-        merge_results[res[0]]['best_context'] = res[1]
+        for res in wmd_results:
+            batch[res[0]]['best_context'] = res[1]
+
+        batch_combined += batch
         
     with open('{}/{}_full.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
-        f.write('\n'.join([json.dumps({k: v for k, v in res.items() if k in ['title', 'entities', 'best_context']}) for res in merge_results if 'best_context' in res.keys()]))
+        f.write('\n'.join([json.dumps({k: v for k, v in res.items() if k in ['title', 'entities', 'best_context']}) for res in batch_combined if 'best_context' in res.keys()]))
     f.close()
 
     transform_res = []
-    for res in merge_results:
+    for res in batch_combined:
         if 'best_context' not in res.keys():
             continue
         target = res['title']
