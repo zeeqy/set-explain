@@ -157,7 +157,7 @@ def main():
     inputs = [(tasks[i], args, queries_dict) for i in range(args.num_process)]
 
     pool = Pool(args.num_process)
-    search_results = p.map(merge_task, inputs)
+    search_results = pool.map(merge_task, inputs)
     pool.close()
     pool.join()
     
