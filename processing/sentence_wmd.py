@@ -171,7 +171,7 @@ def main():
 
     #wmd all sentence
     wmd_results = []
-    minibatch = 1000
+    minibatch = 800
 
     chunks = [merge_results[i * minibatch:(i + 1) * minibatch] for i in range((len(merge_results) + minibatch - 1) // minibatch )]
 
