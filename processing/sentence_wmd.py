@@ -10,6 +10,7 @@ import copy
 import spacy
 import wmd
 from itertools import product
+import gc
 
 """
 search sentence based on wmd
@@ -57,6 +58,8 @@ def merge_task(params):
                     for ns in nsubj:
                         if ent == ns['nproot'] or ent == ns['npsubj']:
                             context[index][ent].append(item_dict)
+    del nlp
+    gc.collect()
     return context
 
 def split(a, n):
@@ -125,7 +128,8 @@ def merge_wmd(params):
                 best_pair = sents_pair
 
         context.append([qid, best_pair])
-        
+    del nlp
+    gc.collect()  
     return context
 
 
@@ -152,8 +156,10 @@ def main():
 
     inputs = [(tasks[i], args, queries_dict) for i in range(args.num_process)]
 
-    with Pool(args.num_process) as p:
-        search_results = p.map(merge_task, inputs)
+    pool = Pool(args.num_process)
+    search_results = p.map(merge_task, inputs)
+    pool.close()
+    pool.join()
     
     merge_results = search_results[0]
 
@@ -170,8 +176,10 @@ def main():
     for i in range(args.num_process):
         inputs.append([(qid, [merge_results[qid][ent] for ent in merge_results[qid]['entities']])  for qid in tasks[i]])
 
-    with Pool(args.num_process) as p:
-        wmd_results = p.map(merge_wmd, inputs)
+    pool = Pool(args.num_process)
+    wmd_results = pool.map(merge_wmd, inputs)
+    pool.close()
+    pool.join()
 
     wmd_results = [item for sublist in wmd_results for item in sublist]
 
