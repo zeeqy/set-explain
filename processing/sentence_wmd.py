@@ -171,15 +171,20 @@ def main():
 
     #wmd all sentence
     wmd_results = []
-    tasks = list(split(range(len(merge_results)), args.num_process))
-    inputs = []
-    for i in range(args.num_process):
-        inputs.append([(qid, [merge_results[qid][ent] for ent in merge_results[qid]['entities']])  for qid in tasks[i]])
+    minibatch = 1000
 
-    pool = Pool(args.num_process)
-    wmd_results = pool.map(merge_wmd, inputs)
-    pool.close()
-    pool.join()
+    chunks = [merge_results[i * minibatch:(i + 1) * minibatch] for i in range((len(merge_results) + minibatch - 1) // minibatch )]
+
+    for batch in chunks:
+        tasks = list(split(range(len(chunks)), args.num_process))
+        inputs = []
+        for i in range(args.num_process):
+            inputs.append([(qid, [merge_results[qid][ent] for ent in merge_results[qid]['entities']])  for qid in tasks[i]])
+
+        pool = Pool(args.num_process)
+        wmd_results += pool.map(merge_wmd, inputs)
+        pool.close()
+        pool.join()
 
     wmd_results = [item for sublist in wmd_results for item in sublist]
 
