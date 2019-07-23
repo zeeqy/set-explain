@@ -5,6 +5,9 @@ import multiprocessing as mp
 from multiprocessing import Pool
 import collections
 from tqdm import tqdm
+import spacy
+import wmd
+from itertools import product
 
 """
 group sentence by cooccurrence
@@ -52,6 +55,36 @@ def cooccur_search(params):
         context.update({k:[sent['text'] for sent in merge_results[k] if ent in set(sent['entityMentioned'])]})
     return context
 
+def cooccur_cluster(params):
+    (jobs, args) = params
+    query = args.query_string.split(',')
+    nlp = spacy.load('en_core_web_lg', disable=['ner'])
+    nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
+    context = []
+    for job in jobs:
+        sents = [job[ent] for ent in query]
+        index_list = [range(len(s)) for s in sents]
+        best_wmd = 1e6
+        best_pair = []
+        prod = list(product(*index_list))
+        if len(prod) > 1000000:
+            continue
+        for pair in tqdm(prod, desc='wmd-{}'.format(job['cooccur']), mininterval=30):
+            sents_pair = [sents[index][pair[index]] for index in range(len(pair))]
+            current_wmd = 0
+            for index in range(len(sents_pair)-1):
+                doc1 = nlp(sents_pair[index])
+                doc2 = nlp(sents_pair[index+1])
+                current_wmd += doc1.similarity(doc2)
+
+            if current_wmd < best_wmd:
+                best_wmd = current_wmd
+                best_pair = sents_pair
+        
+        context.append({'cooccur':job['cooccur'], 'best_wmd':best_wmd, 'best_pair': best_pair})
+
+    return context
+
 def main():
     parser = argparse.ArgumentParser(description="group sentence by cooccurrence")
     parser.add_argument('--input_dir', type=str, default='', help='autophrase parsed directory')
@@ -73,33 +106,42 @@ def main():
     merge_results = search_results[0]
 
     query = args.query_string.split(',')
-    print(query)
 
     for pid in range(1, len(search_results)):
         res = search_results[pid]
         for ent in query:
             merge_results[ent] += res[ent]
 
-    print(merge_results)
     entityMentioned = {}
     for ent in query:
         tmp = set()
         for sent in merge_results[ent]:
             tmp = tmp.union(set([em for em in sent['entityMentioned']]))
-        print(ent, len(tmp))
         entityMentioned.update({ent:tmp})
 
     cooccur = entityMentioned[query[0]]
     for ent in query:
         cooccur = cooccur.intersection(entityMentioned[ent])
 
-    print(cooccur)
     inputs = [(ent, merge_results) for ent in cooccur]
     with Pool(args.num_process) as p:
         cooccur_results = p.map(cooccur_search, inputs)
 
+    #wmd pair
+    tasks = list(split(cooccur_results, args.num_process))
+    inputs = [(tasks[i], args) for i in range(args.num_process)]
+    
+    with Pool(args.num_process) as p:
+        cluster = p.map(cooccur_cluster, inputs)
+
+    cluster = [item for sublist in cluster for item in sublist]
+
+    sorted_cluster = sorted(cluster, key = lambda i: i['best_wmd'])
+
+    print(sorted_cluster)
+
     with open('cooccur_test.txt', "w+") as f:
-        f.write('\n'.join([json.dumps(res) for res in cooccur_results]))
+        f.write('\n'.join([json.dumps(res) for res in sorted_cluster]))
     f.close()
 
 if __name__ == '__main__':
