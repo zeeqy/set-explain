@@ -84,6 +84,8 @@ def cooccur_cluster(params):
                 doc1 = nlp(sents_pair[index])
                 doc2 = nlp(sents_pair[index+1])
                 current_wmd += doc1.similarity(doc2)
+            doc1 = nlp(sents_pair[0])
+            current_wmd += doc1.similarity(doc2)
 
             if current_wmd < best_wmd:
                 best_wmd = current_wmd
