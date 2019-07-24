@@ -17,6 +17,8 @@ group sentence by cooccurrence
 def sent_search(params):
     (task_list, args) = params
 
+    nlp = spacy.load('en_core_web_lg', disable=['ner'])
+
     query = args.query_string.split(',')
 
     context = dict((ent,[]) for ent in query)
@@ -41,7 +43,11 @@ def sent_search(params):
                 if ent not in entity_text:
                     continue
                 else:
-                    context[ent].append(item_dict)
+                    doc = nlp(item_dict['text'])
+                    nsubj = [{'npsubj':chunk.text, 'nproot':chunk.root.text} for chunk in doc.noun_chunks if chunk.root.dep_ in ['nsubjpass', 'nsubj']]
+                    for ns in nsubj:
+                        if ent == ns['nproot'] or ent == ns['npsubj']:
+                            context[ent].append(item_dict)
     return context
 
 def split(a, n):
