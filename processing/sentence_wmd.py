@@ -112,7 +112,7 @@ def merge_wmd(params):
 
         prod = list(product(*index_list))
         
-        if len(prod) > 1000000 or len(filtered) < 2:
+        if len(prod) > 500000 or len(filtered) < 2:
             continue
         
         for pair in tqdm(prod, desc='wmd-{}'.format(qid), mininterval=30):
@@ -172,7 +172,7 @@ def main():
     #wmd all sentence
     batch_combined = []
     wmd_results = []
-    minibatch = 800
+    minibatch = 1000
 
     chunks = [merge_results[i * minibatch:(i + 1) * minibatch] for i in range((len(merge_results) + minibatch - 1) // minibatch )]
 
