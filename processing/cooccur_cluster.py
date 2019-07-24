@@ -62,6 +62,8 @@ def cooccur_cluster(params):
     nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
     context = []
     for job in jobs:
+        if job['cooccur'] in query:
+            continue
         sents = [job[ent] for ent in query]
         index_list = [range(len(s)) for s in sents]
         best_wmd = 1e6
