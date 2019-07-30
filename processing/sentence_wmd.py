@@ -50,6 +50,11 @@ def merge_task(params):
             entity_text = set([em for em in item_dict['entityMentioned']])
             for index in range(len(context)):
                 query = context[index]
+                
+                keys = set(query['keywords'])
+                if keys.intersection(entity_text) == set():
+                    continue
+                
                 for ent in query['entities']:
                     if ent not in entity_text:
                         continue
