@@ -9,6 +9,7 @@ from random import shuffle
 import copy
 import spacy
 import wmd
+import numpy as np
 from itertools import product
 import gc
 
@@ -207,7 +208,7 @@ def main():
     for res in batch_combined:
         if 'best_context' not in res.keys():
             continue
-        target = res['title']
+        target = res['title'].strip()
         context = ''
         if len(res['best_context']) != 0:
             context = ' '.join([s['text'] for s in res['best_context']])
@@ -215,9 +216,17 @@ def main():
 
     shuffle(transform_res)
 
-    valid_set = transform_res[0:int(len(transform_res) * 0.2)]
-    test_set = transform_res[int(len(transform_res) * 0.2) : 2 * int(len(transform_res) * 0.2)]
-    train_set = transform_res[2 * int(len(transform_res) * 0.2):]
+    distinct_sets = list(set([res['target'] for res in transform_res]))
+
+    distinct_sets = np.unique(distinct_sets).tolist()
+
+    valid = set(distinct_sets[0:int(len(distinct_sets) * 0.2)])
+    test = set(distinct_sets[int(len(distinct_sets) * 0.2) : 2 * int(len(distinct_sets) * 0.2)])
+    train = set(distinct_sets[2 * int(len(distinct_sets) * 0.2):])
+
+    valid_set = [res for res in transform_res if res['target'] in valid]
+    test_set = [res for res in transform_res if res['target'] in test]
+    train_set = [res for res in transform_res if res['target'] in train]
 
     with open('{}/{}_train_data.txt'.format(args.output_dir, args.output_prefix), "w+") as f:
         f.write('\n'.join([res['context'] for res in train_set]))
