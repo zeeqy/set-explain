@@ -214,11 +214,11 @@ def main():
             context = ' '.join([s['text'] for s in res['best_context']])
             transform_res.append({'context': context.strip(), 'target': target})
 
-    shuffle(transform_res)
-
     distinct_sets = list(set([res['target'] for res in transform_res]))
 
     distinct_sets = np.unique(distinct_sets).tolist()
+
+    np.random.shuffle(distinct_sets)
 
     valid = set(distinct_sets[0:int(len(distinct_sets) * 0.2)])
     test = set(distinct_sets[int(len(distinct_sets) * 0.2) : 2 * int(len(distinct_sets) * 0.2)])
