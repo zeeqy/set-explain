@@ -60,12 +60,12 @@ def split(a, n):
 #     return context
 
 def cooccur_cluster(params):
-    (inital_sents, merge_results, args) = params
+    (inital_sents, merge_results, args, proid) = params
     query = args.query_string.split(',')
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
     nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
     context = []
-    for init_sent in inital_sents:
+    for init_sent in tqdm(inital_sents, desc='main-{}'.format(proid), mininterval=30):
         init_set = set([em for em in init_sent['entityMentioned']])
         doc_init = nlp(init_sent['core'])
         sents = [merge_results[ent] for ent in query[1:]]
@@ -73,8 +73,6 @@ def cooccur_cluster(params):
         best_wmd = 1e6
         best_pair = []
         prod = list(product(*index_list))
-        if len(prod) > 1000000:
-            continue
         for pair in tqdm(prod, desc='wmd-{}-{}-{}'.format(init_sent['did'], init_sent['pid'], init_sent['sid']), mininterval=10):
             sents_pair = [sents[index][pair[index]] for index in range(len(pair))]
             
@@ -141,7 +139,7 @@ def main():
     #wmd pair
     inital_ent = query[0]
     tasks = list(split(merge_results[inital_ent], args.num_process))
-    inputs = [(tasks[i], merge_results, args) for i in range(args.num_process)]
+    inputs = [(tasks[i], merge_results, args, i) for i in range(args.num_process)]
     
     with Pool(args.num_process) as p:
         cluster = p.map(cooccur_cluster, inputs)
