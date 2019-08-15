@@ -149,7 +149,7 @@ def main():
     sorted_cluster = sorted(cluster, key = lambda i: i['best_wmd'])
 
     with open('cooccur_test.txt', "w+") as f:
-        f.write('\n'.join([json.dumps(res) for res in sorted_cluster[:10]]))
+        f.write('\n'.join([json.dumps(res) for res in sorted_cluster[:20]]))
     f.close()
 
 if __name__ == '__main__':
