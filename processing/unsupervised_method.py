@@ -29,7 +29,7 @@ def sent_search(params):
             doc = f.readlines()
         f.close()
 
-        for item in tqdm(doc, desc='{}'.format(fname), mininterval=30):
+        for item in tqdm(doc, desc='{}'.format(fname), mininterval=10):
             try:
                 item_dict = json.loads(item)
             except:
@@ -66,6 +66,7 @@ def cooccur_cluster(params):
     nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
     context = []
     for init_sent in inital_sents:
+        init_set = set([em for em in init_sent['entityMentioned']])
         doc_init = nlp(init_sent['core'])
         sents = [merge_results[ent] for ent in query[1:]]
         index_list = [range(len(s)) for s in sents]
@@ -74,8 +75,15 @@ def cooccur_cluster(params):
         prod = list(product(*index_list))
         if len(prod) > 1000000:
             continue
-        for pair in tqdm(prod, desc='wmd-{}-{}-{}'.format(init_sent['did'], init_sent['pid'], init_sent['sid']), mininterval=30):
+        for pair in tqdm(prod, desc='wmd-{}-{}-{}'.format(init_sent['did'], init_sent['pid'], init_sent['sid']), mininterval=10):
             sents_pair = [sents[index][pair[index]] for index in range(len(pair))]
+            
+            overlap = init_set
+            for sent in sents_pair:
+                overlap = overlap.intersection(set([em for em in sent['entityMentioned']]))
+            if overlap == set():
+                continue
+
             current_wmd = 0
             for index in range(len(sents_pair)):
                 doc = nlp(sents_pair[index]['core'])
