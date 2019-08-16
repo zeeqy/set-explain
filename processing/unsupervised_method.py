@@ -68,7 +68,7 @@ def cooccur_cluster(params):
     for init_sent in tqdm(inital_sents, desc='main-{}'.format(proid), mininterval=30):
         init_set = set([em for em in init_sent['entityMentioned']])
         doc_init = nlp(init_sent['core'])
-        sents = [merge_results[ent] for ent in query[1:]]
+        sents = [[sent for sent in merge_results[ent] if sent['did'] != init_sent['did']] for ent in query[1:]]
         index_list = [range(len(s)) for s in sents]
         best_wmd = 1e6
         best_pair = []
