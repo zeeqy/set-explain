@@ -30,9 +30,9 @@ def merge_task(task_list, args, pid):
 		time.sleep(0.1)
 	
 	if context != []:
-	with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-		f.write('\n'.join(context))
-	f.close()
+		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
+			f.write('\n'.join(context))
+		f.close()
 
 	# for folder in task_list:
 	# 	outputname = 'XML_{}'.format(folder)
