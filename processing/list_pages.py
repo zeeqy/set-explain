@@ -20,7 +20,7 @@ def merge_task(task_list, args):
 			f.close()
 			for item in tqdm(raw, desc='{}'.format(fname), mininterval=30):
 				item_dict = json.loads(item)
-				if item_dict['title'][:7] != "List of"
+				if item_dict['title'][:7] != "List of":
 					continue # filter lists
 				else:
 					paragraph = parse(item_dict['text'])
