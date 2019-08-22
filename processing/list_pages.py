@@ -25,16 +25,12 @@ def merge_task(task_list, args):
 				if doc['title'][:7] != "List of":
 					continue # filter lists
 				else:
-					title = doc['title'][8:].lower()
-					ent_list = [parse(item[12:]).lower() for item in doc.text.split('\n') if len(item) > 12 and item[:12] == "BULLET::::- " and parse(item[12:]) != '']
-					if ent_list == []:
-						continue
-					item_dict = {'title':title,'list':ent_list}
-					context.append(json.dumps(item_dict))
+					context.append(doc)
 
 		if context != []:
 			with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-				f.write('\n'.join(context))
+				for doc in context:
+					f.write(str(doc))
 			f.close()
 
 def split(a, n):
