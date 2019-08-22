@@ -27,7 +27,7 @@ def merge_task(task_list, args, pid):
 						ent_list.append(ent)
 				if len(ent_list) >= 5:
 					context.append(context.append({'title':title, 'ents':ent_list}))
-		time.sleep(0.1)
+		time.sleep(3)
 	
 	if context != []:
 		with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
