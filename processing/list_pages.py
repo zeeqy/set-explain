@@ -25,6 +25,8 @@ def merge_task(task_list, args, pid):
 				ent_list = []
 				for row in tables[0].rows:
 					key = list(row.keys())[0]
+					if key == 'Rank':
+						key = list(row.keys())[1]
 					ent = parse(str(row[key]).lower())
 					if ent != '':
 						ent_list.append(ent)
