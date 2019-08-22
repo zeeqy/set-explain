@@ -19,7 +19,7 @@ def merge_task(task_list, args):
 			with open('{}/{}'.format(working_dir,fname), 'r') as f:
 				raw = f.read()
 			f.close()
-			soup = BeautifulSoup(raw,'xml')
+			soup = BeautifulSoup(raw,'html')
 			docs = soup.find_all('doc')
 			for doc in tqdm(docs, desc='{}'.format(fname), mininterval=30):
 				if doc['title'][:7] != "List of":
