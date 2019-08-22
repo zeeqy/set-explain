@@ -15,7 +15,10 @@ def merge_task(task_list, args, pid):
 	context = []
 	outputname = 'LIST-{}'.format(pid)
 	for wt in tqdm(task_list, desc='pages-{}'.format(pid), mininterval=30):
-		tables = import_tables(wt)
+		try:
+			tables = import_tables(wt)
+		except:
+			continue
 		if len(tables) > 1:
 			title = parse(wt[8:].lower())
 			if title != '':
@@ -26,7 +29,7 @@ def merge_task(task_list, args, pid):
 					if ent != '':
 						ent_list.append(ent)
 				if len(ent_list) >= 5:
-					context.append(context.append({'title':title, 'ents':ent_list}))
+					context.append(json.dumps({'title':title, 'ents':ent_list}))
 		time.sleep(3)
 	
 	if context != []:
