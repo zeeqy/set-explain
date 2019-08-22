@@ -22,7 +22,7 @@ def merge_task(task_list, args, pid):
 				ent_list = []
 				for row in tables[0].rows:
 					key = list(row.keys())[0]
-					ent = parse(row[key].lower())
+					ent = parse(str(row[key]).lower())
 					if ent != '':
 						ent_list.append(ent)
 				if len(ent_list) >= 5:
