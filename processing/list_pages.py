@@ -3,6 +3,7 @@ import argparse
 import bisect
 import multiprocessing as mp
 from tqdm import tqdm
+from bs4 import BeautifulSoup
 
 """
 keep json format and find list pages
@@ -11,20 +12,22 @@ keep json format and find list pages
 
 def merge_task(task_list, args):
 	for folder in task_list:
-		outputname = 'JSON_{}'.format(folder)
+		outputname = 'XML_{}'.format(folder)
 		working_dir = '{}/{}'.format(args.input_dir,folder)
 		context = []
 		for fname in os.listdir(working_dir):
 			with open('{}/{}'.format(working_dir,fname), 'r') as f:
-				raw = f.readlines()
+				raw = f.read()
 			f.close()
-			for item in tqdm(raw, desc='{}'.format(fname), mininterval=30):
-				item_dict = json.loads(item)
-				if item_dict['title'][:7] != "List of":
+			soup = BeautifulSoup(contents,'xml')
+			docs = soup.find_all('doc')
+			for doc in tqdm(docs, desc='{}'.format(fname), mininterval=30):
+				if doc['title'][:7] != "List of":
 					continue # filter lists
 				else:
-					paragraph = parse(item_dict['text'])
-					item_dict['text'] = paragraph[len(item_dict['title']):].strip()
+					title = doc['title'][7:].lower()
+					ent_list = [item[12:].lower() for item in doc.text.split('\n') if len(item) > 12 and item[:12] == "BULLET::::- " and parse(item) != '']
+					item_dict = {'title':title,'list':ent_list}
 					context.append(json.dumps(item_dict))
 
 		if context != []:
