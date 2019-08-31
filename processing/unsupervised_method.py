@@ -20,7 +20,7 @@ def doc_freq(params):
     query = args.query_string.split(',')
 
     freq = dict()
-    
+
     for ent in query:
         freq.update({ent:dict()})
 
@@ -160,6 +160,9 @@ def main():
         freq_sorted = sorted(freq[ent].items(), key=lambda x: x[1], reverse=True)
         cutoff = min(50, int(.1 * len(freq_sorted)))
         top_freq.update({ent:[item[0] for item in freq_sorted[0:cutoff]]})
+
+    print(top_freq)
+    sys.stdout.flush()
 
     inputs = [(tasks[i], args, top_freq) for i in range(args.num_process)]
 
