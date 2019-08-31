@@ -14,8 +14,42 @@ group sentence by cooccurrence
 
 """
 
-def sent_search(params):
+def doc_freq(params):
     (task_list, args) = params
+
+    freq = dict()
+    for ent in query:
+        freq.update({ent:dict()})
+
+    for fname in task_list:
+
+        with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
+            doc = f.readlines()
+        f.close()
+
+        for item in tqdm(doc, desc='{}'.format(fname), mininterval=10):
+            try:
+                item_dict = json.loads(item)
+            except:
+                print(fname, item)
+                sys.stdout.flush()
+                continue
+
+            entity_text = set([em for em in item_dict['entityMentioned']])
+            
+            for ent in query:
+                if ent not in entity_text:
+                    continue
+                else:
+                    if item_dict['did'] in freq[ent]:
+                        freq[ent][item_dict['did']] += 1
+                    else:
+                        freq[ent].update({item_dict['did']:1})
+    return freq
+
+
+def sent_search(params):
+    (task_list, args, top_freq) = params
 
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
@@ -40,7 +74,7 @@ def sent_search(params):
             entity_text = set([em for em in item_dict['entityMentioned']])
 
             for ent in query:
-                if ent not in entity_text:
+                if item_dict['did'] not in top_freq[ent] or ent not in entity_text:
                     continue
                 else:
                     doc = nlp(item_dict['text'])
@@ -109,6 +143,22 @@ def main():
     tasks = list(split(input_dir, args.num_process))
 
     inputs = [(tasks[i], args) for i in range(args.num_process)]
+
+    with Pool(args.num_process) as p:
+        freq_results = p.map(doc_freq, inputs)
+
+    freq_overall = freq_results[0]
+
+    for pid in range(1, len(freq_results)):
+        freq_overall.update(freq_results[pid])
+
+    top_freq = dict()
+    for ent in query:
+        freq_sorted = sorted(freq[ent].items(), key=lambda x: x[1], reverse=True)
+        cutoff = min(50, int(.1 * len(freq_sorted)))
+        top_freq.update({ent:[item[0] for item in freq_sorted[0:cutoff]]})
+
+    inputs = [(tasks[i], args, top_freq) for i in range(args.num_process)]
 
     with Pool(args.num_process) as p:
         search_results = p.map(sent_search, inputs)
