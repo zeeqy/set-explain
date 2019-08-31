@@ -17,7 +17,10 @@ group sentence by cooccurrence
 def doc_freq(params):
     (task_list, args) = params
 
+    query = args.query_string.split(',')
+
     freq = dict()
+    
     for ent in query:
         freq.update({ent:dict()})
 
