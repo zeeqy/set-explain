@@ -159,8 +159,8 @@ def main():
 
     top_freq = dict()
     for ent in query:
-        freq_sorted = sorted(freq[ent].items(), key=lambda x: x[1], reverse=True)
-        cutoff = min(50, int(.1 * len(freq_sorted)))
+        freq_sorted = sorted(freq_overall[ent].items(), key=lambda x: x[1], reverse=True)
+        cutoff = min(50, int(0.1 * len(freq_sorted)))
         top_freq.update({ent:[item[0] for item in freq_sorted[0:cutoff]]})
 
     print(top_freq)
