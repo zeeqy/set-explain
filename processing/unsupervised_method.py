@@ -141,6 +141,8 @@ def main():
     parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
     
     args = parser.parse_args()
+
+    query = args.query_string.split(',')
     
     input_dir = os.listdir(args.input_dir)
     tasks = list(split(input_dir, args.num_process))
@@ -170,8 +172,6 @@ def main():
         search_results = p.map(sent_search, inputs)
     
     merge_results = search_results[0]
-
-    query = args.query_string.split(',')
 
     for pid in range(1, len(search_results)):
         res = search_results[pid]
