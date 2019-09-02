@@ -155,10 +155,10 @@ def main():
     freq_overall = freq_results[0]
 
     for pid in range(1, len(freq_results)):
-        freq_overall.update(freq_results[pid])
+        for ent in query:
+            freq_overall[ent].update(freq_results[pid][ent])
 
     top_freq = dict()
-    print(freq_overall)
     for ent in query:
         freq_sorted = sorted(freq_overall[ent].items(), key=lambda x: x[1], reverse=True)
         cutoff = min(50, int(0.3 * len(freq_sorted)))
