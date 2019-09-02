@@ -158,7 +158,7 @@ def main():
         freq_overall.update(freq_results[pid])
 
     top_freq = dict()
-    print(freq_overall['boston']['24437894'])
+    print(freq_overall)
     for ent in query:
         freq_sorted = sorted(freq_overall[ent].items(), key=lambda x: x[1], reverse=True)
         cutoff = min(50, int(0.3 * len(freq_sorted)))
