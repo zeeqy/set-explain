@@ -81,8 +81,13 @@ def sent_search(params):
                     continue
                 else:
                     doc = nlp(item_dict['text'])
-                    #item_dict['core'] = ' '.join([token.text for token in doc if token.is_stop == False])
-                    context[ent].append(item_dict)
+                    nsubj = [{'npsubj':chunk.text, 'nproot':chunk.root.text} for chunk in doc.noun_chunks if chunk.root.dep_ in ['nsubjpass', 'nsubj']]
+                    for ns in nsubj:
+                        if ent == ns['nproot'] or ent == ns['npsubj']:
+                            context[index][ent].append(item_dict)
+                    # doc = nlp(item_dict['text'])
+                    # #item_dict['core'] = ' '.join([token.text for token in doc if token.is_stop == False])
+                    # context[ent].append(item_dict)
     return context
 
 def split(a, n):
@@ -161,7 +166,7 @@ def main():
     top_freq = dict()
     for ent in query:
         freq_sorted = sorted(freq_overall[ent].items(), key=lambda x: x[1], reverse=True)
-        cutoff = min(50, int(0.3 * len(freq_sorted)))
+        cutoff = min(50, int(0.5 * len(freq_sorted)))
         top_freq.update({ent:[item[0] for item in freq_sorted[0:cutoff]]})
 
     print(top_freq)
