@@ -81,7 +81,7 @@ def sent_search(params):
                     continue
                 else:
                     doc = nlp(item_dict['text'])
-                    item_dict['core'] = ' '.join([token.text for token in doc if token.is_stop == False])
+                    #item_dict['core'] = ' '.join([token.text for token in doc if token.is_stop == False])
                     context[ent].append(item_dict)
     return context
 
@@ -104,7 +104,7 @@ def cooccur_cluster(params):
     context = []
     for init_sent in tqdm(inital_sents, desc='main-{}'.format(proid), mininterval=30):
         init_set = set([em for em in init_sent['entityMentioned']])
-        doc_init = nlp(init_sent['core'])
+        doc_init = nlp(init_sent['text'])
         sents = [[sent for sent in merge_results[ent] if sent['did'] != init_sent['did']] for ent in query[1:]]
         index_list = [range(len(s)) for s in sents]
         best_wmd = 1e6
@@ -121,7 +121,7 @@ def cooccur_cluster(params):
 
             current_wmd = 0
             for index in range(len(sents_pair)):
-                doc = nlp(sents_pair[index]['core'])
+                doc = nlp(sents_pair[index]['text'])
                 current_wmd += doc_init.similarity(doc)
             
             if current_wmd < best_wmd:
