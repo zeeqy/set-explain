@@ -125,7 +125,8 @@ def cooccur_cluster(params):
                 best_wmd = current_wmd
                 best_pair = bipair
         
-        context.update({keyent:'best_pair':best_pair, 'best_wmd':best_wmd})
+        context.update({keyent:{'best_pair':best_pair, 'best_wmd':best_wmd}})
+    
     return context
 
 
