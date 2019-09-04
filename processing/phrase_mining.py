@@ -77,18 +77,22 @@ def sent_search(params):
                     continue
                 else:
                     doc = nlp(item_dict['text'])
-                    nsubj = [{'npsubj':chunk.text, 'nproot':chunk.root.text} for chunk in doc.noun_chunks if chunk.root.dep_ in ['nsubjpass', 'nsubj']]
-                    for ns in nsubj:
-                        if ent == ns['nproot'] or ent == ns['npsubj']:
-                            tokens = [token.text for token in doc]
-                            pos = [token.pos_ for token in doc]
-                            phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                            item_dict['doc_score'] = count_results[ent][item_dict['did']]/count_results[ent]['total']
-                            item_dict['phrases'] = list(phrases['counts'])
-                            context[ent].append(item_dict)
-                    # doc = nlp(item_dict['text'])
+                    # nsubj = [{'npsubj':chunk.text, 'nproot':chunk.root.text} for chunk in doc.noun_chunks if chunk.root.dep_ in ['nsubjpass', 'nsubj']]
+                    # for ns in nsubj:
+                    #     if ent == ns['nproot'] or ent == ns['npsubj']:
+                    #         tokens = [token.text for token in doc]
+                    #         pos = [token.pos_ for token in doc]
+                    #         phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                    #         item_dict['doc_score'] = count_results[ent][item_dict['did']]/count_results[ent]['total']
+                    #         item_dict['phrases'] = list(phrases['counts'])
+                    #         context[ent].append(item_dict)
                     # #item_dict['core'] = ' '.join([token.text for token in doc if token.is_stop == False])
-                    # context[ent].append(item_dict)
+                    tokens = [token.text for token in doc]
+                    pos = [token.pos_ for token in doc]
+                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                    item_dict['doc_score'] = count_results[ent][item_dict['did']]/count_results[ent]['total']
+                    item_dict['phrases'] = list(phrases['counts'])
+                    context[ent].append(item_dict)
     return context
 
 def split(a, n):
@@ -169,7 +173,7 @@ def main():
 
     for item in cooccur_sorted:
         print(item)
-        
+
     sys.stdout.flush()
 
 if __name__ == '__main__':
