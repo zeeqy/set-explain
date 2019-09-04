@@ -108,7 +108,7 @@ def main():
     input_dir = os.listdir(args.input_dir)
     tasks = list(split(input_dir, args.num_process))
 
-    inputs = [(tasks[i], query) for i in range(args.num_process)]
+    inputs = [(tasks[i], args) for i in range(args.num_process)]
 
     with Pool(args.num_process) as p:
         count_results = p.map(count_freq, inputs)
