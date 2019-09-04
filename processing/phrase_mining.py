@@ -8,6 +8,7 @@ from tqdm import tqdm
 import spacy
 import wmd
 from itertools import product
+from itertools import combinations
 import phrasemachine
 
 def count_freq(params):
@@ -95,6 +96,39 @@ def sent_search(params):
                     context[ent].append(item_dict)
     return context
 
+def cooccur_cluster(params):
+    (cooccur, entityMentioned, query) = params
+    nlp = spacy.load('en_core_web_lg', disable=['ner'])
+    nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
+    context = {}
+    for keyent in cooccur:
+        
+        sentsPool = []
+        for seed in query:
+            sentsPool.append(entityMentioned[seed][keyent]['sents'])
+
+        index_list = [range(len(s)) for s in sentsPool]
+        best_wmd = 1e6
+        best_pair = []
+        prod = list(product(*index_list))
+        for pair in tqdm(prod, desc='wmd-{}'.format(keyent), mininterval=10):
+            sentsPair = [sentsPool[index][pair[index]] for index in range(len(pair))]
+
+            comb = combinations(sentsPair, 2) 
+            current_wmd = 0
+            for bipair in comb:
+                doc1 = nlp(bipair[0])
+                doc2 = nlp(bipair[1])
+                current_wmd += doc1.similarity(doc2)
+
+            if current_wmd < best_wmd:
+                best_wmd = current_wmd
+                best_pair = bipair
+        
+        context.update({keyent:'best_pair':best_pair, 'best_wmd':best_wmd})
+    return context
+
+
 def split(a, n):
     k, m = divmod(len(a), n)
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
@@ -153,9 +187,10 @@ def main():
                 if cooent in query:
                     continue
                 elif cooent in entityMentioned[ent]:
-                    entityMentioned[ent][cooent] += sent['doc_score']
+                    entityMentioned[ent][cooent]['score'] += sent['doc_score']
+                    entityMentioned[ent][cooent]['sents'].append(sent['text'])
                 else:
-                    entityMentioned[ent].update({cooent:sent['doc_score']})
+                    entityMentioned[ent].update({cooent:{'score':sent['doc_score'], 'sents':[sent['text']]}})
 
     cooccur = set(entityMentioned[query[0]].keys())
     for ent in query:
@@ -167,13 +202,26 @@ def main():
     for cooent in cooccur:
         cooccur_score.update({cooent:1})
         for ent in query:
-            cooccur_score[cooent] *= entityMentioned[ent][cooent]
+            cooccur_score[cooent] += entityMentioned[ent][cooent]['score']
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
-    for item in cooccur_sorted:
-        print(item)
+    ##### wmd based on cooccurrence #####
+    tasks = list(split(cooccur, args.num_process))
+    inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
+    
+    with Pool(args.num_process) as p:
+        wmd_results = p.map(cooccur_cluster, inputs)
 
+    wmd_merge = wmd_results[0]
+    for pid in range(1, len(wmd_results)):
+        tmp_res = wmd_results[pid]
+        wmd_merge.update(tmp_res)
+
+    sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
+
+    for item in sorted_wmd:
+        print(item)
     sys.stdout.flush()
 
 if __name__ == '__main__':
