@@ -161,13 +161,15 @@ def main():
     ##### rank cooccurrence #####
     cooccur_score = {}
     for cooent in cooccur:
-        cooccur_score.update({cooent:0})
+        cooccur_score.update({cooent:1})
         for ent in query:
-            cooccur_score[cooent] += entityMentioned[ent][cooent]
+            cooccur_score[cooent] *= entityMentioned[ent][cooent]
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
-    print(cooccur_sorted)
+    for item in cooccur_sorted:
+        print(item)
+        
     sys.stdout.flush()
 
 if __name__ == '__main__':
