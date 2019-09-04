@@ -208,7 +208,7 @@ def main():
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
     ##### wmd based on cooccurrence #####
-    tasks = list(split(cooccur, args.num_process))
+    tasks = list(split(list(cooccur), args.num_process))
     inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
     
     with Pool(args.num_process) as p:
