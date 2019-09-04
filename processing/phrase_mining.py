@@ -117,9 +117,9 @@ def main():
     for pid in range(1, len(count_results)):
         tmp_res = count_results[pid]
         for ent in query:
-            count_results[ent]['total'] += tmp_res[ent]['total']
+            count_merge[ent]['total'] += tmp_res[ent]['total']
             tmp_res[ent].pop('total', None)
-            count_results[ent].update(tmp_res[ent])
+            count_merge[ent].update(tmp_res[ent])
 
     ##### get mentioned doc #####
     # doc_mentions = []
@@ -128,7 +128,7 @@ def main():
     # doc_mentions = set(doc_mentions)
 
     ##### sentence search #####
-    inputs = [(tasks[i], args, count_results) for i in range(args.num_process)]
+    inputs = [(tasks[i], args, count_merge) for i in range(args.num_process)]
 
     with Pool(args.num_process) as p:
         search_results = p.map(sent_search, inputs)
