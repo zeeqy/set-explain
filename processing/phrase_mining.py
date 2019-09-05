@@ -99,7 +99,7 @@ def sent_search(params):
 def cooccur_cluster(params):
     (cooccur, entityMentioned, query) = params
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
-    nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
+    #nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
     context = {}
     for keyent in cooccur:
         
@@ -108,7 +108,7 @@ def cooccur_cluster(params):
             sentsPool.append(entityMentioned[seed][keyent]['sents'])
 
         index_list = [range(len(s)) for s in sentsPool]
-        best_wmd = 1e6
+        best_wmd = 0
         best_pair = []
         prod = list(product(*index_list))
         if len(prod) > 1e5:
@@ -123,7 +123,7 @@ def cooccur_cluster(params):
                 doc2 = nlp(group[1])
                 current_wmd += doc1.similarity(doc2)
 
-            if current_wmd < best_wmd:
+            if current_wmd > best_wmd:
                 best_wmd = current_wmd
                 best_pair = sentsPair
         
