@@ -11,8 +11,10 @@ from itertools import product
 from itertools import combinations
 import phrasemachine
 
-def count_freq(params):
+def sent_search(params):
     (task_list, args) = params
+
+    nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
     query = args.query_string.split(',')
 
@@ -20,40 +22,6 @@ def count_freq(params):
 
     for ent in query:
         freq.update({ent:{'total':0}})
-
-    for fname in task_list:
-
-        with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
-            doc = f.readlines()
-        f.close()
-
-        for item in tqdm(doc, desc='{}'.format(fname), mininterval=10):
-            try:
-                item_dict = json.loads(item)
-            except:
-                print(fname, item)
-                sys.stdout.flush()
-                continue
-
-            entity_text = set([em for em in item_dict['entityMentioned']])
-            
-            for ent in query:
-                if ent not in entity_text:
-                    continue
-                else:
-                    freq[ent]['total'] += 1
-                    if item_dict['did'] in freq[ent]:
-                        freq[ent][item_dict['did']] += 1
-                    else:
-                        freq[ent].update({item_dict['did']:1})
-    return freq
-
-def sent_search(params):
-    (task_list, args, count_results) = params
-
-    nlp = spacy.load('en_core_web_lg', disable=['ner'])
-
-    query = args.query_string.split(',')
 
     context = dict((ent,[]) for ent in query)
 
@@ -74,19 +42,26 @@ def sent_search(params):
             entity_text = set([em for em in item_dict['entityMentioned']])
 
             for ent in query:
-                if item_dict['did'] not in count_results[ent] or ent not in entity_text:
+                if ent not in entity_text:
                     continue
                 else:
                     doc = nlp(item_dict['text'])
-                    nsubj = [{'npsubj':chunk.text, 'nproot':chunk.root.text} for chunk in doc.noun_chunks if chunk.root.dep_ in ['nsubjpass', 'nsubj']]
-                    for ns in nsubj:
-                        if ent == ns['nproot'] or ent == ns['npsubj']:
-                            tokens = [token.text for token in doc]
-                            pos = [token.pos_ for token in doc]
-                            phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                            item_dict['doc_score'] = count_results[ent][item_dict['did']]/count_results[ent]['total']
-                            item_dict['phrases'] = list(phrases['counts'])
-                            context[ent].append(item_dict)
+                    nsubj = []
+                    for chunk in doc.noun_chunks:
+                        if chunk.root.dep_ in ['nsubjpass', 'nsubj']:
+                            nsubj += [chunk.root.text, chunk.text]
+                    if ent in nsubj
+                        tokens = [token.text for token in doc]
+                        pos = [token.pos_ for token in doc]
+                        phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                        item_dict['phrases'] = list(phrases['counts'])
+                        context[ent].append(item_dict)
+
+                        freq[ent]['total'] += 1
+                        if item_dict['did'] in freq[ent]:
+                            freq[ent][item_dict['did']] += 1
+                        else:
+                            freq[ent].update({item_dict['did']:1})
                     # #item_dict['core'] = ' '.join([token.text for token in doc if token.is_stop == False])
                     # tokens = [token.text for token in doc]
                     # pos = [token.pos_ for token in doc]
@@ -94,12 +69,13 @@ def sent_search(params):
                     # item_dict['doc_score'] = count_results[ent][item_dict['did']]/count_results[ent]['total']
                     # item_dict['phrases'] = list(phrases['counts'])
                     # context[ent].append(item_dict)
-    return context
+    
+    return {'context':context, 'freq':freq}
 
 def cooccur_cluster(params):
     (cooccur, entityMentioned, query) = params
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
-    #nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
+    nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
     context = {}
     for keyent in cooccur:
         
@@ -108,7 +84,7 @@ def cooccur_cluster(params):
             sentsPool.append(entityMentioned[seed][keyent]['sents'])
 
         index_list = [range(len(s)) for s in sentsPool]
-        best_wmd = 0
+        best_wmd = 1e6
         best_pair = []
         prod = list(product(*index_list))
         if len(prod) > 1e5:
@@ -123,14 +99,13 @@ def cooccur_cluster(params):
                 doc2 = nlp(group[1])
                 current_wmd += doc1.similarity(doc2)
 
-            if current_wmd > best_wmd:
+            if current_wmd < best_wmd:
                 best_wmd = current_wmd
                 best_pair = sentsPair
         
         context.update({keyent:{'best_pair':best_pair, 'best_wmd':best_wmd}})
     
     return context
-
 
 def split(a, n):
     k, m = divmod(len(a), n)
@@ -148,48 +123,35 @@ def main():
     print(query)
     sys.stdout.flush()
 
-    ##### count mentions in corpus #####
+    ##### sentence search #####
     input_dir = os.listdir(args.input_dir)
     tasks = list(split(input_dir, args.num_process))
-
+    
     inputs = [(tasks[i], args) for i in range(args.num_process)]
-
-    with Pool(args.num_process) as p:
-        count_results = p.map(count_freq, inputs)
-
-    count_merge = count_results[0]
-    for pid in range(1, len(count_results)):
-        tmp_res = count_results[pid]
-        for ent in query:
-            count_merge[ent]['total'] += tmp_res[ent]['total']
-            tmp_res[ent].pop('total', None)
-            count_merge[ent].update(tmp_res[ent])
-
-    print(count_merge)
-
-    ##### get mentioned doc #####
-    # doc_mentions = []
-    # for ent in query:
-    #     doc_mentions.append(list(count_results[ent].keys()))
-    # doc_mentions = set(doc_mentions)
-
-    ##### sentence search #####
-    inputs = [(tasks[i], args, count_merge) for i in range(args.num_process)]
 
     with Pool(args.num_process) as p:
         search_results = p.map(sent_search, inputs)
     
-    search_merge = search_results[0]
+    search_merge = search_results[0]['context']
+    count_merge = search_results[0]['freq']
 
     for pid in range(1, len(search_results)):
-        tmp_res = search_results[pid]
+        tmp_context = search_results[pid]['context']
+        tmp_freq = search_results[pid]['freq']
         for ent in query:
-            search_merge[ent] += tmp_res[ent]
-
+            search_merge[ent] += tmp_context[ent]
+            count_merge[ent]['total'] += tmp_res[ent]['total']
+            tmp_res[ent].pop('total', None)
+            count_merge[ent].update(tmp_res[ent])
+    
     for ent in query:
-        for sent in search_merge[ent]:
-            print(sent)
-    sys.stdout.flush()
+        for index in range(len(search_merge[ent])):
+            search_merge[ent][index]['doc_score'] = count_merge[ent][search_merge[ent][index]['did']]/count_merge[ent]['total']
+
+    # for ent in query:
+    #     for sent in search_merge[ent]:
+    #         print(sent)
+    # sys.stdout.flush()
 
     ##### entity cooccurrence #####
     entityMentioned = {}
@@ -239,7 +201,7 @@ def main():
         tmp_res = wmd_results[pid]
         wmd_merge.update(tmp_res)
 
-    sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'], reverse=True)
+    sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
 
     for item in sorted_wmd:
         print(item)
