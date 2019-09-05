@@ -21,7 +21,7 @@ def merge_task(task_list, invalid, args):
 			f.close()
 			soup = BeautifulSoup(raw,'html')
 			docs = soup.find_all('doc')
-			for item in tqdm(docs, desc='{}'.format(fname), mininterval=30):
+			for doc in tqdm(docs, desc='{}'.format(fname), mininterval=30):
 				title = doc['title']
 				if title in invalid:
 					continue # filter out invalid documents
