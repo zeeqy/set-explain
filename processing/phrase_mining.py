@@ -186,6 +186,11 @@ def main():
         for ent in query:
             search_merge[ent] += tmp_res[ent]
 
+    for ent in query:
+        for sent in search_merge[ent]:
+            print(sent)
+    sys.stdout.flush()
+
     ##### entity cooccurrence #####
     entityMentioned = {}
     for ent in query:
