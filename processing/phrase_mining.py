@@ -209,8 +209,16 @@ def main():
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
+    for item in cooccur_sorted:
+        print(item)
+    sys.stdout.flush()
+
+    threshold = int(0.3 * len(cooccur))
+
+    cooccur_subset = [item[0] for item in cooccur_sorted[:threshold]]
+
     ##### wmd based on cooccurrence #####
-    tasks = list(split(list(cooccur), args.num_process))
+    tasks = list(split(list(cooccur_subset), args.num_process))
     inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
     
     with Pool(args.num_process) as p:
