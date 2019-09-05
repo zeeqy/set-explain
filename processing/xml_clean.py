@@ -22,7 +22,7 @@ def merge_task(task_list, invalid, args):
 			soup = BeautifulSoup(raw,'html')
 			docs = soup.find_all('doc')
 			for doc in tqdm(docs, desc='{}'.format(fname), mininterval=30):
-				title = doc['title']
+				title = doc['title'].lower()
 				if title in invalid:
 					continue # filter out invalid documents
 				else:
