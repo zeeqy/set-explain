@@ -145,6 +145,9 @@ def main():
     args = parser.parse_args()
     query = args.query_string.split(',')
 
+    print(query)
+    sys.stdout.flush()
+
     ##### count mentions in corpus #####
     input_dir = os.listdir(args.input_dir)
     tasks = list(split(input_dir, args.num_process))
