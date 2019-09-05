@@ -165,6 +165,8 @@ def main():
             tmp_res[ent].pop('total', None)
             count_merge[ent].update(tmp_res[ent])
 
+    print(count_merge)
+
     ##### get mentioned doc #####
     # doc_mentions = []
     # for ent in query:
