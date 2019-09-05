@@ -78,22 +78,22 @@ def sent_search(params):
                     continue
                 else:
                     doc = nlp(item_dict['text'])
-                    # nsubj = [{'npsubj':chunk.text, 'nproot':chunk.root.text} for chunk in doc.noun_chunks if chunk.root.dep_ in ['nsubjpass', 'nsubj']]
-                    # for ns in nsubj:
-                    #     if ent == ns['nproot'] or ent == ns['npsubj']:
-                    #         tokens = [token.text for token in doc]
-                    #         pos = [token.pos_ for token in doc]
-                    #         phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                    #         item_dict['doc_score'] = count_results[ent][item_dict['did']]/count_results[ent]['total']
-                    #         item_dict['phrases'] = list(phrases['counts'])
-                    #         context[ent].append(item_dict)
+                    nsubj = [{'npsubj':chunk.text, 'nproot':chunk.root.text} for chunk in doc.noun_chunks if chunk.root.dep_ in ['nsubjpass', 'nsubj']]
+                    for ns in nsubj:
+                        if ent == ns['nproot'] or ent == ns['npsubj']:
+                            tokens = [token.text for token in doc]
+                            pos = [token.pos_ for token in doc]
+                            phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                            item_dict['doc_score'] = count_results[ent][item_dict['did']]/count_results[ent]['total']
+                            item_dict['phrases'] = list(phrases['counts'])
+                            context[ent].append(item_dict)
                     # #item_dict['core'] = ' '.join([token.text for token in doc if token.is_stop == False])
-                    tokens = [token.text for token in doc]
-                    pos = [token.pos_ for token in doc]
-                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                    item_dict['doc_score'] = count_results[ent][item_dict['did']]/count_results[ent]['total']
-                    item_dict['phrases'] = list(phrases['counts'])
-                    context[ent].append(item_dict)
+                    # tokens = [token.text for token in doc]
+                    # pos = [token.pos_ for token in doc]
+                    # phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                    # item_dict['doc_score'] = count_results[ent][item_dict['did']]/count_results[ent]['total']
+                    # item_dict['phrases'] = list(phrases['counts'])
+                    # context[ent].append(item_dict)
     return context
 
 def cooccur_cluster(params):
@@ -218,7 +218,7 @@ def main():
     cooccur_subset = [item[0] for item in cooccur_sorted[:threshold]]
 
     ##### wmd based on cooccurrence #####
-    tasks = list(split(list(cooccur_subset), args.num_process))
+    tasks = list(split(list(cooccur), args.num_process))
     inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
     
     with Pool(args.num_process) as p:
