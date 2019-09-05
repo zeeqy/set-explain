@@ -239,7 +239,7 @@ def main():
         tmp_res = wmd_results[pid]
         wmd_merge.update(tmp_res)
 
-    sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
+    sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'], reverse=True)
 
     for item in sorted_wmd:
         print(item)
