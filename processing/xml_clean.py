@@ -29,7 +29,6 @@ def merge_task(task_list, invalid, args):
 					continue # filter out invalid documents
 				else:
 					_ = [s.extract() for s in doc('ref')]
-					title = title.lower()
 					did = doc['id']
 					text = parse(doc.text)
 					paragraphs = [line for line in text.splitlines() if line != title and len(line.split()) >= 4]
@@ -38,7 +37,11 @@ def merge_task(task_list, invalid, args):
 						sid = 0
 						doc = nlp(para)
 						for sent in doc.sents:
-							context.append(json.dumps({'title':title, 'did':did, 'pid':pid, 'sid':sid, 'text':sent.text}))
+							nsubj = []
+							for chunk in sent.noun_chunks:
+							    if chunk.root.dep_ in ['nsubjpass', 'nsubj']:
+							        nsubj += [chunk.text.lower()]
+							context.append(json.dumps({'title':title.lower(), 'did':did, 'pid':pid, 'sid':sid, 'text':sent.text.lower(), 'nsubj':nsubj}))
 							sid += 1
 						pid +=1
 
@@ -81,7 +84,7 @@ def parse(text):
     new_text = re.sub(r'<.*?>', '', new_text)
     new_text = new_text.replace('(', '').replace(')','').replace('[', '').replace(']', '').replace('{', '').replace('}', '')
     new_text = new_text.encode("ascii", errors="ignore").decode()
-    return new_text.strip().lower()
+    return new_text.strip()
 
 def main():
 	parser = argparse.ArgumentParser(description="parse xml format and clean text")
