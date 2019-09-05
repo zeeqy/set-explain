@@ -4,6 +4,7 @@ import bisect
 import multiprocessing as mp
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+import spacy
 
 """
 parse xml format and clean text 
@@ -11,6 +12,7 @@ parse xml format and clean text
 """
 
 def merge_task(task_list, invalid, args):
+	nlp = spacy.load("en_core_web_lg", disable=['ner'])
 	for folder in task_list:
 		outputname = 'JSON_{}'.format(folder)
 		working_dir = '{}/{}'.format(args.input_dir,folder)
@@ -30,8 +32,15 @@ def merge_task(task_list, invalid, args):
 					title = title.lower()
 					did = doc['id']
 					text = parse(doc.text)
-					paragraphs = [line for line in text.splitlines() if line != title and len(line.split()) >= 4] 
-					context.append(json.dumps({'title':title, 'text':paragraphs, 'did':did}))
+					paragraphs = [line for line in text.splitlines() if line != title and len(line.split()) >= 4]
+					pid = 0
+					for para in paragraphs:
+						sid = 0
+						doc = nlp(para)
+						for sent in doc.sents:
+							context.append(json.dumps({'title':title, 'did':did, 'pid':pid, 'sid':sid, 'text':sent.text}))
+							sid += 1
+						pid +=1
 
 		if context != []:
 			with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
