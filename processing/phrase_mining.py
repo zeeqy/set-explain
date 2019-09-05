@@ -47,10 +47,12 @@ def sent_search(params):
                 else:
                     doc = nlp(item_dict['text'])
                     nsubj = []
+
                     for chunk in doc.noun_chunks:
                         if chunk.root.dep_ in ['nsubjpass', 'nsubj']:
                             nsubj += [chunk.root.text, chunk.text]
-                    if ent in nsubj
+
+                    if ent in nsubj:
                         tokens = [token.text for token in doc]
                         pos = [token.pos_ for token in doc]
                         phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
