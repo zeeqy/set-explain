@@ -22,12 +22,12 @@ def merge_task(task_list, invalid, args):
 			soup = BeautifulSoup(raw,'html')
 			docs = soup.find_all('doc')
 			for doc in tqdm(docs, desc='{}'.format(fname), mininterval=30):
-				title = doc['title'].lower()
+				title = doc['title']
 				if title in invalid:
 					continue # filter out invalid documents
 				else:
 					_ = [s.extract() for s in doc('ref')]
-					title = doc['title']
+					title = title.lower()
 					did = doc['id']
 					text = parse(doc.text)
 					paragraphs = [line for line in text.splitlines() if line != title and len(line.split()) >= 4] 
