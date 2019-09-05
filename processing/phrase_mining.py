@@ -142,9 +142,9 @@ def main():
         tmp_freq = search_results[pid]['freq']
         for ent in query:
             search_merge[ent] += tmp_context[ent]
-            count_merge[ent]['total'] += tmp_res[ent]['total']
-            tmp_res[ent].pop('total', None)
-            count_merge[ent].update(tmp_res[ent])
+            count_merge[ent]['total'] += tmp_freq[ent]['total']
+            tmp_freq[ent].pop('total', None)
+            count_merge[ent].update(tmp_freq[ent])
     
     for ent in query:
         for index in range(len(search_merge[ent])):
