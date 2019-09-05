@@ -118,14 +118,14 @@ def cooccur_cluster(params):
 
             comb = combinations(sentsPair, 2) 
             current_wmd = 0
-            for bipair in comb:
-                doc1 = nlp(bipair[0])
-                doc2 = nlp(bipair[1])
+            for group in comb:
+                doc1 = nlp(group[0])
+                doc2 = nlp(group[1])
                 current_wmd += doc1.similarity(doc2)
 
             if current_wmd < best_wmd:
                 best_wmd = current_wmd
-                best_pair = bipair
+                best_pair = sentsPair
         
         context.update({keyent:{'best_pair':best_pair, 'best_wmd':best_wmd}})
     
