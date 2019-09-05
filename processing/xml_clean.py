@@ -26,6 +26,7 @@ def merge_task(task_list, invalid, args):
 				if title in invalid:
 					continue # filter out invalid documents
 				else:
+					_ = [s.extract() for s in doc('ref')]
 					title = doc['title']
 					did = doc['id']
 					text = parse(doc.text)
