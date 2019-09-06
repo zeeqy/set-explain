@@ -21,7 +21,7 @@ def merge_task(task_list, invalid, args):
 			with open('{}/{}'.format(working_dir,fname), 'r') as f:
 				raw = f.read()
 			f.close()
-			soup = BeautifulSoup(raw,'html')
+			soup = BeautifulSoup(raw,'lxml')
 			docs = soup.find_all('doc')
 			for doc in tqdm(docs, desc='{}'.format(fname), mininterval=30):
 				title = doc['title']
