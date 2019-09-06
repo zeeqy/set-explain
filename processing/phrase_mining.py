@@ -83,7 +83,7 @@ def cooccur_cluster(params):
         
         sentsPool = []
         for seed in query:
-            sentsPool.append(entityMentioned[seed][keyent]['sents'])
+            sentsPool.append(entityMentioned[seed][keyent]['sents']['text'])
 
         index_list = [range(len(s)) for s in sentsPool]
         best_wmd = 1e6
@@ -165,9 +165,9 @@ def main():
                     continue
                 elif cooent in entityMentioned[ent]:
                     entityMentioned[ent][cooent]['score'] += sent['doc_score']
-                    entityMentioned[ent][cooent]['sents'].append(sent['text'])
+                    entityMentioned[ent][cooent]['sents'].append(sent)
                 else:
-                    entityMentioned[ent].update({cooent:{'score':sent['doc_score'], 'sents':[sent['text']]}})
+                    entityMentioned[ent].update({cooent:{'score':sent['doc_score'], 'sents':[sent]}})
 
     cooccur = set(entityMentioned[query[0]].keys())
     for ent in query:
@@ -187,27 +187,47 @@ def main():
         print(item)
     sys.stdout.flush()
 
-    threshold = int(0.3 * len(cooccur))
+    # best cooccur entity 
+    best_cooccur = cooccur_sorted[0][0]
 
-    cooccur_subset = [item[0] for item in cooccur_sorted[:threshold]]
+    phrase_list = []
+    for ent in query:
+        phrase_set = set()
+        for sent in entityMentioned[query[0]][best_cooccur]['sents']:
+            phrase_set.union(set([phrase for phrase in sent['phrases'] if best_cooccur in phrase]))
+        phrase_list.append(phrase_set)
+
+    phrase_intercect = phrase_list[0]
+    for subset in phrase_list:
+        phrase_intercect.intersection(subset)
+
+    print(len(phrase_intercect))
+
+    for phrase in sorted(list(phrase_intercect), key=len, reverse=True):
+        print(phrase)
+    sys.stdout.flush()
+
+    # threshold = int(0.3 * len(cooccur))
+
+    # cooccur_subset = [item[0] for item in cooccur_sorted[:threshold]]
 
     ##### wmd based on cooccurrence #####
-    tasks = list(split(list(cooccur), args.num_process))
-    inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
+    # tasks = list(split(list(cooccur), args.num_process))
+    # inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
     
-    with Pool(args.num_process) as p:
-        wmd_results = p.map(cooccur_cluster, inputs)
+    # with Pool(args.num_process) as p:
+    #     wmd_results = p.map(cooccur_cluster, inputs)
 
-    wmd_merge = wmd_results[0]
-    for pid in range(1, len(wmd_results)):
-        tmp_res = wmd_results[pid]
-        wmd_merge.update(tmp_res)
+    # wmd_merge = wmd_results[0]
+    # for pid in range(1, len(wmd_results)):
+    #     tmp_res = wmd_results[pid]
+    #     wmd_merge.update(tmp_res)
 
-    sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
+    # sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
 
-    for item in sorted_wmd:
-        print(item)
-    sys.stdout.flush()
+    # for item in sorted_wmd:
+    #     print(item)
+    # sys.stdout.flush()
 
 if __name__ == '__main__':
     main()
