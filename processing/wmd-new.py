@@ -39,31 +39,24 @@ def sent_search(params):
                 sys.stdout.flush()
                 continue
 
-            entity_text = set([em for em in item_dict['entityMentioned']])
-
             for ent in query:
-                if ent not in entity_text:
+                if ent not in item_dict['nsubj']:
                     continue
                 else:
                     doc = nlp(item_dict['text'])
-                    nsubj = []
+                    if len(doc) >= 40:
+                        continue
+                    tokens = [token.text for token in doc]
+                    pos = [token.pos_ for token in doc]
+                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                    item_dict['phrases'] = list(phrases['counts'])
+                    context[ent].append(item_dict)
 
-                    for chunk in doc.noun_chunks:
-                        if chunk.root.dep_ in ['nsubjpass', 'nsubj']:
-                            nsubj += [chunk.root.text, chunk.text]
-
-                    if ent in nsubj:
-                        tokens = [token.text for token in doc]
-                        pos = [token.pos_ for token in doc]
-                        phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                        item_dict['phrases'] = list(phrases['counts'])
-                        context[ent].append(item_dict)
-
-                        freq[ent]['total'] += 1
-                        if item_dict['did'] in freq[ent]:
-                            freq[ent][item_dict['did']] += 1
-                        else:
-                            freq[ent].update({item_dict['did']:1})
+                    freq[ent]['total'] += 1
+                    if item_dict['did'] in freq[ent]:
+                        freq[ent][item_dict['did']] += 1
+                    else:
+                        freq[ent].update({item_dict['did']:1})
                     # #item_dict['core'] = ' '.join([token.text for token in doc if token.is_stop == False])
                     # tokens = [token.text for token in doc]
                     # pos = [token.pos_ for token in doc]
@@ -155,55 +148,13 @@ def main():
     #         print(sent)
     # sys.stdout.flush()
 
-    ##### entity cooccurrence #####
-    entityMentioned = {}
+    fid = 1
     for ent in query:
-        entityMentioned.update({ent:{}})
-        for sent in search_merge[ent]:
-            for cooent in sent['entityMentioned']:
-                if cooent in query:
-                    continue
-                elif cooent in entityMentioned[ent]:
-                    entityMentioned[ent][cooent]['score'] += sent['doc_score']
-                    entityMentioned[ent][cooent]['sents'].append(sent)
-                else:
-                    entityMentioned[ent].update({cooent:{'score':sent['doc_score'], 'sents':[sent]}})
-
-    cooccur = set(entityMentioned[query[0]].keys())
-    for ent in query:
-        tmp_res = set(entityMentioned[ent].keys())
-        cooccur = cooccur.intersection(tmp_res)
-
-    ##### rank cooccurrence #####
-    cooccur_score = {}
-    for cooent in cooccur:
-        cooccur_score.update({cooent:1})
-        for ent in query:
-            cooccur_score[cooent] += entityMentioned[ent][cooent]['score']
-
-    cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
-
-    # best cooccur entity 
-    for ranked in cooccur_sorted:
-        best_cooccur = ranked[0]
-
-        phrase_list = {'key':best_cooccur}
-        for ent in query:
-            phrase_set = set()
-            for sent in entityMentioned[ent][best_cooccur]['sents']:
-                phrase_set = phrase_set.union(set([phrase for phrase in sent['phrases'] if best_cooccur in phrase]))
-            phrase_list.update({ent:list(phrase_set)})
-
-        print(phrase_list)
-        #phrase_intercect = phrase_list[0]
-        # for subset in phrase_list:
-        #     phrase_intercect = phrase_intercect.intersection(subset)
-
-        # if len(phrase_intercect) != 0:
-        #     phrase_sorted = sorted(list(phrase_intercect), key=len, reverse=True)
-        #     print(phrase_sorted[0])
-        
-        sys.stdout.flush()
+        with open('retrieved-{}.txt'.format(fid), "w+") as f:
+            for sent in search_merge[ent]
+                f.write(json.dumps(sent) + '\n')
+        f.close()
+        fid += 1
 
     # threshold = int(0.3 * len(cooccur))
 
