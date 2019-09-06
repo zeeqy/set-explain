@@ -39,31 +39,23 @@ def sent_search(params):
                 sys.stdout.flush()
                 continue
 
-            entity_text = set([em for em in item_dict['entityMentioned']])
-
             for ent in query:
-                if ent not in entity_text:
+                if ent not in item_dict['nsubj']:
                     continue
                 else:
                     doc = nlp(item_dict['text'])
-                    nsubj = []
 
-                    for chunk in doc.noun_chunks:
-                        if chunk.root.dep_ in ['nsubjpass', 'nsubj']:
-                            nsubj += [chunk.root.text, chunk.text]
+                    tokens = [token.text for token in doc]
+                    pos = [token.pos_ for token in doc]
+                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                    item_dict['phrases'] = list(phrases['counts'])
+                    context[ent].append(item_dict)
 
-                    if ent in nsubj:
-                        tokens = [token.text for token in doc]
-                        pos = [token.pos_ for token in doc]
-                        phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                        item_dict['phrases'] = list(phrases['counts'])
-                        context[ent].append(item_dict)
-
-                        freq[ent]['total'] += 1
-                        if item_dict['did'] in freq[ent]:
-                            freq[ent][item_dict['did']] += 1
-                        else:
-                            freq[ent].update({item_dict['did']:1})
+                    freq[ent]['total'] += 1
+                    if item_dict['did'] in freq[ent]:
+                        freq[ent][item_dict['did']] += 1
+                    else:
+                        freq[ent].update({item_dict['did']:1})
                     # #item_dict['core'] = ' '.join([token.text for token in doc if token.is_stop == False])
                     # tokens = [token.text for token in doc]
                     # pos = [token.pos_ for token in doc]
