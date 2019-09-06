@@ -200,7 +200,7 @@ def main():
 
     phrase_intercect = phrase_list[0]
     for subset in phrase_list:
-        phrase_intercect.intersection(subset)
+        phrase_intercect = phrase_intercect.intersection(subset)
 
     print(len(phrase_intercect))
 
