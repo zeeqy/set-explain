@@ -189,6 +189,7 @@ def main():
 
     # best cooccur entity 
     best_cooccur = cooccur_sorted[0][0]
+    print('best entity', best_cooccur)
 
     phrase_list = []
     for ent in query:
@@ -196,6 +197,7 @@ def main():
         for sent in entityMentioned[query[0]][best_cooccur]['sents']:
             phrase_set.union(set([phrase for phrase in sent['phrases'] if best_cooccur in phrase]))
         phrase_list.append(phrase_set)
+    print(phrase_list)    
 
     phrase_intercect = phrase_list[0]
     for subset in phrase_list:
