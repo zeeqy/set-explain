@@ -151,7 +151,7 @@ def main():
     fid = 1
     for ent in query:
         with open('retrieved-{}.txt'.format(fid), "w+") as f:
-            for sent in search_merge[ent]
+            for sent in search_merge[ent]:
                 f.write(json.dumps(sent) + '\n')
         f.close()
         fid += 1
