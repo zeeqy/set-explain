@@ -183,29 +183,25 @@ def main():
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
-    for item in cooccur_sorted:
-        print(item)
-    sys.stdout.flush()
-
     # best cooccur entity 
     for ranked in cooccur_sorted:
         best_cooccur = ranked[0]
-        print('best entity', best_cooccur)
-
-        phrase_list = []
+        
+        phrase_list = {'key':best_cooccur}
         for ent in query:
             phrase_set = set()
             for sent in entityMentioned[ent][best_cooccur]['sents']:
                 phrase_set = phrase_set.union(set([phrase for phrase in sent['phrases'] if best_cooccur in phrase]))
-            phrase_list.append(phrase_set)
+            phrase_list.update({ent:list(phrase_set)})
 
-        phrase_intercect = phrase_list[0]
-        for subset in phrase_list:
-            phrase_intercect = phrase_intercect.intersection(subset)
+        print(phrase_list)
+        #phrase_intercect = phrase_list[0]
+        # for subset in phrase_list:
+        #     phrase_intercect = phrase_intercect.intersection(subset)
 
-        if len(phrase_intercect) != 0:
-            phrase_sorted = sorted(list(phrase_intercect), key=len, reverse=True)
-            print(phrase_sorted[0])
+        # if len(phrase_intercect) != 0:
+        #     phrase_sorted = sorted(list(phrase_intercect), key=len, reverse=True)
+        #     print(phrase_sorted[0])
         
         sys.stdout.flush()
 
