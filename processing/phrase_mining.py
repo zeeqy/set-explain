@@ -193,9 +193,9 @@ def main():
 
     phrase_list = []
     for ent in query:
-        print(entityMentioned[ent][best_cooccur]['sents'])
         phrase_set = set()
         for sent in entityMentioned[ent][best_cooccur]['sents']:
+            print(set([phrase for phrase in sent['phrases'] if best_cooccur in phrase]))
             phrase_set.union(set([phrase for phrase in sent['phrases'] if best_cooccur in phrase]))
         phrase_list.append(phrase_set)
     print(phrase_list)    
