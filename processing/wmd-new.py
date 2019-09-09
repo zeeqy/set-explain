@@ -6,6 +6,7 @@ from multiprocessing import Pool
 import collections
 from tqdm import tqdm
 import spacy
+import textacy
 import wmd
 from itertools import product
 from itertools import combinations
