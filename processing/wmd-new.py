@@ -10,6 +10,7 @@ import wmd
 from itertools import product
 from itertools import combinations
 import phrasemachine
+from nltk.tokenize import MWETokenizer
 
 def sent_search(params):
     (task_list, args) = params
@@ -57,13 +58,6 @@ def sent_search(params):
                         freq[ent][item_dict['did']] += 1
                     else:
                         freq[ent].update({item_dict['did']:1})
-                    # #item_dict['core'] = ' '.join([token.text for token in doc if token.is_stop == False])
-                    # tokens = [token.text for token in doc]
-                    # pos = [token.pos_ for token in doc]
-                    # phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                    # item_dict['doc_score'] = count_results[ent][item_dict['did']]/count_results[ent]['total']
-                    # item_dict['phrases'] = list(phrases['counts'])
-                    # context[ent].append(item_dict)
     
     return {'context':context, 'freq':freq}
 
@@ -76,7 +70,7 @@ def cooccur_cluster(params):
         
         sentsPool = []
         for seed in query:
-            sentsPool.append(entityMentioned[seed][keyent]['sents']['text'])
+            sentsPool.append(entityMentioned[seed][keyent])
 
         index_list = [range(len(s)) for s in sentsPool]
         best_wmd = 1e6
@@ -85,7 +79,7 @@ def cooccur_cluster(params):
         if len(prod) > 1e5:
             continue
         for pair in tqdm(prod, desc='wmd-{}'.format(keyent), mininterval=10):
-            sentsPair = [sentsPool[index][pair[index]] for index in range(len(pair))]
+            sentsPair = [sentsPool[index][pair[index]]['text'] for index in range(len(pair))]
 
             comb = combinations(sentsPair, 2) 
             current_wmd = 0
@@ -114,6 +108,7 @@ def main():
     
     args = parser.parse_args()
     query = args.query_string.split(',')
+    nlp = spacy.load('en_core_web_lg')
 
     print(query)
     sys.stdout.flush()
@@ -156,27 +151,47 @@ def main():
         f.close()
         fid += 1
 
-    # threshold = int(0.3 * len(cooccur))
+    unigrams = []
+    for ent in query:
+        context = ' '.join([sent['text'] for sent in search_merge[ent]])
+        doc = nlp(context)
+        unigram = set([token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True, min_freq=5)])
+        unigrams.append(unigram)
 
-    # cooccur_subset = [item[0] for item in cooccur_sorted[:threshold]]
+    common_unigram = unigrams[0]
+    for item in unigrams:
+        common_unigram = common_unigram.intersection(item)
+
+    cand_sents = {}
+    for ent in query:
+        cand_sents.update({ent:{}})  
+        for sent in search_merge[ent]:
+            doc = nlp(sent['text'])
+            unigram = set([token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)])
+            unigram_intersect = unigram.intersection(common_unigram)
+            for item in unigram_intersect:
+                if item in cand_sents[ent].keys():
+                    cand_sents[ent][item].append(sent)
+                else:
+                    cand_sents[ent].update({item:[sent]})
 
     ##### wmd based on cooccurrence #####
-    # tasks = list(split(list(cooccur), args.num_process))
-    # inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
+    tasks = list(split(list(common_unigram), args.num_process))
+    inputs = [(tasks[i], cand_sents, query) for i in range(args.num_process)]
     
-    # with Pool(args.num_process) as p:
-    #     wmd_results = p.map(cooccur_cluster, inputs)
+    with Pool(args.num_process) as p:
+        wmd_results = p.map(cooccur_cluster, inputs)
 
-    # wmd_merge = wmd_results[0]
-    # for pid in range(1, len(wmd_results)):
-    #     tmp_res = wmd_results[pid]
-    #     wmd_merge.update(tmp_res)
+    wmd_merge = wmd_results[0]
+    for pid in range(1, len(wmd_results)):
+        tmp_res = wmd_results[pid]
+        wmd_merge.update(tmp_res)
 
-    # sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
+    sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
 
-    # for item in sorted_wmd:
-    #     print(item)
-    # sys.stdout.flush()
+    for item in sorted_wmd:
+        print(item)
+    sys.stdout.flush()
 
 if __name__ == '__main__':
     main()
