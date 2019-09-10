@@ -5,6 +5,8 @@ import multiprocessing as mp
 from multiprocessing import Pool
 import collections
 from tqdm import tqdm
+import textacy
+from textacy import similarity
 import spacy
 import wmd
 from itertools import product
@@ -93,26 +95,27 @@ def cooccur_cluster(params):
             sentsPool.append(entityMentioned[seed][keyent]['sents'])
 
         index_list = [range(len(s)) for s in sentsPool]
-        best_wmd = 1e6
+        best_sim = 0
         best_pair = []
         prod = list(product(*index_list))
         if len(prod) > 1e5:
             continue
-        for pair in tqdm(prod, desc='wmd-{}'.format(keyent), mininterval=10):
+        for pair in tqdm(prod, desc='similarity-{}'.format(keyent), mininterval=10):
             sentsPair = [sentsPool[index][pair[index]]['text'] for index in range(len(pair))]
 
             comb = combinations(sentsPair, 2) 
-            current_wmd = 0
+            current_sim = 0
             for group in comb:
-                doc1 = nlp(group[0])
-                doc2 = nlp(group[1])
-                current_wmd += doc1.similarity(doc2)
+                current_sim += similarity.jaccard(group[0],group[1])
+                # doc1 = nlp(group[0])
+                # doc2 = nlp(group[1])
+                # current_sim += doc1.similarity(doc2)
 
-            if current_wmd < best_wmd:
-                best_wmd = current_wmd
+            if current_sim > best_sim:
+                best_sim = current_sim
                 best_pair = sentsPair
         
-        context.update({keyent:{'best_pair':best_pair, 'best_wmd':best_wmd}})
+        context.update({keyent:{'best_pair':best_pair, 'best_sim':best_sim}})
     
     return context
 
@@ -215,21 +218,21 @@ def main():
 
     # cooccur_subset = [item[0] for item in cooccur_sorted[:threshold]]
 
-    #### wmd based on cooccurrence #####
+    #### similarity based on cooccurrence #####
     tasks = list(split(list(cooccur), args.num_process))
     inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
     
     with Pool(args.num_process) as p:
-        wmd_results = p.map(cooccur_cluster, inputs)
+        sim_results = p.map(cooccur_cluster, inputs)
 
-    wmd_merge = wmd_results[0]
-    for pid in range(1, len(wmd_results)):
-        tmp_res = wmd_results[pid]
-        wmd_merge.update(tmp_res)
+    sim_merge = sim_results[0]
+    for pid in range(1, len(sim_results)):
+        tmp_res = sim_results[pid]
+        sim_merge.update(tmp_res)
 
-    sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
+    sorted_sim = sorted(sim_merge.items(), key=lambda x : x[1]['best_sim'], reverse=True)
 
-    for item in sorted_wmd:
+    for item in sorted_sim:
         print(item)
     sys.stdout.flush()
 
