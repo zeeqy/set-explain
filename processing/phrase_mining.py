@@ -191,10 +191,9 @@ def main():
             if entityMentioned[ent][cooent]['score'] >= 0.03:
                 cooccur_list[ent].add(cooent)
 
-    cooccur = set(cooccur_list[query[0]].keys())
+    cooccur = cooccur_list[query[0]]
     for ent in query:
-        tmp_res = set(cooccur_list[ent].keys())
-        cooccur = cooccur.intersection(tmp_res)
+        cooccur = cooccur.intersection(cooccur_list[ent])
 
     print(cooccur)
     
