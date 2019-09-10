@@ -201,9 +201,9 @@ def main():
     ##### rank cooccurrence #####
     cooccur_score = {}
     for cooent in cooccur:
-        cooccur_score.update({cooent:1})
+        cooccur_score.update({cooent:0})
         for ent in query:
-            cooccur_score[cooent] *= entityMentioned[ent][cooent]['score']
+            cooccur_score[cooent] += entityMentioned[ent][cooent]['score']
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
@@ -215,23 +215,23 @@ def main():
 
     # cooccur_subset = [item[0] for item in cooccur_sorted[:threshold]]
 
-    ##### wmd based on cooccurrence #####
-    # tasks = list(split(list(cooccur), args.num_process))
-    # inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
+    #### wmd based on cooccurrence #####
+    tasks = list(split(list(cooccur), args.num_process))
+    inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
     
-    # with Pool(args.num_process) as p:
-    #     wmd_results = p.map(cooccur_cluster, inputs)
+    with Pool(args.num_process) as p:
+        wmd_results = p.map(cooccur_cluster, inputs)
 
-    # wmd_merge = wmd_results[0]
-    # for pid in range(1, len(wmd_results)):
-    #     tmp_res = wmd_results[pid]
-    #     wmd_merge.update(tmp_res)
+    wmd_merge = wmd_results[0]
+    for pid in range(1, len(wmd_results)):
+        tmp_res = wmd_results[pid]
+        wmd_merge.update(tmp_res)
 
-    # sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
+    sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
 
-    # for item in sorted_wmd:
-    #     print(item)
-    # sys.stdout.flush()
+    for item in sorted_wmd:
+        print(item)
+    sys.stdout.flush()
 
 if __name__ == '__main__':
     main()
