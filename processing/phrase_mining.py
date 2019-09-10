@@ -44,42 +44,42 @@ def sent_search(params):
             entity_text = set([em for em in item_dict['entityMentioned']])
 
             for ent in query:
-                if ent not in entity_text:
+                if ent not in item_dict['nsubj']:
                     continue
                 else:
                     doc = nlp(item_dict['text'])
                     nsubj = []
-
-                    # for chunk in doc.noun_chunks:
-                    #     if chunk.root.dep_ in ['nsubjpass', 'nsubj']:
-                    #         nsubj += [chunk.root.text, chunk.text]
-
-                    # if ent in nsubj:
-                    #     tokens = [token.text for token in doc]
-                    #     pos = [token.pos_ for token in doc]
-                    #     phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                    #     item_dict['phrases'] = list(phrases['counts'])
-                    #     context[ent].append(item_dict)
-
-                    #     freq[ent]['total'] += 1
-                    #     if item_dict['did'] in freq[ent]:
-                    #         freq[ent][item_dict['did']] += 1
-                    #     else:
-                    #         freq[ent].update({item_dict['did']:1})
-                    # #item_dict['core'] = ' '.join([token.text for token in doc if token.is_stop == False])
                     if len(doc) >= 40:
                         continue
-                    tokens = [token.text for token in doc]
-                    pos = [token.pos_ for token in doc]
-                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                    item_dict['phrases'] = list(phrases['counts'])
-                    context[ent].append(item_dict)
 
-                    freq[ent]['total'] += 1
-                    if item_dict['did'] in freq[ent]:
-                        freq[ent][item_dict['did']] += 1
-                    else:
-                        freq[ent].update({item_dict['did']:1})
+                    for chunk in doc.noun_chunks:
+                        if chunk.root.dep_ in ['nsubjpass', 'nsubj']:
+                            nsubj += [chunk.root.text, chunk.text]
+
+                    if ent in nsubj:
+                        tokens = [token.text for token in doc]
+                        pos = [token.pos_ for token in doc]
+                        phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                        item_dict['phrases'] = list(phrases['counts'])
+                        context[ent].append(item_dict)
+
+                        freq[ent]['total'] += 1
+                        if item_dict['did'] in freq[ent]:
+                            freq[ent][item_dict['did']] += 1
+                        else:
+                            freq[ent].update({item_dict['did']:1})
+                    
+                    # tokens = [token.text for token in doc]
+                    # pos = [token.pos_ for token in doc]
+                    # phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                    # item_dict['phrases'] = list(phrases['counts'])
+                    # context[ent].append(item_dict)
+
+                    # freq[ent]['total'] += 1
+                    # if item_dict['did'] in freq[ent]:
+                    #     freq[ent][item_dict['did']] += 1
+                    # else:
+                    #     freq[ent].update({item_dict['did']:1})
     
     return {'context':context, 'freq':freq}
 
@@ -191,7 +191,7 @@ def main():
     for ent in query:
         cooccur_list.update({ent:set()})
         for cooent, value in entityMentioned[ent].items():
-            if entityMentioned[ent][cooent]['score'] >= 0.003:
+            if entityMentioned[ent][cooent]['score'] >= 0.01:
                 cooccur_list[ent].add(cooent)
 
     cooccur = cooccur_list[query[0]]
