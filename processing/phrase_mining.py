@@ -188,7 +188,7 @@ def main():
     for ent in query:
         cooccur_list.update({ent:set()})
         for cooent, value in entityMentioned[ent].items():
-            if entityMentioned[ent][cooent]['score'] >= 0.003:
+            if entityMentioned[ent][cooent]['score'] >= 0.001:
                 cooccur_list[ent].add(cooent)
 
     cooccur = cooccur_list[query[0]]
