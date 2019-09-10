@@ -185,7 +185,8 @@ def main():
             entityMentioned[ent][cooent]['score'] = entityMentioned[ent][cooent]['total'] / total
 
     for ent in query:
-        print(entityMentioned[ent])
+        for cooent in entityMentioned[ent].keys():
+            print(cooent, entityMentioned[ent][cooent]['score'])
 
     cooccur_list = {}
     for ent in query:
