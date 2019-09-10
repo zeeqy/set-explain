@@ -48,29 +48,36 @@ def sent_search(params):
                     doc = nlp(item_dict['text'])
                     nsubj = []
 
-                    for chunk in doc.noun_chunks:
-                        if chunk.root.dep_ in ['nsubjpass', 'nsubj']:
-                            nsubj += [chunk.root.text, chunk.text]
+                    # for chunk in doc.noun_chunks:
+                    #     if chunk.root.dep_ in ['nsubjpass', 'nsubj']:
+                    #         nsubj += [chunk.root.text, chunk.text]
 
-                    if ent in nsubj:
-                        tokens = [token.text for token in doc]
-                        pos = [token.pos_ for token in doc]
-                        phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                        item_dict['phrases'] = list(phrases['counts'])
-                        context[ent].append(item_dict)
+                    # if ent in nsubj:
+                    #     tokens = [token.text for token in doc]
+                    #     pos = [token.pos_ for token in doc]
+                    #     phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                    #     item_dict['phrases'] = list(phrases['counts'])
+                    #     context[ent].append(item_dict)
 
-                        freq[ent]['total'] += 1
-                        if item_dict['did'] in freq[ent]:
-                            freq[ent][item_dict['did']] += 1
-                        else:
-                            freq[ent].update({item_dict['did']:1})
+                    #     freq[ent]['total'] += 1
+                    #     if item_dict['did'] in freq[ent]:
+                    #         freq[ent][item_dict['did']] += 1
+                    #     else:
+                    #         freq[ent].update({item_dict['did']:1})
                     # #item_dict['core'] = ' '.join([token.text for token in doc if token.is_stop == False])
-                    # tokens = [token.text for token in doc]
-                    # pos = [token.pos_ for token in doc]
-                    # phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                    # item_dict['doc_score'] = count_results[ent][item_dict['did']]/count_results[ent]['total']
-                    # item_dict['phrases'] = list(phrases['counts'])
-                    # context[ent].append(item_dict)
+                    if len(doc) >= 40:
+                        continue
+                    tokens = [token.text for token in doc]
+                    pos = [token.pos_ for token in doc]
+                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                    item_dict['phrases'] = list(phrases['counts'])
+                    context[ent].append(item_dict)
+
+                    freq[ent]['total'] += 1
+                    if item_dict['did'] in freq[ent]:
+                        freq[ent][item_dict['did']] += 1
+                    else:
+                        freq[ent].update({item_dict['did']:1})
     
     return {'context':context, 'freq':freq}
 
@@ -157,53 +164,53 @@ def main():
 
     ##### entity cooccurrence #####
     entityMentioned = {}
+    count_entity = {}
     for ent in query:
         entityMentioned.update({ent:{}})
+        count_entity.update({ent:0})
         for sent in search_merge[ent]:
             for cooent in sent['entityMentioned']:
                 if cooent in query:
                     continue
                 elif cooent in entityMentioned[ent]:
-                    entityMentioned[ent][cooent]['score'] += sent['doc_score']
+                    entityMentioned[ent][cooent]['total'] += 1
                     entityMentioned[ent][cooent]['sents'].append(sent)
                 else:
-                    entityMentioned[ent].update({cooent:{'score':sent['doc_score'], 'sents':[sent]}})
-
-    cooccur = set(entityMentioned[query[0]].keys())
+                    entityMentioned[ent].update({cooent:{'total':1, 'sents':[sent]}})
+                count_entity[ent] += 1
+                
     for ent in query:
-        tmp_res = set(entityMentioned[ent].keys())
+        total = count_entity[ent]
+        for cooent, value in entityMentioned[ent].items():
+            entityMentioned[ent][cooent]['score'] = entityMentioned[ent][cooent]['total'] / total
+
+    cooccur_list = {}
+    for ent in query
+        cooccur_list.update({ent:set()})
+        for cooent, value in entityMentioned[ent].items():
+            if entityMentioned[ent][cooent]['score'] >= 0.03:
+                cooccur_list[ent].add(cooent)
+
+    cooccur = set(cooccur_list[query[0]].keys())
+    for ent in query:
+        tmp_res = set(cooccur_list[ent].keys())
         cooccur = cooccur.intersection(tmp_res)
+
+    print(cooccur)
+    
 
     ##### rank cooccurrence #####
     cooccur_score = {}
     for cooent in cooccur:
         cooccur_score.update({cooent:1})
         for ent in query:
-            cooccur_score[cooent] += entityMentioned[ent][cooent]['score']
+            cooccur_score[cooent] *= entityMentioned[ent][cooent]['score']
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
-    # best cooccur entity 
-    for ranked in cooccur_sorted:
-        best_cooccur = ranked[0]
+    print(cooccur_sorted)
 
-        phrase_list = {'key':best_cooccur}
-        for ent in query:
-            phrase_set = set()
-            for sent in entityMentioned[ent][best_cooccur]['sents']:
-                phrase_set = phrase_set.union(set([phrase for phrase in sent['phrases'] if best_cooccur in phrase]))
-            phrase_list.update({ent:list(phrase_set)})
-
-        print(phrase_list)
-        #phrase_intercect = phrase_list[0]
-        # for subset in phrase_list:
-        #     phrase_intercect = phrase_intercect.intersection(subset)
-
-        # if len(phrase_intercect) != 0:
-        #     phrase_sorted = sorted(list(phrase_intercect), key=len, reverse=True)
-        #     print(phrase_sorted[0])
-        
-        sys.stdout.flush()
+    sys.stdout.flush()
 
     # threshold = int(0.3 * len(cooccur))
 
