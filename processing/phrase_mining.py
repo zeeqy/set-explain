@@ -184,11 +184,14 @@ def main():
         for cooent, value in entityMentioned[ent].items():
             entityMentioned[ent][cooent]['score'] = entityMentioned[ent][cooent]['total'] / total
 
+    for ent in query:
+        print(entityMentioned[ent])
+
     cooccur_list = {}
     for ent in query:
         cooccur_list.update({ent:set()})
         for cooent, value in entityMentioned[ent].items():
-            if entityMentioned[ent][cooent]['score'] >= 0.03:
+            if entityMentioned[ent][cooent]['score'] >= 0.01:
                 cooccur_list[ent].add(cooent)
 
     cooccur = cooccur_list[query[0]]
