@@ -255,6 +255,8 @@ def main():
         score = 0
         tokens = nltk.word_tokenize(phrase)
         nonstop_tokens = [token for token in tokens if token not in stop]
+        if len(nonstop_tokens) / len(token) <= 0.5:
+            continue
         raw_tokenized = tokenizer.tokenize(tokens)
         tokenized_set = set(raw_tokenized)
         for token in tokenized_set.intersection(cooccur):
