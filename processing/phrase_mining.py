@@ -126,6 +126,7 @@ def main():
     
     args = parser.parse_args()
     query = args.query_string.split(',')
+    nlp = spacy.load('en_core_web_lg')
 
     print(query)
     sys.stdout.flush()
