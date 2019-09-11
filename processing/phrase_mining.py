@@ -198,9 +198,9 @@ def main():
     ##### rank cooccurrence #####
     cooccur_score = {}
     for cooent in cooccur:
-        cooccur_score.update({cooent:0})
+        cooccur_score.update({cooent:1})
         for ent in query:
-            cooccur_score[cooent] += entityMentioned[ent][cooent]['doc_score']
+            cooccur_score[cooent] *= entityMentioned[ent][cooent]['doc_score']
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
