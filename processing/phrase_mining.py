@@ -155,11 +155,6 @@ def main():
         for index in range(len(search_merge[ent])):
             search_merge[ent][index]['doc_score'] = count_merge[ent][search_merge[ent][index]['did']]/count_merge[ent]['total']
 
-    # for ent in query:
-    #     for sent in search_merge[ent]:
-    #         print(sent)
-    # sys.stdout.flush()
-
     ##### entity cooccurrence #####
     entityMentioned = {}
     count_entity = {}
@@ -193,8 +188,14 @@ def main():
     for ent in query:
         cooccur = cooccur.intersection(cooccur_list[ent])
 
-    print(cooccur)
-    
+    fid = 1
+    for ent in query:
+        with open('retrieved-{}.txt'.format(fid), "w+") as f:
+            for sent in search_merge[ent]:
+                if set(sent['entityMentioned']).intersection(cooccur) != set():
+                    f.write(json.dumps(sent) + '\n')
+        f.close()
+        fid += 1
 
     ##### rank cooccurrence #####
     cooccur_score = {}
@@ -214,22 +215,22 @@ def main():
     # cooccur_subset = [item[0] for item in cooccur_sorted[:threshold]]
 
     #### similarity based on cooccurrence #####
-    tasks = list(split(list(cooccur), args.num_process))
-    inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
+    # tasks = list(split(list(cooccur), args.num_process))
+    # inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
     
-    with Pool(args.num_process) as p:
-        sim_results = p.map(cooccur_cluster, inputs)
+    # with Pool(args.num_process) as p:
+    #     sim_results = p.map(cooccur_cluster, inputs)
 
-    sim_merge = sim_results[0]
-    for pid in range(1, len(sim_results)):
-        tmp_res = sim_results[pid]
-        sim_merge.update(tmp_res)
+    # sim_merge = sim_results[0]
+    # for pid in range(1, len(sim_results)):
+    #     tmp_res = sim_results[pid]
+    #     sim_merge.update(tmp_res)
 
-    sorted_sim = sorted(sim_merge.items(), key=lambda x : x[1]['best_sim'], reverse=True)
+    # sorted_sim = sorted(sim_merge.items(), key=lambda x : x[1]['best_sim'], reverse=True)
 
-    for item in sorted_sim:
-        print(item)
-    sys.stdout.flush()
+    # for item in sorted_sim:
+    #     print(item)
+    # sys.stdout.flush()
 
 if __name__ == '__main__':
     main()
