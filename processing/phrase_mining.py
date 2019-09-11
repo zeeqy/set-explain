@@ -244,9 +244,20 @@ def main():
     # sys.stdout.flush()
 
     list_phrases = []
+    phrases_overlap = []
     for ent in query:
+        tmp_res = []
         for sent in search_merge[ent]:
             list_phrases += sent['phrases']
+            tmp_res += sent['phrases']
+        phrases_overlap.append(set(tmp_res))
+
+    phrases_set = phrases_overlap[0]
+    for item in phrases_overlap:
+        phrases_set = phrases_set.intersection(item)
+
+    print('common phrase: ', phrases_set)
+
 
     tokenizer = MWETokenizer(separator=' ')
 
