@@ -173,7 +173,7 @@ def main():
                     continue
                 elif cooent in entityMentioned[ent]:
                     if sent['did'] not in did:
-                        entityMentioned[ent]['doc_score'] += sent['doc_score']
+                        entityMentioned[ent][cooent]['doc_score'] += sent['doc_score']
                     entityMentioned[ent][cooent]['total'] += 1
                     entityMentioned[ent][cooent]['sents'].append(sent)
                 else:
