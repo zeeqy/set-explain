@@ -254,8 +254,6 @@ def main():
         tokens = nltk.word_tokenize(phrase)
         raw_tokenized = tokenizer.tokenize(tokens)
         tokenized_set = set(raw_tokenized)
-        if len(unigram) == 0:
-            continue
         for token in tokenized_set.intersection(cooccur):
             score += cooccur_score[token]
         phrases_score.update({phrase:score/len(tokens)})
