@@ -171,10 +171,12 @@ def main():
                 if cooent in query:
                     continue
                 elif cooent in entityMentioned[ent]:
+                    entityMentioned[ent][cooent]['doc_score'] += sent['doc_score']
                     entityMentioned[ent][cooent]['total'] += 1
                     entityMentioned[ent][cooent]['sents'].append(sent)
+
                 else:
-                    entityMentioned[ent].update({cooent:{'total':1, 'sents':[sent]}})
+                    entityMentioned[ent].update({cooent:{'total':1, 'sents': [sent], 'doc_score': sent['doc_score']}})
                 count_entity[ent] += 1
                 
     for ent in query:
@@ -186,8 +188,8 @@ def main():
     for ent in query:
         cooccur_list.update({ent:set()})
         for cooent, value in entityMentioned[ent].items():
-            if entityMentioned[ent][cooent]['total'] >= 5:
-                cooccur_list[ent].add(cooent)
+            #if entityMentioned[ent][cooent]['total'] >= 5:
+            cooccur_list[ent].add(cooent)
 
     cooccur = cooccur_list[query[0]]
     for ent in query:
@@ -198,7 +200,7 @@ def main():
     for cooent in cooccur:
         cooccur_score.update({cooent:0})
         for ent in query:
-            cooccur_score[cooent] += entityMentioned[ent][cooent]['score']
+            cooccur_score[cooent] += entityMentioned[ent][cooent]['doc_score']
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
