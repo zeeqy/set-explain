@@ -14,6 +14,8 @@ from itertools import combinations
 from nltk.tokenize import MWETokenizer
 import nltk
 import phrasemachine
+from nltk.corpus import stopwords
+stop = set(stopwords.words('english'))
 
 def sent_search(params):
     (task_list, args) = params
@@ -252,11 +254,12 @@ def main():
     for phrase in list_phrases:
         score = 0
         tokens = nltk.word_tokenize(phrase)
+        nonstop_tokens = [token for token in tokens if token not in stop]
         raw_tokenized = tokenizer.tokenize(tokens)
         tokenized_set = set(raw_tokenized)
         for token in tokenized_set.intersection(cooccur):
             score += cooccur_score[token]
-        phrases_score.update({phrase:score/len(tokens)})
+        phrases_score.update({phrase:score/len(nonstop_tokens)})
 
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1], reverse=True)
 
