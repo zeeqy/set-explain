@@ -217,22 +217,41 @@ def main():
     #cooccur_subset = [item[0] for item in cooccur_sorted[:threshold]]
 
     ### similarity based on cooccurrence #####
-    tasks = list(split(list(cooccur), args.num_process))
-    inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
+    # tasks = list(split(list(cooccur), args.num_process))
+    # inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
     
-    with Pool(args.num_process) as p:
-        sim_results = p.map(cooccur_cluster, inputs)
+    # with Pool(args.num_process) as p:
+    #     sim_results = p.map(cooccur_cluster, inputs)
 
-    sim_merge = sim_results[0]
-    for pid in range(1, len(sim_results)):
-        tmp_res = sim_results[pid]
-        sim_merge.update(tmp_res)
+    # sim_merge = sim_results[0]
+    # for pid in range(1, len(sim_results)):
+    #     tmp_res = sim_results[pid]
+    #     sim_merge.update(tmp_res)
 
-    sorted_sim = sorted(sim_merge.items(), key=lambda x : x[1]['best_sim'], reverse=True)
+    # sorted_sim = sorted(sim_merge.items(), key=lambda x : x[1]['best_sim'], reverse=True)
 
-    for item in sorted_sim:
-        print(item)
-    sys.stdout.flush()
+    # for item in sorted_sim:
+    #     print(item)
+    # sys.stdout.flush()
+
+    list_phrases = []
+    for ent in query:
+        for sent in search_merge[ent]:
+            list_phrases += sent['phrases']
+
+    list_phrases = set(list_phrases)
+    phrases_score = {}
+    for phrase in list_phrases:
+        score = 0
+        doc = nlp(phrase)
+        unigram = set([token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)])
+        for token in unigram.intersection(cooccur):
+            score += cooccur_score[token]
+        phrases_score.update({phrase:score/len(unigram)})
+
+    phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1], reverse=True)
+
+    print(phrases_sorted[:10])
 
 if __name__ == '__main__':
     main()
