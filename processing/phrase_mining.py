@@ -11,6 +11,8 @@ import spacy
 import wmd
 from itertools import product
 from itertools import combinations
+from nltk.tokenize import MWETokenizer
+import nltk
 import phrasemachine
 
 def sent_search(params):
@@ -240,17 +242,23 @@ def main():
         for sent in search_merge[ent]:
             list_phrases += sent['phrases']
 
+    tokenizer = MWETokenizer(separator=' ')
+
+    for e in cooccur:
+        tokenizer.add_mwe(nltk.word_tokenize(e))
+    
     list_phrases = set(list_phrases)
     phrases_score = {}
     for phrase in list_phrases:
         score = 0
-        doc = nlp(phrase)
-        unigram = set([token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)])
+        tokens = nltk.word_tokenize(phrase)
+        raw_tokenized = tokenizer.tokenize(tokens)
+        tokenized_set = set(raw_tokenized)
         if len(unigram) == 0:
             continue
-        for token in unigram.intersection(cooccur):
+        for token in tokenized_set.intersection(cooccur):
             score += cooccur_score[token]
-        phrases_score.update({phrase:score/len(unigram)})
+        phrases_score.update({phrase:score/len(tokens)})
 
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1], reverse=True)
 
