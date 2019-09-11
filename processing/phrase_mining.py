@@ -266,7 +266,7 @@ def main():
     
     list_phrases = set(list_phrases)
     phrases_score = {}
-    for phrase in list_phrases:
+    for phrase in phrases_set:
         score = 0
         tokens = nltk.word_tokenize(phrase)
         nonstop_tokens = [token for token in tokens if token not in stop]
