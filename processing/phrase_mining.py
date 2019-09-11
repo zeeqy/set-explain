@@ -164,6 +164,7 @@ def main():
     entityMentioned = {}
     count_entity = {}
     for ent in query:
+        did = set()
         entityMentioned.update({ent:{}})
         count_entity.update({ent:0})
         for sent in search_merge[ent]:
@@ -171,14 +172,15 @@ def main():
                 if cooent in query:
                     continue
                 elif cooent in entityMentioned[ent]:
-                    entityMentioned[ent][cooent]['doc_score'] += sent['doc_score']
+                    if sent['did'] not in did:
+                        entityMentioned[ent]['doc_score'] += sent['doc_score']
                     entityMentioned[ent][cooent]['total'] += 1
                     entityMentioned[ent][cooent]['sents'].append(sent)
-
                 else:
                     entityMentioned[ent].update({cooent:{'total':1, 'sents': [sent], 'doc_score': sent['doc_score']}})
                 count_entity[ent] += 1
-                
+            did.add(sent['did'])
+
     for ent in query:
         total = count_entity[ent]
         for cooent, value in entityMentioned[ent].items():
