@@ -55,30 +55,30 @@ def sent_search(params):
                     if len(doc) >= 40:
                         continue
 
-                    if ent in item_dict['nsubj']:
-                        tokens = [token.text for token in doc]
-                        pos = [token.pos_ for token in doc]
-                        phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                        item_dict['phrases'] = list(phrases['counts'])
-                        context[ent].append(item_dict)
+                    # if ent in item_dict['nsubj']:
+                    #     tokens = [token.text for token in doc]
+                    #     pos = [token.pos_ for token in doc]
+                    #     phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                    #     item_dict['phrases'] = list(phrases['counts'])
+                    #     context[ent].append(item_dict)
 
-                        freq[ent]['total'] += 1
-                        if item_dict['did'] in freq[ent]:
-                            freq[ent][item_dict['did']] += 1
-                        else:
-                            freq[ent].update({item_dict['did']:1})
+                    #     freq[ent]['total'] += 1
+                    #     if item_dict['did'] in freq[ent]:
+                    #         freq[ent][item_dict['did']] += 1
+                    #     else:
+                    #         freq[ent].update({item_dict['did']:1})
                     
-                    # tokens = [token.text for token in doc]
-                    # pos = [token.pos_ for token in doc]
-                    # phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                    # item_dict['phrases'] = list(phrases['counts'])
-                    # context[ent].append(item_dict)
+                    tokens = [token.text for token in doc]
+                    pos = [token.pos_ for token in doc]
+                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                    item_dict['phrases'] = list(phrases['counts'])
+                    context[ent].append(item_dict)
 
-                    # freq[ent]['total'] += 1
-                    # if item_dict['did'] in freq[ent]:
-                    #     freq[ent][item_dict['did']] += 1
-                    # else:
-                    #     freq[ent].update({item_dict['did']:1})
+                    freq[ent]['total'] += 1
+                    if item_dict['did'] in freq[ent]:
+                        freq[ent][item_dict['did']] += 1
+                    else:
+                        freq[ent].update({item_dict['did']:1})
     
     return {'context':context, 'freq':freq}
 
