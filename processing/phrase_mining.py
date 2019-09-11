@@ -246,6 +246,8 @@ def main():
         score = 0
         doc = nlp(phrase)
         unigram = set([token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)])
+        if len(unigram) == 0:
+            continue
         for token in unigram.intersection(cooccur):
             score += cooccur_score[token]
         phrases_score.update({phrase:score/len(unigram)})
