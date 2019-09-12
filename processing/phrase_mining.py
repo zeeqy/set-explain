@@ -226,19 +226,19 @@ def main():
 
     #cooccur_subset = [item[0] for item in cooccur_sorted[:threshold]]
 
-    ### similarity based on cooccurrence #####
-    # tasks = list(split(list(cooccur), args.num_process))
-    # inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
+    ## similarity based on cooccurrence #####
+    tasks = list(split(list(['basketball team']), args.num_process))
+    inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
     
-    # with Pool(args.num_process) as p:
-    #     sim_results = p.map(cooccur_cluster, inputs)
+    with Pool(args.num_process) as p:
+        sim_results = p.map(cooccur_cluster, inputs)
 
-    # sim_merge = sim_results[0]
-    # for pid in range(1, len(sim_results)):
-    #     tmp_res = sim_results[pid]
-    #     sim_merge.update(tmp_res)
+    sim_merge = sim_results[0]
+    for pid in range(1, len(sim_results)):
+        tmp_res = sim_results[pid]
+        sim_merge.update(tmp_res)
 
-    # sorted_sim = sorted(sim_merge.items(), key=lambda x : x[1]['best_sim'], reverse=True)
+    sorted_sim = sorted(sim_merge.items(), key=lambda x : x[1]['best_sim'], reverse=True)
 
     # for item in sorted_sim:
     #     print(item)
@@ -257,8 +257,8 @@ def main():
     for item in phrases_overlap:
         phrases_set = phrases_set.intersection(item)
 
-    for item in phrases_set:
-        print(item)
+    # for item in phrases_set:
+    #     print(item)
 
 
     tokenizer = MWETokenizer(separator=' ')
@@ -291,10 +291,10 @@ def main():
                 sent_score += cooccur_score[item]
             search_merge[ent][index]['sent_score'] = sent_score
 
-    for ent in query:
-        sent_sorted = sorted(search_merge[ent], key=lambda x: x['sent_score'], reverse=True)
-        print(ent)
-        print(sent_sorted[:20])
+    # for ent in query:
+    #     sent_sorted = sorted(search_merge[ent], key=lambda x: x['sent_score'], reverse=True)
+    #     print(ent)
+    #     print(sent_sorted[:20])
 
 if __name__ == '__main__':
     main()
