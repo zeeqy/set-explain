@@ -222,20 +222,17 @@ def main():
 
     #cooccur_subset = [item[0] for item in cooccur_sorted[:threshold]]
 
-    ## similarity based on cooccurrence #####
-    # tasks = list(split(list(cooccur), args.num_process))
-    # inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
+    # similarity based on cooccurrence #####
+    tasks = list(split(list(cooccur), args.num_process))
+    inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
     
-    # with Pool(args.num_process) as p:
-    #     sim_results = p.map(cooccur_cluster, inputs)
+    with Pool(args.num_process) as p:
+        sim_results = p.map(cooccur_cluster, inputs)
 
-    # sim_merge = sim_results[0]
-    # for pid in range(1, len(sim_results)):
-    #     tmp_res = sim_results[pid]
-    #     sim_merge.update(tmp_res)
-
-    params = (['basketball team'], entityMentioned, query)
-    sim_merge = cooccur_cluster(params)
+    sim_merge = sim_results[0]
+    for pid in range(1, len(sim_results)):
+        tmp_res = sim_results[pid]
+        sim_merge.update(tmp_res)
 
     sorted_sim = sorted(sim_merge.items(), key=lambda x : x[1]['best_sim'], reverse=True)
 
