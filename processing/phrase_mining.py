@@ -48,11 +48,11 @@ def sent_search(params):
             entity_text = set([em for em in item_dict['entityMentioned']])
 
             for ent in query:
-                if ent not in entity_text or item_dict['pid'] != 0 or item_dict['sid'] != 0:
+                if ent not in entity_text:
                     continue
                 else:
                     doc = nlp(item_dict['text'])
-                    if len(doc) >= 40:
+                    if len(doc) >= 30:
                         continue
 
                     # if ent in item_dict['nsubj']:
