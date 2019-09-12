@@ -206,7 +206,8 @@ def main():
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
-    print(cooccur_sorted)
+    for item in cooccur_sorted:
+        print(item)
 
     sys.stdout.flush()
 
@@ -256,7 +257,8 @@ def main():
     for item in phrases_overlap:
         phrases_set = phrases_set.intersection(item)
 
-    print('common phrase: ', phrases_set)
+    for item in phrases_set:
+        print(item)
 
 
     tokenizer = MWETokenizer(separator=' ')
@@ -266,7 +268,7 @@ def main():
     
     list_phrases = set(list_phrases)
     phrases_score = {}
-    for phrase in phrases_set:
+    for phrase in list_phrases:
         score = 0
         tokens = nltk.word_tokenize(phrase)
         nonstop_tokens = [token for token in tokens if token not in stop]
