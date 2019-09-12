@@ -284,5 +284,17 @@ def main():
 
     print(phrases_sorted[:10])
 
+    for ent in query:
+        for index, sent in enumerate(search_merge[ent]):
+            sent_score = 0
+            for item in set(sent['entityMentioned']).intersection(cooccur):
+                sent_score += cooccur_score[item]
+            search_merge[ent][index]['sent_score'] = sent_score
+
+    for ent in query:
+        sent_sorted = sorted(search_merge[ent], key=lambda x: x['sent_score'], reverse=True)
+        print(ent)
+        print(sent_sorted[:20])
+
 if __name__ == '__main__':
     main()
