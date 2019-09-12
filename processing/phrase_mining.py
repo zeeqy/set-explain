@@ -48,7 +48,7 @@ def sent_search(params):
             entity_text = set([em for em in item_dict['entityMentioned']])
 
             for ent in query:
-                if ent not in entity_text or item_dict['pid'] != 0 or item_dict['sid'] != 0:
+                if ent not in entity_text:
                     continue
                 else:
                     doc = nlp(item_dict['text'])
@@ -223,22 +223,22 @@ def main():
     #cooccur_subset = [item[0] for item in cooccur_sorted[:threshold]]
 
     # similarity based on cooccurrence #####
-    tasks = list(split(list(cooccur), args.num_process))
-    inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
+    # tasks = list(split(list(cooccur), args.num_process))
+    # inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
     
-    with Pool(args.num_process) as p:
-        sim_results = p.map(cooccur_cluster, inputs)
+    # with Pool(args.num_process) as p:
+    #     sim_results = p.map(cooccur_cluster, inputs)
 
-    sim_merge = sim_results[0]
-    for pid in range(1, len(sim_results)):
-        tmp_res = sim_results[pid]
-        sim_merge.update(tmp_res)
+    # sim_merge = sim_results[0]
+    # for pid in range(1, len(sim_results)):
+    #     tmp_res = sim_results[pid]
+    #     sim_merge.update(tmp_res)
 
-    sorted_sim = sorted(sim_merge.items(), key=lambda x : x[1]['best_sim'], reverse=True)
+    # sorted_sim = sorted(sim_merge.items(), key=lambda x : x[1]['best_sim'], reverse=True)
 
-    for item in sorted_sim:
-        print(item)
-    sys.stdout.flush()
+    # for item in sorted_sim:
+    #     print(item)
+    # sys.stdout.flush()
 
     list_phrases = []
     phrases_overlap = []
