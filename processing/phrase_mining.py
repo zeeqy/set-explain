@@ -85,7 +85,7 @@ def sent_search(params):
 def cooccur_cluster(params):
     (cooccur, entityMentioned, query) = params
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
-    #nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
+    nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
     context = {}
     for keyent in cooccur:
         
@@ -97,18 +97,17 @@ def cooccur_cluster(params):
         best_sim = 0
         best_pair = []
         prod = list(product(*index_list))
-        if len(prod) > 1e5:
-            continue
+        # if len(prod) > 1e5:
+        #     continue
         for pair in tqdm(prod, desc='similarity-{}'.format(keyent), mininterval=10):
             sentsPair = [sentsPool[index][pair[index]]['text'] for index in range(len(pair))]
 
             comb = combinations(sentsPair, 2) 
             current_sim = 0
             for group in comb:
-                # current_sim += similarity.jaccard(group[0],group[1])
                 doc1 = nlp(group[0])
                 doc2 = nlp(group[1])
-                current_sim += textacy.similarity.word2vec(doc1,doc2)
+                current_sim += doc1.similarity(doc2)
 
             if current_sim > best_sim:
                 best_sim = current_sim
