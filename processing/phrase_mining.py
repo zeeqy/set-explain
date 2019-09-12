@@ -227,7 +227,8 @@ def main():
     #cooccur_subset = [item[0] for item in cooccur_sorted[:threshold]]
 
     ## similarity based on cooccurrence #####
-    tasks = list(split(list(['basketball team']), args.num_process))
+    #tasks = list(split(list(cooccur), args.num_process))
+    tasks = list(split(['basketball team'], args.num_process))
     inputs = [(tasks[i], entityMentioned, query) for i in range(args.num_process)]
     
     with Pool(args.num_process) as p:
@@ -240,9 +241,9 @@ def main():
 
     sorted_sim = sorted(sim_merge.items(), key=lambda x : x[1]['best_sim'], reverse=True)
 
-    # for item in sorted_sim:
-    #     print(item)
-    # sys.stdout.flush()
+    for item in sorted_sim:
+        print(item)
+    sys.stdout.flush()
 
     list_phrases = []
     phrases_overlap = []
