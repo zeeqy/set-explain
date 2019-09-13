@@ -163,6 +163,9 @@ def main():
     for item in unigrams:
         common_unigram = common_unigram.union(item)
 
+    for ent in query:
+        common_unigram.discard(ent)
+        
     cand_sents = {}
     for ent in query:
         cand_sents.update({ent:{}})  
