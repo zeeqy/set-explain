@@ -188,6 +188,10 @@ def main():
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
+    for item in cooccur_sorted:
+        print(item)
+    sys.stdout.flush()
+    
     ##### wmd based on cooccurrence #####
     # tasks = list(split(list(common_unigram), args.num_process))
     # inputs = [(tasks[i], cand_sents, query) for i in range(args.num_process)]
