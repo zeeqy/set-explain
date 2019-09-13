@@ -201,7 +201,7 @@ def main():
     for cooent in cooccur:
         cooccur_score.update({cooent:0})
         for ent in query:
-            if ent in entityMentioned[ent].keys():
+            if cooent in entityMentioned[ent].keys():
                 cooccur_score[cooent] += entityMentioned[ent][cooent]['doc_score']
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
