@@ -196,13 +196,17 @@ def main():
     for ent in query:
         cooccur = cooccur.union(cooccur_list[ent])
 
+    total = 0
+    for ent in query:
+        total += len(search_merge[ent])
+
     ##### rank cooccurrence #####
     cooccur_score = {}
     for cooent in cooccur:
         cooccur_score.update({cooent:0})
         for ent in query:
             if cooent in entityMentioned[ent].keys():
-                cooccur_score[cooent] += len(search_merge[ent]) * entityMentioned[ent][cooent]['doc_score']
+                cooccur_score[cooent] += (len(search_merge[ent])/total) * entityMentioned[ent][cooent]['doc_score']
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
