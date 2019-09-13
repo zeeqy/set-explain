@@ -143,11 +143,6 @@ def main():
         for index in range(len(search_merge[ent])):
             search_merge[ent][index]['doc_score'] = count_merge[ent][search_merge[ent][index]['did']]/count_merge[ent]['total']
 
-    # for ent in query:
-    #     for sent in search_merge[ent]:
-    #         print(sent)
-    # sys.stdout.flush()
-
     fid = 1
     for ent in query:
         with open('retrieved-{}.txt'.format(fid), "w+") as f:
@@ -163,45 +158,46 @@ def main():
         unigram = set([token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True, min_freq=5)])
         unigrams.append(unigram)
 
-    common_unigram = unigrams[0]
+    unigram_set = unigrams[0]
     for item in unigrams:
-        common_unigram = common_unigram.union(item)
+        unigram_set = unigram_set.union(item)
 
     for ent in query:
-        common_unigram.discard(ent)
+        unigram_set.discard(ent)
 
-    cand_sents = {}
+    unigram_sents = {}
     for ent in query:
-        cand_sents.update({ent:{}})  
+        unigram_sents.update({ent:{}})  
         for sent in search_merge[ent]:
             unigram = set(sent['unigram'])
-            unigram_intersect = unigram.intersection(common_unigram)
+            unigram_intersect = unigram.intersection(unigram_set)
             for item in unigram_intersect:
-                if item in cand_sents[ent].keys():
-                    cand_sents[ent][item].append(sent)
+                if item in unigram_sents[ent].keys():
+                    unigram_sents[ent][item].append(sent)
                 else:
-                    cand_sents[ent].update({item:[sent]})
+                    unigram_sents[ent].update({item:[sent]})
 
-    cooccur_score = {}
     score_dist = {}
-    for cooent in common_unigram:
-        cooccur_score.update({cooent:0})
-        score_dist.update({cooent:{}})
+    for ug in unigram_set:
+        score_dist.update({ug:{}})
         for ent in query:
-            score_dist[cooent].update({ent:0})
-            if cooent in cand_sents[ent].keys():
+            score_dist[ug].update({ent:0})
+            if ug in unigram_sents[ent].keys():
                 did = set()
-                for sent in cand_sents[ent][cooent]:
+                for sent in unigram_sents[ent][ug]:
                     if sent['did'] not in did:
-                        cooccur_score[cooent] += sent['doc_score']
-                        score_dist[cooent][ent] += sent['doc_score']
+                        score_dist[ug][ent] += sent['doc_score']
                     did.add(sent['did'])
 
-    cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
+    agg_score = {}
+    for ug in score_dist.keys():
+        agg_score.update({ug: sum(score_dist[ug].values())})
 
-    for item in cooccur_sorted:
-        print(item)
-        print(score_dist[item[0]])
+
+    score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
+
+    for item in score_sorted:
+        print(item, score_dist[item[0]])
     sys.stdout.flush()
 
     context = ''
@@ -212,7 +208,7 @@ def main():
 
     tokenizer = MWETokenizer(separator=' ')
 
-    for e in common_unigram:
+    for e in unigram_set:
         tokenizer.add_mwe(nltk.word_tokenize(e))
     
     list_phrases = set(mined_phrases['counts'])
@@ -225,8 +221,8 @@ def main():
             continue
         raw_tokenized = tokenizer.tokenize(tokens)
         tokenized_set = set(raw_tokenized)
-        for token in tokenized_set.intersection(common_unigram):
-            score += cooccur_score[token]
+        for token in tokenized_set.intersection(unigram_set):
+            score += agg_score[token]
         phrases_score.update({phrase:score/len(nonstop_tokens)})
 
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1], reverse=True)
@@ -235,8 +231,8 @@ def main():
 
 
     ##### wmd based on cooccurrence #####
-    # tasks = list(split(list(common_unigram), args.num_process))
-    # inputs = [(tasks[i], cand_sents, query) for i in range(args.num_process)]
+    # tasks = list(split(list(unigram_set), args.num_process))
+    # inputs = [(tasks[i], unigram_sents, query) for i in range(args.num_process)]
     
     # with Pool(args.num_process) as p:
     #     wmd_results = p.map(cooccur_cluster, inputs)
