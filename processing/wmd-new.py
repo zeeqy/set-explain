@@ -112,7 +112,8 @@ def main():
     
     args = parser.parse_args()
     query = args.query_string.split(',')
-    nlp = spacy.load('en_core_web_lg')
+    nlp = spacy.load('en_core_web_lg', disable=['ner']) 
+    nlp.max_length = 4000000
 
     print(query)
     sys.stdout.flush()
@@ -183,13 +184,13 @@ def main():
 
     cooccur_score = {}
     for cooent in common_unigram:
-        cooccur_score.update({cooent:0})
+        cooccur_score.update({cooent:1})
         for ent in query:
             if cooent in cand_sents[ent].keys():
                 did = set()
                 for sent in cand_sents[ent][cooent]:
                     if sent['did'] not in did:
-                        cooccur_score[cooent] += sent['doc_score']
+                        cooccur_score[cooent] *= sent['doc_score']
                     did.add(sent['did'])
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
