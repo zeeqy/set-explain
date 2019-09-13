@@ -68,10 +68,10 @@ def sent_search(params):
                     #     else:
                     #         freq[ent].update({item_dict['did']:1})
                     
-                    tokens = [token.text for token in doc]
-                    pos = [token.pos_ for token in doc]
-                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                    item_dict['phrases'] = list(phrases['counts'])
+                    #tokens = [token.text for token in doc]
+                    #pos = [token.pos_ for token in doc]
+                    #phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                    #item_dict['phrases'] = list(phrases['counts'])
                     context[ent].append(item_dict)
 
                     freq[ent]['total'] += 1
@@ -194,17 +194,19 @@ def main():
 
     cooccur = cooccur_list[query[0]]
     for ent in query:
-        cooccur = cooccur.intersection(cooccur_list[ent])
+        cooccur = cooccur.union(cooccur_list[ent])
 
     ##### rank cooccurrence #####
     cooccur_score = {}
     for cooent in cooccur:
         cooccur_score.update({cooent:0})
         for ent in query:
-            cooccur_score[cooent] += entityMentioned[ent][cooent]['doc_score']
+            if ent in entityMentioned[ent].keys():
+                cooccur_score[cooent] += entityMentioned[ent][cooent]['doc_score']
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
+    print(cooccur_sorted[:100])
     sys.stdout.flush()
 
     fid = 1
@@ -240,52 +242,52 @@ def main():
     #     print(item)
     # sys.stdout.flush()
 
-    list_phrases = []
-    phrases_overlap = []
-    for ent in query:
-        tmp_res = []
-        for sent in search_merge[ent]:
-            list_phrases += sent['phrases']
-            tmp_res += sent['phrases']
-        phrases_overlap.append(set(tmp_res))
+    # list_phrases = []
+    # phrases_overlap = []
+    # for ent in query:
+    #     tmp_res = []
+    #     for sent in search_merge[ent]:
+    #         list_phrases += sent['phrases']
+    #         tmp_res += sent['phrases']
+    #     phrases_overlap.append(set(tmp_res))
 
-    phrases_set = phrases_overlap[0]
-    for item in phrases_overlap:
-        phrases_set = phrases_set.intersection(item)
+    # phrases_set = phrases_overlap[0]
+    # for item in phrases_overlap:
+    #     phrases_set = phrases_set.intersection(item)
 
     # for item in phrases_set:
     #     print(item)
 
 
-    tokenizer = MWETokenizer(separator=' ')
+    # tokenizer = MWETokenizer(separator=' ')
 
-    for e in cooccur:
-        tokenizer.add_mwe(nltk.word_tokenize(e))
+    # for e in cooccur:
+    #     tokenizer.add_mwe(nltk.word_tokenize(e))
     
-    list_phrases = set(list_phrases)
-    phrases_score = {}
-    for phrase in list_phrases:
-        score = 0
-        tokens = nltk.word_tokenize(phrase)
-        nonstop_tokens = [token for token in tokens if token not in stop]
-        if len(nonstop_tokens) / len(tokens) <= 0.5:
-            continue
-        raw_tokenized = tokenizer.tokenize(tokens)
-        tokenized_set = set(raw_tokenized)
-        for token in tokenized_set.intersection(cooccur):
-            score += cooccur_score[token]
-        phrases_score.update({phrase:score/len(nonstop_tokens)})
+    # list_phrases = set(list_phrases)
+    # phrases_score = {}
+    # for phrase in list_phrases:
+    #     score = 0
+    #     tokens = nltk.word_tokenize(phrase)
+    #     nonstop_tokens = [token for token in tokens if token not in stop]
+    #     if len(nonstop_tokens) / len(tokens) <= 0.5:
+    #         continue
+    #     raw_tokenized = tokenizer.tokenize(tokens)
+    #     tokenized_set = set(raw_tokenized)
+    #     for token in tokenized_set.intersection(cooccur):
+    #         score += cooccur_score[token]
+    #     phrases_score.update({phrase:score/len(nonstop_tokens)})
 
-    phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1], reverse=True)
+    # phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1], reverse=True)
 
-    print(phrases_sorted[:10])
+    # print(phrases_sorted[:10])
 
-    for ent in query:
-        for index, sent in enumerate(search_merge[ent]):
-            sent_score = 0
-            for item in set(sent['entityMentioned']).intersection(cooccur):
-                sent_score += cooccur_score[item]
-            search_merge[ent][index]['sent_score'] = sent_score
+    # for ent in query:
+    #     for index, sent in enumerate(search_merge[ent]):
+    #         sent_score = 0
+    #         for item in set(sent['entityMentioned']).intersection(cooccur):
+    #             sent_score += cooccur_score[item]
+    #         search_merge[ent][index]['sent_score'] = sent_score
 
     # for ent in query:
     #     sent_sorted = sorted(search_merge[ent], key=lambda x: x['sent_score'], reverse=True)
