@@ -215,7 +215,7 @@ def main():
     
     list_phrases = set(mined_phrases['counts'])
     phrases_score = {}
-    for phrase in list_phrases:
+    for phrase in tqdm(list_phrases, desc='phrase-eval', mininterval=10):
         score = 0
         tokens = nltk.word_tokenize(phrase)
         nonstop_tokens = [token for token in tokens if token not in stop]
