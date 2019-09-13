@@ -8,10 +8,11 @@ from tqdm import tqdm
 import spacy
 import textacy
 import wmd
+from nltk.tokenize import MWETokenizer
+import nltk
 from itertools import product
 from itertools import combinations
 import phrasemachine
-from nltk.tokenize import MWETokenizer
 
 def sent_search(params):
     (task_list, args) = params
