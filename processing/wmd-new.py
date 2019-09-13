@@ -219,7 +219,7 @@ def main():
             continue
         raw_tokenized = tokenizer.tokenize(tokens)
         tokenized_set = set(raw_tokenized)
-        for token in tokenized_set.intersection(cooccur):
+        for token in tokenized_set.intersection(common_unigram):
             score += cooccur_score[token]
         phrases_score.update({phrase:score/len(nonstop_tokens)})
 
