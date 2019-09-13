@@ -206,7 +206,8 @@ def main():
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
-    print(cooccur_sorted[:100])
+    for item in cooccur_sorted:
+        print(item)
     sys.stdout.flush()
 
     fid = 1
