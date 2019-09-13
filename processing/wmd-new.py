@@ -192,7 +192,8 @@ def main():
 
     agg_score = {}
     for ug in score_dist.keys():
-        agg_score.update({ug: np.mean(score_dist[ug].values()) - np.std(score_dist[ug].values())})
+        tmp_res = [item[1] for item in score_dist[ug].items()]
+        agg_score.update({ug: np.mean(tmp_res) - np.std(tmp_res)})
 
 
     score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
