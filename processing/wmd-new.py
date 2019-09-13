@@ -185,7 +185,7 @@ def main():
     cooccur_score = {}
     score_dist = {}
     for cooent in common_unigram:
-        cooccur_score
+        cooccur_score.update({cooent:0})
         score_dist.update({cooent:{}})
         for ent in query:
             score_dist[cooent].update({ent:0})
