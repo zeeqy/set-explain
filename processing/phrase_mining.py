@@ -48,7 +48,7 @@ def sent_search(params):
             entity_text = set([em for em in item_dict['entityMentioned']])
 
             for ent in query:
-                if ent not in item_dict['nsubj']:
+                if ent not in entity_text:
                     continue
                 else:
                     doc = nlp(item_dict['text'])
@@ -204,9 +204,12 @@ def main():
     cooccur_score = {}
     for cooent in cooccur:
         cooccur_score.update({cooent:0})
+        num_coo = 0
         for ent in query:
             if cooent in entityMentioned[ent].keys():
-                cooccur_score[cooent] += (len(search_merge[ent])/total) * entityMentioned[ent][cooent]['doc_score']
+                cooccur_score[cooent] += entityMentioned[ent][cooent]['doc_score']
+                num_coo += 1
+        cooccur_score[cooent] *= num_coo
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
