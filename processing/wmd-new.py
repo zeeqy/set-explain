@@ -183,20 +183,25 @@ def main():
                     cand_sents[ent].update({item:[sent]})
 
     cooccur_score = {}
+    score_dist = {}
     for cooent in common_unigram:
-        cooccur_score.update({cooent:1})
+        cooccur_score
+        score_dist.update({cooent:{}})
         for ent in query:
+            score_dist[cooent].update({ent:0})
             if cooent in cand_sents[ent].keys():
                 did = set()
                 for sent in cand_sents[ent][cooent]:
                     if sent['did'] not in did:
-                        cooccur_score[cooent] *= sent['doc_score']
+                        cooccur_score[cooent] += sent['doc_score']
+                        score_dist[cooent][ent] += sent['doc_score']
                     did.add(sent['did'])
 
     cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
 
     for item in cooccur_sorted:
         print(item)
+        print(score_dist[item[0]])
     sys.stdout.flush()
 
     context = ''
