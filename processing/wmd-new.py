@@ -50,7 +50,7 @@ def sent_search(params):
                     doc = nlp(item_dict['text'])
                     if len(doc) >= 30:
                         continue
-                    unigram = set([token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)])
+                    unigram = [token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
                     item_dict['unigram'] = unigram
                     context[ent].append(item_dict)
 
@@ -191,7 +191,7 @@ def main():
     for item in cooccur_sorted:
         print(item)
     sys.stdout.flush()
-    
+
     ##### wmd based on cooccurrence #####
     # tasks = list(split(list(common_unigram), args.num_process))
     # inputs = [(tasks[i], cand_sents, query) for i in range(args.num_process)]
