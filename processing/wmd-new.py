@@ -13,6 +13,7 @@ import nltk
 from itertools import product
 from itertools import combinations
 import phrasemachine
+stop = set(stopwords.words('english'))
 
 def sent_search(params):
     (task_list, args) = params
