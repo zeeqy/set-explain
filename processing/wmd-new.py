@@ -9,6 +9,7 @@ import spacy
 import textacy
 import wmd
 from nltk.tokenize import MWETokenizer
+from nltk.corpus import stopwords
 import nltk
 from itertools import product
 from itertools import combinations
