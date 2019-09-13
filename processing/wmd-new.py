@@ -165,7 +165,7 @@ def main():
 
     for ent in query:
         common_unigram.discard(ent)
-        
+
     cand_sents = {}
     for ent in query:
         cand_sents.update({ent:{}})  
@@ -194,6 +194,36 @@ def main():
     for item in cooccur_sorted:
         print(item)
     sys.stdout.flush()
+
+    context = ''
+    for ent in query:
+        context += ' '.join([item['text'] for item in search_merge[ent]])
+
+    mined_phrases = phrasemachine.get_phrases(context, minlen=2,maxlen=8)
+
+    tokenizer = MWETokenizer(separator=' ')
+
+    for e in common_unigram:
+        tokenizer.add_mwe(nltk.word_tokenize(e))
+    
+    list_phrases = set(mined_phrases['counts'])
+    phrases_score = {}
+    for phrase in list_phrases:
+        score = 0
+        tokens = nltk.word_tokenize(phrase)
+        nonstop_tokens = [token for token in tokens if token not in stop]
+        if len(nonstop_tokens) / len(tokens) <= 0.5:
+            continue
+        raw_tokenized = tokenizer.tokenize(tokens)
+        tokenized_set = set(raw_tokenized)
+        for token in tokenized_set.intersection(cooccur):
+            score += cooccur_score[token]
+        phrases_score.update({phrase:score/len(nonstop_tokens)})
+
+    phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1], reverse=True)
+
+    print(phrases_sorted[:10])
+
 
     ##### wmd based on cooccurrence #####
     # tasks = list(split(list(common_unigram), args.num_process))
