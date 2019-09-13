@@ -7,6 +7,7 @@ import collections
 from tqdm import tqdm
 import spacy
 import textacy
+import numpy as np
 import wmd
 from nltk.tokenize import MWETokenizer
 from nltk.corpus import stopwords
@@ -191,7 +192,7 @@ def main():
 
     agg_score = {}
     for ug in score_dist.keys():
-        agg_score.update({ug: sum(score_dist[ug].values())})
+        agg_score.update({ug: np.mean(score_dist[ug].values()) - np.std(score_dist[ug].values())})
 
 
     score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
