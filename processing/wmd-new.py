@@ -41,17 +41,17 @@ def sent_search(params):
                 sys.stdout.flush()
                 continue
 
+            entity_text = set([em for em in item_dict['entityMentioned']])
+
             for ent in query:
-                if ent not in item_dict['nsubj']:
+                if ent not in entity_text:
                     continue
                 else:
                     doc = nlp(item_dict['text'])
-                    if len(doc) >= 40:
+                    if len(doc) >= 30:
                         continue
-                    tokens = [token.text for token in doc]
-                    pos = [token.pos_ for token in doc]
-                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                    item_dict['phrases'] = list(phrases['counts'])
+                    unigram = set([token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)])
+                    item_dict['unigram'] = unigram
                     context[ent].append(item_dict)
 
                     freq[ent]['total'] += 1
@@ -161,14 +161,13 @@ def main():
 
     common_unigram = unigrams[0]
     for item in unigrams:
-        common_unigram = common_unigram.intersection(item)
+        common_unigram = common_unigram.union(item)
 
     cand_sents = {}
     for ent in query:
         cand_sents.update({ent:{}})  
         for sent in search_merge[ent]:
-            doc = nlp(sent['text'])
-            unigram = set([token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)])
+            unigram = set(sent['unigram'])
             unigram_intersect = unigram.intersection(common_unigram)
             for item in unigram_intersect:
                 if item in cand_sents[ent].keys():
@@ -176,23 +175,36 @@ def main():
                 else:
                     cand_sents[ent].update({item:[sent]})
 
+    cooccur_score = {}
+    for cooent in common_unigram:
+        cooccur_score.update({cooent:0})
+        for ent in query:
+            if cooent in cand_sents[ent].keys():
+                did = set()
+                for sent in cand_sents[ent][cooent]:
+                    if sent['did'] not in did:
+                        cooccur_score[cooent] += sent['doc_score']
+                    did.add(sent['did'])
+
+    cooccur_sorted = sorted(cooccur_score.items(), key=lambda x: x[1], reverse=True)
+
     ##### wmd based on cooccurrence #####
-    tasks = list(split(list(common_unigram), args.num_process))
-    inputs = [(tasks[i], cand_sents, query) for i in range(args.num_process)]
+    # tasks = list(split(list(common_unigram), args.num_process))
+    # inputs = [(tasks[i], cand_sents, query) for i in range(args.num_process)]
     
-    with Pool(args.num_process) as p:
-        wmd_results = p.map(cooccur_cluster, inputs)
+    # with Pool(args.num_process) as p:
+    #     wmd_results = p.map(cooccur_cluster, inputs)
 
-    wmd_merge = wmd_results[0]
-    for pid in range(1, len(wmd_results)):
-        tmp_res = wmd_results[pid]
-        wmd_merge.update(tmp_res)
+    # wmd_merge = wmd_results[0]
+    # for pid in range(1, len(wmd_results)):
+    #     tmp_res = wmd_results[pid]
+    #     wmd_merge.update(tmp_res)
 
-    sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
+    # sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
 
-    for item in sorted_wmd:
-        print(item)
-    sys.stdout.flush()
+    # for item in sorted_wmd:
+    #     print(item)
+    # sys.stdout.flush()
 
 if __name__ == '__main__':
     main()
