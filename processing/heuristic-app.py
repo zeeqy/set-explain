@@ -199,7 +199,7 @@ def main():
     query_length = 3
     bleu_eval = {}
 
-    for query_set in sets[0]:
+    for query_set in sets[:1]:
         score = 0
         item = json.loads(query_set)
         target = item['title'].lower().split(',')[0]
