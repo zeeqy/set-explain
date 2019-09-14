@@ -203,14 +203,15 @@ def main():
         score = 0
         item = json.loads(query_set)
         target = item['title'].lower().split(',')[0]
+        target_token = [token.text for token in nlp(target)]
         for index in range(num_query):
             query = list(np.random.choice(item['entities'], query_length))
             labels = main_thrd(query, args.num_process, args.input_dir)
-            candidate = []
-            for lab in labels:
-                doc = nlp(lab)
-                candidate.append([token.text for token in doc])
-            score += sentence_bleu(target, candidate)
+            candidate = [token.text for token in nlp(labels[0])]
+            # for lab in labels:
+            #     doc = nlp(lab)
+            #     candidate.append([token.text for token in doc])
+            score += sentence_bleu(target_token, candidate)
         score /= num_query
         bleu_eval.update({target:score})
 
