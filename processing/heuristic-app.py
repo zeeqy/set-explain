@@ -12,14 +12,13 @@ from nltk.corpus import stopwords
 import nltk
 import phrasemachine
 from scipy.stats import skew
+from nltk.translate.bleu_score import sentence_bleu
 stop = set(stopwords.words('english'))
 
 def sent_search(params):
-    (task_list, args) = params
+    (task_list, query, input_dir) = params
 
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
-
-    query = args.query_string.split(',')
 
     freq = dict()
 
@@ -30,7 +29,7 @@ def sent_search(params):
 
     for fname in task_list:
 
-        with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
+        with open('{}/{}'.format(input_dir,fname), 'r') as f:
             doc = f.readlines()
         f.close()
 
@@ -66,27 +65,17 @@ def split(a, n):
     k, m = divmod(len(a), n)
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
-def main():
-    parser = argparse.ArgumentParser(description="heuristic approach")
-    parser.add_argument('--input_dir', type=str, default='', help='corpus directory')
-    parser.add_argument('--query_string', type=str, default='', help='search query')
-    parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
-    
-    args = parser.parse_args()
-    query = args.query_string.split(',')
+def main_thrd(query, num_process, input_dir):
     nlp = spacy.load('en_core_web_lg', disable=['ner']) 
     nlp.max_length = 10000000
 
-    print(query)
-    sys.stdout.flush()
-
     ##### sentence search #####
-    input_dir = os.listdir(args.input_dir)
-    tasks = list(split(input_dir, args.num_process))
+    input_dir = os.listdir(input_dir)
+    tasks = list(split(input_dir, num_process))
     
-    inputs = [(tasks[i], args) for i in range(args.num_process)]
+    inputs = [(tasks[i], query, input_dir) for i in range(num_process)]
 
-    with Pool(args.num_process) as p:
+    with Pool(num_process) as p:
         search_results = p.map(sent_search, inputs)
     
     search_merge = search_results[0]['context']
@@ -158,10 +147,6 @@ def main():
     print("unigram scoring finished")
     sys.stdout.flush()
     
-    for item in score_sorted[:100]:
-        print(item, score_dist[item[0]])
-    sys.stdout.flush()
-
     context = ''
     for ent in query:
         context += ' '.join([item['text'] for item in search_merge[ent]])
@@ -195,7 +180,41 @@ def main():
 
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1], reverse=True)
 
-    print(phrases_sorted[:10])
+    return [phrase[0] for phrase in phrases_sorted[:5]]
+
+def main():
+    parser = argparse.ArgumentParser(description="heuristic approach")
+    parser.add_argument('--input_dir', type=str, default='', help='corpus directory')
+    parser.add_argument('--query_dir', type=str, default='', help='search query')
+    parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
+    
+    args = parser.parse_args()
+    nlp = spacy.load('en_core_web_lg', disable=['ner'])
+
+    with open('{}/gold_set.txt'.format(args.query_dir), 'r') as f:
+        sets = f.readlines()
+    f.close()
+
+    num_query = 10
+    query_length = 3
+    bleu_eval = {}
+
+    for query_set in sets[0]:
+        score = 0
+        item = json.loads(query_set)
+        target = item['title'].lower().split(',')[0]
+        for index in range(num_query):
+            query = list(np.random.choice(item['entities'], query_length))
+            labels = main_thrd(query, args.num_process, args.input_dir)
+            candidate = []
+            for lab in labels:
+                doc = nlp(lab)
+                candidate.append([token.text for token in doc])
+            score += sentence_bleu(target, candidate)
+        score /= num_query
+        bleu_eval.update({target:score})
+
+    print(bleu_eval)
 
 if __name__ == '__main__':
     main()
