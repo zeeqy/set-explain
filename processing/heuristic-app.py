@@ -70,8 +70,8 @@ def main_thrd(query, num_process, input_dir):
     nlp.max_length = 10000000
 
     ##### sentence search #####
-    input_dir = os.listdir(input_dir)
-    tasks = list(split(input_dir, num_process))
+    input_files = os.listdir(input_dir)
+    tasks = list(split(input_files, num_process))
     
     inputs = [(tasks[i], query, input_dir) for i in range(num_process)]
 
