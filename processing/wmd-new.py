@@ -15,6 +15,7 @@ import nltk
 from itertools import product
 from itertools import combinations
 import phrasemachine
+from scipy.stats import skew
 stop = set(stopwords.words('english'))
 
 def sent_search(params):
@@ -186,19 +187,20 @@ def main():
             if ug in unigram_sents[ent].keys():
                 did = set()
                 for sent in unigram_sents[ent][ug]:
-                    if sent['did'] not in did:
-                        score_dist[ug][ent] += sent['doc_score']
+                    score_dist[ug][ent] += sent['doc_score']
+                    #if sent['did'] not in did:
+                        #score_dist[ug][ent] += sent['doc_score']
                     did.add(sent['did'])
 
     agg_score = {}
     for ug in score_dist.keys():
         tmp_res = [item[1] for item in score_dist[ug].items()]
-        agg_score.update({ug: np.mean(tmp_res)})
+        agg_score.update({ug: np.mean(tmp_res) - np.std(tmp_res)})
 
 
     score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
 
-    for item in score_sorted:
+    for item in score_sorted[:100]:
         print(item, score_dist[item[0]])
     sys.stdout.flush()
 
@@ -219,11 +221,13 @@ def main():
         score = 0
         tokens = nltk.word_tokenize(phrase)
         nonstop_tokens = [token for token in tokens if token not in stop]
+        if len(nonstop_tokens) / len(tokens) <= 0.5:
+            continue
         raw_tokenized = tokenizer.tokenize(tokens)
         tokenized_set = set(raw_tokenized)
         for token in tokenized_set.intersection(unigram_set):
             score += agg_score[token]
-        phrases_score.update({phrase:score * len(nonstop_tokens) / len(tokens)})
+        phrases_score.update({phrase:score/len(nonstop_tokens)})
 
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1], reverse=True)
 
