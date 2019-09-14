@@ -114,7 +114,7 @@ def main():
     args = parser.parse_args()
     query = args.query_string.split(',')
     nlp = spacy.load('en_core_web_lg', disable=['ner']) 
-    nlp.max_length = 4000000
+    nlp.max_length = 10000000
 
     print(query)
     sys.stdout.flush()
