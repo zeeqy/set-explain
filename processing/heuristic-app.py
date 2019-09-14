@@ -166,7 +166,10 @@ def main():
     for ent in query:
         context += ' '.join([item['text'] for item in search_merge[ent]])
 
-    mined_phrases = phrasemachine.get_phrases(context, minlen=2,maxlen=8)
+    doc = nlp(context)
+    tokens = [token.text for token in doc]
+    pos = [token.pos_ for token in doc]
+    mined_phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
 
     print("phrase mining finished")
     sys.stdout.flush()
@@ -178,7 +181,7 @@ def main():
     
     list_phrases = set(mined_phrases['counts'])
     phrases_score = {}
-    for phrase in tqdm(list_phrases, desc='phrase-eval', mininterval=10):
+    for phrase in tqdm(list_phrases, desc='phrase-eval'):
         score = 0
         tokens = nltk.word_tokenize(phrase)
         nonstop_tokens = [token for token in tokens if token not in stop]
@@ -191,7 +194,7 @@ def main():
         phrases_score.update({phrase:score/len(nonstop_tokens)})
 
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1], reverse=True)
-    
+
     print(phrases_sorted[:10])
 
 if __name__ == '__main__':
