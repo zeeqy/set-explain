@@ -192,7 +192,7 @@ def main():
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
     with open('{}/gold_set.txt'.format(args.query_dir), 'r') as f:
-        sets = f.readlines()
+        sets = f.read().split('\n')
     f.close()
 
     num_query = 10
