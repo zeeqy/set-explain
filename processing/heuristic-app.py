@@ -152,19 +152,20 @@ def main_thrd(query, num_process, input_dir):
     print("unigram scoring finished")
     sys.stdout.flush()
     
-    # context = ''
-    # for ent in query:
-    #     context += ' '.join([item['text'] for item in search_merge[ent]])
-
-    # doc = nlp(context)
-    # tokens = [token.text for token in doc]
-    # pos = [token.pos_ for token in doc]
-    # mined_phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
-
-    mined_phrases = []
+    context = ''
     for ent in query:
-        for sent in search_merge[ent]:
-            mined_phrases += sent['phrases']
+        context += ' '.join([item['text'] for item in search_merge[ent]])
+
+    doc = nlp(context)
+    tokens = [token.text for token in doc]
+    pos = [token.pos_ for token in doc]
+    mined_phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
+    mined_phrases = mined_phrases['counts']
+    
+    # mined_phrases = []
+    # for ent in query:
+    #     for sent in search_merge[ent]:
+    #         mined_phrases += sent['phrases']
 
     print("phrase mining finished")
     sys.stdout.flush()
