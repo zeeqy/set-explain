@@ -54,10 +54,10 @@ def sent_search(params):
                         continue
                     unigram = [token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
                     item_dict['unigram'] = unigram
-                    tokens = [token.text for token in doc]
-                    pos = [token.pos_ for token in doc]
-                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                    item_dict['phrases'] = list(phrases['counts'])
+                    # tokens = [token.text for token in doc]
+                    # pos = [token.pos_ for token in doc]
+                    # phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                    # item_dict['phrases'] = list(phrases['counts'])
                     context[ent].append(item_dict)
 
                     freq[ent]['total'] += 1
@@ -105,14 +105,13 @@ def main_thrd(query, num_process, input_dir):
 
     unigrams = []
     for ent in query:
-        context = ' '.join([sent['text'] for sent in search_merge[ent]])
-        doc = nlp(context)
-        unigram = set([token.text for token in textacy.extract.ngrams(doc, n=1, filter_nums=True, filter_punct=True, filter_stops=True, min_freq=5)])
-        unigrams.append(unigram)
+        for sent in search_merge[ent]:
+            unigrams += sent['unigram']
+    unigrams = set(unigrams)
 
-    unigram_set = unigrams[0]
-    for item in unigrams:
-        unigram_set = unigram_set.union(item)
+    # unigram_set = unigrams[0]
+    # for item in unigrams:
+    #     unigram_set = unigram_set.union(item)
 
     for ent in query:
         unigram_set.discard(ent)
