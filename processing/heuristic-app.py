@@ -67,7 +67,7 @@ def split(a, n):
 
 def main_thrd(query, num_process, input_dir):
     nlp = spacy.load('en_core_web_lg', disable=['ner']) 
-    nlp.max_length = 10000000
+    nlp.max_length = 30000000
 
     ##### sentence search #####
     input_files = os.listdir(input_dir)
