@@ -12,8 +12,10 @@ from nltk.corpus import stopwords
 import nltk
 import phrasemachine
 from scipy.stats import skew
-from nltk.translate.bleu_score import sentence_bleu
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+from nltk.stem.snowball import SnowballStemmer
 stop = set(stopwords.words('english'))
+stemmer = SnowballStemmer(language='english')
 
 def sent_search(params):
     (task_list, query, input_dir) = params
@@ -207,23 +209,24 @@ def main():
     num_query = args.num_query
     query_length = args.query_length
     bleu_eval = {}
+    smoothie = SmoothingFunction().method2
 
     for query_set in sets[:1]:
         score = 0
         item = json.loads(query_set)
         target = item['title'].lower().split(',')[0]
-        target_token = [[token.text for token in nlp(target)]]
+        target_token = [[stemmer.stem(token.text) for token in nlp(target)]]
         index = 0
         while index < num_query:
             query = list(np.random.choice(item['entities'], query_length))
             if len(set(query).intersection(entityset)) != len(query):
                 continue
             labels = main_thrd(query, args.num_process, args.input_dir)
-            candidate = [token.text for token in nlp(labels[0])]
+            candidate = [stemmer.stem(token.text) for token in nlp(labels[0])]
             # for lab in labels:
             #     doc = nlp(lab)
             #     candidate.append([token.text for token in doc])
-            bleu = sentence_bleu(target_token, candidate, weights=(1, 0, 0, 0))
+            bleu = sentence_bleu(target_token, candidate, smoothing_function=smoothie)
             score += bleu
             index += 1
             print(query, target_token, candidate, bleu)
