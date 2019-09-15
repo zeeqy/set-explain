@@ -54,6 +54,10 @@ def sent_search(params):
                         continue
                     unigram = [token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
                     item_dict['unigram'] = unigram
+                    tokens = [token.text for token in doc]
+                    pos = [token.pos_ for token in doc]
+                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                    item_dict['phrases'] = list(phrases['counts'])
                     context[ent].append(item_dict)
 
                     freq[ent]['total'] += 1
@@ -149,14 +153,19 @@ def main_thrd(query, num_process, input_dir):
     print("unigram scoring finished")
     sys.stdout.flush()
     
-    context = ''
-    for ent in query:
-        context += ' '.join([item['text'] for item in search_merge[ent]])
+    # context = ''
+    # for ent in query:
+    #     context += ' '.join([item['text'] for item in search_merge[ent]])
 
-    doc = nlp(context)
-    tokens = [token.text for token in doc]
-    pos = [token.pos_ for token in doc]
-    mined_phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
+    # doc = nlp(context)
+    # tokens = [token.text for token in doc]
+    # pos = [token.pos_ for token in doc]
+    # mined_phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
+
+    mined_phrases = []
+    for ent in query:
+        for sent in search_merge[ent]:
+            mined_phrases += sent['phrases']
 
     print("phrase mining finished")
     sys.stdout.flush()
@@ -166,7 +175,7 @@ def main_thrd(query, num_process, input_dir):
     for e in unigram_set:
         tokenizer.add_mwe(nltk.word_tokenize(e))
     
-    list_phrases = set(mined_phrases['counts'])
+    list_phrases = set(mined_phrases)
     phrases_score = {}
     for phrase in tqdm(list_phrases, desc='phrase-eval'):
         score = 0
@@ -187,27 +196,31 @@ def main_thrd(query, num_process, input_dir):
 def main():
     parser = argparse.ArgumentParser(description="heuristic approach")
     parser.add_argument('--input_dir', type=str, default='', help='corpus directory')
+    parser.add_argument('--query_dir', type=str, default='', help='search query')
     parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
+    parser.add_argument('--num_query', type=int, default=5, help='number of query per set')
+    parser.add_argument('--query_length', type=int, default=3, help='query length')
+    parser.add_argument('--entity_dir', type=str, default='', help='entity files directory')
     
     args = parser.parse_args()
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
-    with open('/mnt/nfs/work1/allan/zhiqihuang/set-explain/data/gold_set.txt', 'r') as f:
+    with open('{}/gold_set.txt'.format(args.query_dir), 'r') as f:
         sets = f.read().split('\n')
     f.close()
 
-    with open('/mnt/nfs/work1/allan/zhiqihuang/HiExpan/src/tools/AutoPhrase/data/EN/wiki_quality.txt', 'r') as f:
+    with open('{}/wiki_quality.txt'.format(args.entity_dir), 'r') as f:
         raw_list = f.read()
     f.close()
 
     entityset = set(raw_list.split('\n'))
 
-    num_query = 5
-    query_length = 3
+    num_query = args.num_query
+    query_length = args.query_length
     bleu_eval = {}
     smoothie = SmoothingFunction().method2
 
-    for query_set in sets:
+    for query_set in sets[:1]:
         score = 0
         item = json.loads(query_set)
         target = item['title'].lower().split(',')[0]
