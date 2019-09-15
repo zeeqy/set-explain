@@ -218,6 +218,7 @@ def main():
             query = list(np.random.choice(item['entities'], query_length))
             if len(set(query).intersection(entityset)) != len(query):
                 continue
+            print(query)
             labels = main_thrd(query, args.num_process, args.input_dir)
             candidate = [token.text for token in nlp(labels[0])]
             # for lab in labels:
