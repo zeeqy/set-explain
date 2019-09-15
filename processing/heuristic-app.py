@@ -189,6 +189,7 @@ def main():
     parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
     parser.add_argument('--num_query', type=int, default=5, help='number of query per set')
     parser.add_argument('--query_length', type=int, default=3, help='query length')
+    parser.add_argument('--entity_dir', type=str, default='', help='entity files directory')
     
     args = parser.parse_args()
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
@@ -196,6 +197,12 @@ def main():
     with open('{}/gold_set.txt'.format(args.query_dir), 'r') as f:
         sets = f.read().split('\n')
     f.close()
+
+    with open('{}/wiki_quality.txt'.format(args.entity_dir), 'r') as f:
+        raw_list = f.read()
+    f.close()
+
+    entityset = set(raw_list.split('\n'))
 
     num_query = args.num_query
     query_length = args.query_length
@@ -206,14 +213,18 @@ def main():
         item = json.loads(query_set)
         target = item['title'].lower().split(',')[0]
         target_token = [token.text for token in nlp(target)]
-        for index in range(num_query):
+        index = 0
+        while index < num_query:
             query = list(np.random.choice(item['entities'], query_length))
+            if len(set(query).intersection(entityset)) != len(query):
+                continue
             labels = main_thrd(query, args.num_process, args.input_dir)
             candidate = [token.text for token in nlp(labels[0])]
             # for lab in labels:
             #     doc = nlp(lab)
             #     candidate.append([token.text for token in doc])
             score += sentence_bleu(target_token, candidate, weights=(1, 0, 0, 0))
+            index += 1
             print(labels, target_token, candidate, score)
         score /= num_query
         bleu_eval.update({target:score})
