@@ -207,6 +207,7 @@ def main():
         for index in range(num_query):
             query = list(np.random.choice(item['entities'], query_length))
             labels = main_thrd(query, args.num_process, args.input_dir)
+            print(labels)
             candidate = [token.text for token in nlp(labels[0])]
             # for lab in labels:
             #     doc = nlp(lab)
