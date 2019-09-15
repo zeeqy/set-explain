@@ -220,7 +220,7 @@ def main():
     bleu_eval = {}
     smoothie = SmoothingFunction().method2
 
-    for query_set in sets[:1]:
+    for query_set in sets:
         score = 0
         item = json.loads(query_set)
         target = item['title'].lower().split(',')[0]
