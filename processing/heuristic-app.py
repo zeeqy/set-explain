@@ -67,7 +67,7 @@ def split(a, n):
 
 def main_thrd(query, num_process, input_dir):
     nlp = spacy.load('en_core_web_lg', disable=['ner']) 
-    nlp.max_length = 30000000
+    nlp.max_length = 50000000
 
     ##### sentence search #####
     input_files = os.listdir(input_dir)
@@ -101,7 +101,7 @@ def main_thrd(query, num_process, input_dir):
     for ent in query:
         context = ' '.join([sent['text'] for sent in search_merge[ent]])
         doc = nlp(context)
-        unigram = set([token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True, min_freq=5)])
+        unigram = set([token.text for token in textacy.extract.ngrams(doc, n=1, filter_nums=True, filter_punct=True, filter_stops=True, min_freq=5)])
         unigrams.append(unigram)
 
     unigram_set = unigrams[0]
@@ -187,6 +187,8 @@ def main():
     parser.add_argument('--input_dir', type=str, default='', help='corpus directory')
     parser.add_argument('--query_dir', type=str, default='', help='search query')
     parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
+    parser.add_argument('--num_query', type=int, default=5, help='number of query per set')
+    parser.add_argument('--query_length', type=int, default=3, help='query length')
     
     args = parser.parse_args()
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
@@ -195,8 +197,8 @@ def main():
         sets = f.read().split('\n')
     f.close()
 
-    num_query = 10
-    query_length = 3
+    num_query = args.num_query
+    query_length = args.query_length
     bleu_eval = {}
 
     for query_set in sets[:1]:
@@ -216,7 +218,9 @@ def main():
         score /= num_query
         bleu_eval.update({target:score})
 
-    print(bleu_eval)
+        with open('bleu.txt', 'a') as f:
+            f.write(json.dumps(bleu_eval) + '\n')
+        f.close()
 
 if __name__ == '__main__':
     main()
