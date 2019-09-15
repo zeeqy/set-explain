@@ -212,7 +212,7 @@ def main():
             # for lab in labels:
             #     doc = nlp(lab)
             #     candidate.append([token.text for token in doc])
-            score += sentence_bleu(target_token, candidate)
+            score += sentence_bleu(target_token, candidate, weights=(1, 0, 0, 0))
         score /= num_query
         bleu_eval.update({target:score})
 
