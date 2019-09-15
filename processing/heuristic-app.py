@@ -187,27 +187,23 @@ def main_thrd(query, num_process, input_dir):
 def main():
     parser = argparse.ArgumentParser(description="heuristic approach")
     parser.add_argument('--input_dir', type=str, default='', help='corpus directory')
-    parser.add_argument('--query_dir', type=str, default='', help='search query')
     parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
-    parser.add_argument('--num_query', type=int, default=5, help='number of query per set')
-    parser.add_argument('--query_length', type=int, default=3, help='query length')
-    parser.add_argument('--entity_dir', type=str, default='', help='entity files directory')
     
     args = parser.parse_args()
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
-    with open('{}/gold_set.txt'.format(args.query_dir), 'r') as f:
+    with open('/mnt/nfs/work1/allan/zhiqihuang/set-explain/data/gold_set.txt', 'r') as f:
         sets = f.read().split('\n')
     f.close()
 
-    with open('{}/wiki_quality.txt'.format(args.entity_dir), 'r') as f:
+    with open('/mnt/nfs/work1/allan/zhiqihuang/HiExpan/src/tools/AutoPhrase/data/EN/wiki_quality.txt', 'r') as f:
         raw_list = f.read()
     f.close()
 
     entityset = set(raw_list.split('\n'))
 
-    num_query = args.num_query
-    query_length = args.query_length
+    num_query = 5
+    query_length = 3
     bleu_eval = {}
     smoothie = SmoothingFunction().method2
 
