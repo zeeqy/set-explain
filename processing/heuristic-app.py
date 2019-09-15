@@ -107,7 +107,7 @@ def main_thrd(query, num_process, input_dir):
     for ent in query:
         for sent in search_merge[ent]:
             unigrams += sent['unigram']
-    unigrams = set(unigrams)
+    unigram_set = set(unigrams)
 
     # unigram_set = unigrams[0]
     # for item in unigrams:
