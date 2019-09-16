@@ -4,9 +4,6 @@ import bisect
 import multiprocessing as mp
 from tqdm import tqdm
 import string
-import phrasemachine
-import textacy
-import spacy
 from nltk.tokenize import MWETokenizer
 import nltk
 
@@ -19,8 +16,6 @@ def merge_task(task_list, args):
     with open('{}/wiki_quality.txt'.format(args.entity_dir), 'r') as f:
         raw_list = f.read()
     f.close()
-
-    nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
     entityset = set(raw_list.split('\n'))
 
@@ -47,14 +42,7 @@ def merge_task(task_list, args):
             tokenized_set = set(raw_tokenized)
             mentioned_entity = list(tokenized_set.intersection(entityset))
             if len(mentioned_entity) != 0:
-                doc = nlp(item_dict['text'])
                 item_dict.update({'entityMentioned':mentioned_entity})
-                unigram = [token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
-                item_dict['unigram'] = unigram
-                tokens = [token.text for token in doc]
-                pos = [token.pos_ for token in doc]
-                phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
-                item_dict['phrases'] = list(phrases['counts'])
                 context.append(json.dumps(item_dict))
 
         with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
