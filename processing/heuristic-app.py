@@ -11,6 +11,7 @@ from nltk.tokenize import MWETokenizer
 from nltk.corpus import stopwords
 import nltk
 import phrasemachine
+import time
 from scipy.stats import skew
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from nltk.stem.snowball import SnowballStemmer
@@ -72,6 +73,7 @@ def split(a, n):
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
 def main_thrd(query, num_process, input_dir):
+    start_time = time.time()
     nlp = spacy.load('en_core_web_lg', disable=['ner']) 
     nlp.max_length = 50000000
 
@@ -100,9 +102,10 @@ def main_thrd(query, num_process, input_dir):
         for index in range(len(search_merge[ent])):
             search_merge[ent][index]['doc_score'] = count_merge[ent][search_merge[ent][index]['did']]/count_merge[ent]['total']
 
-    print("context search finished")
+    print("--- search use %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
 
+    start_time = time.time()
     unigrams = []
     for ent in query:
         for sent in search_merge[ent]:
@@ -149,7 +152,7 @@ def main_thrd(query, num_process, input_dir):
 
     score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
 
-    print("unigram scoring finished")
+    print("--- unigram score %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
     
     # context = ''
@@ -162,14 +165,17 @@ def main_thrd(query, num_process, input_dir):
     # mined_phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
     # mined_phrases = mined_phrases['counts']
     
+    start_time = time.time()
+    
     mined_phrases = []
     for ent in query:
         for sent in search_merge[ent]:
             mined_phrases += sent['phrases']
 
-    print("phrase mining finished")
+    print("--- phrase mining %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
 
+    start_time = time.time()
     tokenizer = MWETokenizer(separator=' ')
 
     for e in unigram_set:
@@ -190,6 +196,8 @@ def main_thrd(query, num_process, input_dir):
         phrases_score.update({phrase:score/len(nonstop_tokens)})
 
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1], reverse=True)
+
+    print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
 
     return [phrase[0] for phrase in phrases_sorted[:5]]
 
