@@ -257,7 +257,7 @@ def main():
         score /= num_query
         bleu_eval.update({target:score})
 
-        with open('bleu.txt', 'a') as f:
+        with open('bleu-{}.txt'.format(query_length), 'a+') as f:
             f.write(json.dumps(bleu_eval) + '\n')
         f.close()
 
