@@ -226,17 +226,22 @@ def main():
     num_query = args.num_query
     query_length = args.query_length
     bleu_eval = {}
-    smoothie = SmoothingFunction().method2
+    smoothie = SmoothingFunction().method3 # NIST smoothing
 
     for query_set in sets:
         score = 0
         item = json.loads(query_set)
+        seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
         target = item['title'].lower().split(',')[0]
         target_token = [[stemmer.stem(token.text) for token in nlp(target)]]
         index = 0
+        retry = 0
         while index < num_query:
-            query = list(np.random.choice(item['entities'], query_length))
+            if retry > 1000:
+                break
+            query = list(np.random.choice(seeds, query_length))
             if len(set(query).intersection(entityset)) != len(query):
+                retry += 1
                 continue
             labels = main_thrd(query, args.num_process, args.input_dir)
             candidate = [stemmer.stem(token.text) for token in nlp(labels[0])]
@@ -247,6 +252,8 @@ def main():
             score += bleu
             index += 1
             print(query, target_token, candidate, bleu)
+        if retry > 1000:
+            continue
         score /= num_query
         bleu_eval.update({target:score})
 
