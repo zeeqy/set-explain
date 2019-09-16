@@ -20,6 +20,8 @@ def merge_task(task_list, args):
         raw_list = f.read()
     f.close()
 
+    nlp = spacy.load('en_core_web_lg', disable=['ner'])
+
     entityset = set(raw_list.split('\n'))
 
     tokenizer = MWETokenizer(separator=' ')
@@ -45,6 +47,7 @@ def merge_task(task_list, args):
             tokenized_set = set(raw_tokenized)
             mentioned_entity = list(tokenized_set.intersection(entityset))
             if len(mentioned_entity) != 0:
+                doc = nlp(item_dict['text'])
                 item_dict.update({'entityMentioned':mentioned_entity})
                 unigram = [token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
                 item_dict['unigram'] = unigram
