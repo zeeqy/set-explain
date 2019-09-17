@@ -228,7 +228,11 @@ def main():
     bleu_eval = {}
     smoothie = SmoothingFunction().method3 # NIST smoothing
 
-    for query_set in sets:
+    query_set = []
+    for entry in sets:
+        query_set.append(json.loads(entry))
+
+    for item in query_set:
         score = 0
         item = json.loads(query_set)
         seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
