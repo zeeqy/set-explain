@@ -199,7 +199,7 @@ def main_thrd(query, num_process, input_dir):
 
     print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
 
-    return [phrase[0] for phrase in phrases_sorted[:5]]
+    return [phrase for phrase in phrases_sorted[:5]]
 
 def main():
     parser = argparse.ArgumentParser(description="heuristic approach")
@@ -249,14 +249,18 @@ def main():
                 retry += 1
                 continue
             labels = main_thrd(query, args.num_process, args.input_dir)
-            candidate = [stemmer.stem(token.text) for token in nlp(labels[0])]
+            candidate = [stemmer.stem(token.text) for token in nlp(labels[0][0])]
             # for lab in labels:
             #     doc = nlp(lab)
             #     candidate.append([token.text for token in doc])
             bleu = sentence_bleu(target_token, candidate, smoothing_function=smoothie)
             score += bleu
             index += 1
-            print(query, target_token, candidate, bleu)
+            meta = {'query':query, 'traget': target, 'top5': labels, 'top1_bleu':bleu}
+            print(meta)
+            with open('log-{}.txt'.format(query_length), 'a+') as f:
+                f.write(json.dumps(meta) + '\n')
+            f.close()
         if retry > 1000:
             continue
         score /= num_query
