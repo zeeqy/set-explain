@@ -223,6 +223,8 @@ def main():
 
     entityset = set(raw_list.split('\n'))
 
+    sets = [line for line in sets if line != '']
+
     num_query = args.num_query
     query_length = args.query_length
     bleu_eval = {}
@@ -234,7 +236,6 @@ def main():
 
     for item in query_set:
         score = 0
-        item = json.loads(query_set)
         seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
         target = item['title'].lower().split(',')[0]
         target_token = [[stemmer.stem(token.text) for token in nlp(target)]]
