@@ -260,11 +260,11 @@ def main():
             best_bleu = 0
             best_phrase = ''
             for label in labels:
-                candidate = [stemmer.stem(token.text) for token in nlp(label)]
+                candidate = [stemmer.stem(token.text) for token in nlp(label[0])]
                 tmp_bleu = sentence_bleu(target_token, candidate, smoothing_function=smoothie)
                 if tmp_bleu > best_bleu:
                     best_bleu = tmp_bleu
-                    best_phrase = label
+                    best_phrase = label[0]
             recall += best_bleu
             meta = {'query':query, 'target': target, 'top5': labels, 'top1_bleu':bleu, 'top100_recall': (best_phrase, best_bleu)}
             print(meta)
