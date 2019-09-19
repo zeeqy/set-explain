@@ -199,7 +199,7 @@ def main_thrd(query, num_process, input_dir):
 
     print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
 
-    return [phrase for phrase in phrases_sorted[:5]]
+    return [phrase for phrase in phrases_sorted[:min(100, len(phrases_sorted))]]
 
 def main():
     parser = argparse.ArgumentParser(description="heuristic approach")
@@ -256,7 +256,15 @@ def main():
             bleu = sentence_bleu(target_token, candidate, smoothing_function=smoothie)
             score += bleu
             index += 1
-            meta = {'query':query, 'traget': target, 'top5': labels, 'top1_bleu':bleu}
+            best_bleu = 0
+            best_phrase = ''
+            for label in labels:
+                candidate = [stemmer.stem(token.text) for token in nlp(label)]
+                tmp_bleu = sentence_bleu(target_token, candidate, smoothing_function=smoothie)
+                if tmp_bleu > best_bleu:
+                    best_bleu = tmp_bleu
+                    best_phrase = label
+            meta = {'query':query, 'target': target, 'top5': labels, 'top1_bleu':bleu, 'top100_recall': (best_phrase, best_bleu)}
             print(meta)
             with open('log-{}.txt'.format(query_length), 'a+') as f:
                 f.write(json.dumps(meta) + '\n')
