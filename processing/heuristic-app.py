@@ -236,6 +236,7 @@ def main():
 
     for item in query_set:
         score = 0
+        recall = 0
         seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
         target = item['title'].lower().split(',')[0]
         target_token = [[stemmer.stem(token.text) for token in nlp(target)]]
@@ -264,6 +265,7 @@ def main():
                 if tmp_bleu > best_bleu:
                     best_bleu = tmp_bleu
                     best_phrase = label
+            recall += best_bleu
             meta = {'query':query, 'target': target, 'top5': labels, 'top1_bleu':bleu, 'top100_recall': (best_phrase, best_bleu)}
             print(meta)
             with open('log-{}.txt'.format(query_length), 'a+') as f:
@@ -272,7 +274,8 @@ def main():
         if retry > 1000:
             continue
         score /= num_query
-        bleu_eval.update({target:score})
+        recall /= num_query
+        bleu_eval.update({target:{'top1_bleu': score, 'top100_reall': recall}})
 
         with open('bleu-{}.txt'.format(query_length), 'a+') as f:
             f.write(json.dumps(bleu_eval) + '\n')
