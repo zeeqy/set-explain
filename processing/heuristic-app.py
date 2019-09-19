@@ -266,7 +266,7 @@ def main():
                     best_bleu = tmp_bleu
                     best_phrase = label[0]
             recall += best_bleu
-            meta = {'query':query, 'target': target, 'top5': labels, 'top1_bleu':bleu, 'top100_recall': (best_phrase, best_bleu)}
+            meta = {'query':query, 'target': target, 'top5': labels[:5], 'top1_bleu':bleu, 'top100_recall': (best_phrase, best_bleu)}
             print(meta)
             with open('log-{}.txt'.format(query_length), 'a+') as f:
                 f.write(json.dumps(meta) + '\n')
