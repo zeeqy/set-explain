@@ -157,10 +157,6 @@ def main():
         f.close()
         fid += 1
 
-    print("--- search use %s seconds ---" % (time.time() - start_time))
-    sys.stdout.flush()
-
-    start_time = time.time()
     unigrams = []
     for ent in query:
         for sent in search_merge[ent]:
@@ -202,10 +198,6 @@ def main():
 
 
     score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
-
-    print("--- unigram score %s seconds ---" % (time.time() - start_time))
-    sys.stdout.flush()
-
 
     ### phrase hard match ###
 
