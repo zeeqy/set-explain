@@ -86,7 +86,7 @@ def cooccur_cluster(params):
         best_wmd = 1e6
         best_pair = []
         prod = list(product(*index_list))
-        if len(prod) > 1e5:
+        if len(prod) > 1e4:
             continue
         for pair in tqdm(prod, desc='wmd-{}'.format(keyent), mininterval=10):
             sentsPair = [sentsPool[index][pair[index]]['text'] for index in range(len(pair))]
@@ -211,7 +211,36 @@ def main():
     for ent in query:
         coo_phrases = coo_phrases.intersection(set(mined_phrases[ent]))
 
-    print(coo_phrases)
+    print('number of cooccurred phrase: ', len(coo_phrases))
+    sys.stdout.flush()
+
+    phrase_sents = {}
+    for ent in query:
+        phrase_sents.update({ent:{}})
+        for sent in search_merge[ent]:
+            for item in coo_phrases:
+                if item in phrase_sents[ent].keys():
+                    phrase_sents[ent][item].append(sent)
+                else:
+                    phrase_sents[ent].update({item:[sent]})
+
+
+    tasks = list(split(list(coo_phrases), args.num_process))
+    inputs = [(tasks[i], phrase_sents, query) for i in range(args.num_process)]
+
+    with Pool(args.num_process) as p:
+        wmd_results = p.map(cooccur_cluster, inputs)
+
+    wmd_merge = wmd_results[0]
+    for pid in range(1, len(wmd_results)):
+        tmp_res = wmd_results[pid]
+        wmd_merge.update(tmp_res)
+
+    sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
+
+    for item in sorted_wmd:
+        print(item)
+    sys.stdout.flush()
 
     ##### wmd based on cooccurrence #####
     # tasks = list(split(list(unigram_set), args.num_process))
