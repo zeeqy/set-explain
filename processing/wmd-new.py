@@ -19,11 +19,9 @@ from scipy.stats import skew
 stop = set(stopwords.words('english'))
 
 def sent_search(params):
-    (task_list, args) = params
+    (task_list, query, input_dir) = params
 
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
-
-    query = args.query_string.split(',')
 
     freq = dict()
 
@@ -34,7 +32,7 @@ def sent_search(params):
 
     for fname in task_list:
 
-        with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
+        with open('{}/{}'.format(input_dir,fname), 'r') as f:
             doc = f.readlines()
         f.close()
 
@@ -57,6 +55,10 @@ def sent_search(params):
                         continue
                     unigram = [token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
                     item_dict['unigram'] = unigram
+                    tokens = [token.text for token in doc]
+                    pos = [token.pos_ for token in doc]
+                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
+                    item_dict['phrases'] = list(phrases['counts'])
                     context[ent].append(item_dict)
 
                     freq[ent]['total'] += 1
@@ -64,7 +66,6 @@ def sent_search(params):
                         freq[ent][item_dict['did']] += 1
                     else:
                         freq[ent].update({item_dict['did']:1})
-    
     return {'context':context, 'freq':freq}
 
 def cooccur_cluster(params):
@@ -153,16 +154,15 @@ def main():
         f.close()
         fid += 1
 
+    print("--- search use %s seconds ---" % (time.time() - start_time))
+    sys.stdout.flush()
+
+    start_time = time.time()
     unigrams = []
     for ent in query:
-        context = ' '.join([sent['text'] for sent in search_merge[ent]])
-        doc = nlp(context)
-        unigram = set([token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True, min_freq=5)])
-        unigrams.append(unigram)
-
-    unigram_set = unigrams[0]
-    for item in unigrams:
-        unigram_set = unigram_set.union(item)
+        for sent in search_merge[ent]:
+            unigrams += sent['unigram']
+    unigram_set = set(unigrams)
 
     for ent in query:
         unigram_set.discard(ent)
@@ -200,39 +200,23 @@ def main():
 
     score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
 
-    for item in score_sorted[:100]:
-        print(item, score_dist[item[0]])
+    print("--- unigram score %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
 
-    context = ''
+
+    ### phrase hard match ###
+
+    mined_phrases = {}
     for ent in query:
-        context += ' '.join([item['text'] for item in search_merge[ent]])
+        mined_phrases.update({ent:[]})
+        for sent in search_merge[ent]:
+            mined_phrases[ent] += sent['phrases']
 
-    mined_phrases = phrasemachine.get_phrases(context, minlen=2,maxlen=8)
+    coo_phrases = set(mined_phrases[query[0]])
+    for ent in query:
+        coo_phrases = coo_phrases.intersection(set(mined_phrases[ent]))
 
-    tokenizer = MWETokenizer(separator=' ')
-
-    for e in unigram_set:
-        tokenizer.add_mwe(nltk.word_tokenize(e))
-    
-    list_phrases = set(mined_phrases['counts'])
-    phrases_score = {}
-    for phrase in tqdm(list_phrases, desc='phrase-eval', mininterval=10):
-        score = 0
-        tokens = nltk.word_tokenize(phrase)
-        nonstop_tokens = [token for token in tokens if token not in stop]
-        if len(nonstop_tokens) / len(tokens) <= 0.5:
-            continue
-        raw_tokenized = tokenizer.tokenize(tokens)
-        tokenized_set = set(raw_tokenized)
-        for token in tokenized_set.intersection(unigram_set):
-            score += agg_score[token]
-        phrases_score.update({phrase:score/len(nonstop_tokens)})
-
-    phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1], reverse=True)
-
-    print(phrases_sorted[:10])
-
+    print(coo_phrases)
 
     ##### wmd based on cooccurrence #####
     # tasks = list(split(list(unigram_set), args.num_process))
