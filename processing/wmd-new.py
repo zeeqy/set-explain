@@ -19,7 +19,9 @@ from scipy.stats import skew
 stop = set(stopwords.words('english'))
 
 def sent_search(params):
-    (task_list, query, input_dir) = params
+    (task_list, args) = params
+    
+    query = args.query_string.split(',')
 
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
@@ -32,7 +34,7 @@ def sent_search(params):
 
     for fname in task_list:
 
-        with open('{}/{}'.format(input_dir,fname), 'r') as f:
+        with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
             doc = f.readlines()
         f.close()
 
