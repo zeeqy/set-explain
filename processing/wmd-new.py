@@ -7,6 +7,7 @@ import collections
 from tqdm import tqdm
 import spacy
 import textacy
+import time
 import numpy as np
 import wmd
 from nltk.tokenize import MWETokenizer
@@ -20,7 +21,7 @@ stop = set(stopwords.words('english'))
 
 def sent_search(params):
     (task_list, args) = params
-    
+
     query = args.query_string.split(',')
 
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
