@@ -86,7 +86,7 @@ def cooccur_cluster(params):
         best_wmd = 1e6
         best_pair = []
         prod = list(product(*index_list))
-        if len(prod) > 1e5:
+        if len(prod) > 1e4:
             continue
         for pair in tqdm(prod, desc='wmd-{}'.format(keyent), mininterval=10):
             sentsPair = [sentsPool[index][pair[index]]['text'] for index in range(len(pair))]
