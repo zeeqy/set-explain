@@ -86,7 +86,7 @@ def cooccur_cluster(params):
         best_wmd = 1e6
         best_pair = []
         prod = list(product(*index_list))
-        if len(prod) > 1e4:
+        if len(prod) > 1e5:
             continue
         for pair in tqdm(prod, desc='wmd-{}'.format(keyent), mininterval=10):
             sentsPair = [sentsPool[index][pair[index]]['text'] for index in range(len(pair))]
@@ -124,7 +124,10 @@ def main():
     print(query)
     sys.stdout.flush()
 
+
     ##### sentence search #####
+    start_time = time.time()
+
     input_dir = os.listdir(args.input_dir)
     tasks = list(split(input_dir, args.num_process))
     
@@ -157,6 +160,10 @@ def main():
         f.close()
         fid += 1
 
+    print("--- search use %s seconds ---" % (time.time() - start_time))
+    sys.stdout.flush()
+
+    start_time = time.time()
     unigrams = []
     for ent in query:
         for sent in search_merge[ent]:
@@ -199,8 +206,12 @@ def main():
 
     score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
 
+    print("--- unigram score %s seconds ---" % (time.time() - start_time))
+    sys.stdout.flush()
+
     ### phrase hard match ###
 
+    start_time = time.time()
     mined_phrases = {}
     for ent in query:
         mined_phrases.update({ent:[]})
@@ -212,8 +223,10 @@ def main():
         coo_phrases = coo_phrases.intersection(set(mined_phrases[ent]))
 
     print('number of cooccurred phrase: ', len(coo_phrases))
+    print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
 
+    start_time = time.time()
     phrase_sents = {}
     for ent in query:
         phrase_sents.update({ent:{}})
@@ -224,6 +237,7 @@ def main():
                 else:
                     phrase_sents[ent].update({item:[sent]})
 
+    print("--- phrase sent dist use %s seconds ---" % (time.time() - start_time))
 
     tasks = list(split(list(coo_phrases), args.num_process))
     inputs = [(tasks[i], phrase_sents, query) for i in range(args.num_process)]
