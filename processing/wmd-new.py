@@ -86,7 +86,7 @@ def cooccur_cluster(params):
         best_wmd = 1e6
         best_pair = []
         prod = list(product(*index_list))
-        if len(prod) > 1e5:
+        if len(prod) > 5e5:
             continue
         for pair in tqdm(prod, desc='wmd-{}'.format(keyent), mininterval=10):
             sentsPair = [sentsPool[index][pair[index]]['text'] for index in range(len(pair))]
@@ -240,7 +240,7 @@ def main():
     fid = 1
     for ent in query:
         with open('phrase-sent-dist-{}.txt'.format(fid), "w+") as f:
-            for key, value in phrase_sents.items():
+            for key, value in phrase_sents[ent].items():
                 meta = {key:len(value)}
                 f.write(json.dumps(meta) + '\n')
         f.close()
