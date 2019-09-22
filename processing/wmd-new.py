@@ -86,7 +86,7 @@ def cooccur_cluster(params):
         best_wmd = 1e6
         best_pair = []
         prod = list(product(*index_list))
-        if len(prod) > 5e5:
+        if len(prod) > 1e5:
             continue
         for pair in tqdm(prod, desc='wmd-{}'.format(keyent), mininterval=10):
             sentsPair = [sentsPool[index][pair[index]]['text'] for index in range(len(pair))]
@@ -231,7 +231,8 @@ def main():
     for ent in query:
         phrase_sents.update({ent:{}})
         for sent in search_merge[ent]:
-            for item in coo_phrases:
+            interc = set(sent['phrases']).intersection(coo_phrases)
+            for item in interc:
                 if item in phrase_sents[ent].keys():
                     phrase_sents[ent][item].append(sent)
                 else:
