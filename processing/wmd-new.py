@@ -237,6 +237,15 @@ def main():
                 else:
                     phrase_sents[ent].update({item:[sent]})
 
+    fid = 1
+    for ent in query:
+        with open('phrase-sent-dist-{}.txt'.format(fid), "w+") as f:
+            for key, value in phrase_sents.items():
+                meta = {key:len(value)}
+                f.write(json.dumps(meta) + '\n')
+        f.close()
+        fid += 1
+
     print("--- phrase sent dist use %s seconds ---" % (time.time() - start_time))
 
     tasks = list(split(list(coo_phrases), args.num_process))
