@@ -249,6 +249,8 @@ def main():
 
     print("--- phrase sent dist use %s seconds ---" % (time.time() - start_time))
 
+    start_time = time.time()
+
     tasks = list(split(list(coo_phrases), args.num_process))
     inputs = [(tasks[i], phrase_sents, query) for i in range(args.num_process)]
 
@@ -262,9 +264,15 @@ def main():
 
     sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
 
-    for item in sorted_wmd:
-        print(item)
-    sys.stdout.flush()
+    print("--- wmd process use %s seconds ---" % (time.time() - start_time))
+
+    with open('wmd.txt', "w+") as f:
+        for item in sorted_wmd:
+            keyent = item[0]
+            data = item[1]
+            data.update({'key':keyent})
+            f.write(json.dumps(data) + '\n')
+    f.close()
 
     ##### wmd based on cooccurrence #####
     # tasks = list(split(list(unigram_set), args.num_process))
