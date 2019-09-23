@@ -186,11 +186,14 @@ def main_thrd(query, num_process, input_dir, target):
     
     target_doc = nlp(target)
     target_token = [stemmer.stem(token.text) for token in target_doc]
-    tf = dict(Counter(target_token))
+    token_freq = dict(Counter(target_token))
     target_vec = []
+    valid_token = 0
     for token in target_token:
         if token in unistems:
-            target_vec.append(tf[token] * idf[token])
+            valid_token += 1
+            target_vec.append(token_freq[token] * idf[token])
+    target_token /= valid_token
 
     tokenizer = MWETokenizer(separator=' ')
 
@@ -212,12 +215,16 @@ def main_thrd(query, num_process, input_dir, target):
         
         phrase_vec = []
         tokenized_stem = [stemmer.stem(t) for t in tokenized_set]
-        tf = dict(Counter(tokenized_stem))
+        token_freq = dict(Counter(tokenized_stem))
+        valid_token = 0
         for token in target_token:
             if token in tokenized_stem:
-                phrase_vec.append(tf[token] * idf[token])
+                phrase_vec.append(token_freq[token] * idf[token])
+                valid_token += 1
             elif token in unistems:
                 phrase_vec.append(0)
+                valid_token += 1
+        phrase_vec /= valid_token
 
         phrases_score.update({phrase:{'score': score/len(nonstop_tokens), 'tfidf_sim': np.dot(target_vec, phrase_vec)/(np.linalg.norm(target_vec) * np.linalg.norm(phrase_vec))}})
 
@@ -327,7 +334,7 @@ def main():
             recall_sorted = sorted(labels, key=lambda x: x[1]['tfidf_sim'], reverse=True)
             recall += recall_sorted[0][1]['tfidf_sim']
             score += labels[0][1]['tfidf_sim']
-            meta = {'query':query, 'target': target, 'top5': top5, 'top1_tfidf_sim':labels[0][1]['tfidf_sim'], 'top100_recall': (recall_sorted[0][0], recall_sorted[0][1]['tfidf_sim'])}
+            meta = {'query':query, 'target': target, 'top5': top5, 'top1_tfidf_sim':(labels[0][0].labels[0][1]['tfidf_sim']), 'top100_recall': (recall_sorted[0][0], recall_sorted[0][1]['tfidf_sim'])}
             print(meta)
             with open('log-{}.txt'.format(query_length), 'a+') as f:
                 f.write(json.dumps(meta) + '\n')
