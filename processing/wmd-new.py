@@ -90,7 +90,7 @@ def cooccur_cluster(params):
             if length > 1e4:
                 break
         
-        if len(length) > 1e4:
+        if length > 1e4:
             continue
 
         index_list = [range(len(s)) for s in sentsPool]
