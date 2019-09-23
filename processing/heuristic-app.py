@@ -306,7 +306,7 @@ def main():
     #         f.write(json.dumps(eval_metric) + '\n')
     #     f.close()
 
-    for item in query_set[0]:
+    for item in query_set[:1]:
         score = 0
         recall = 0
         seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
