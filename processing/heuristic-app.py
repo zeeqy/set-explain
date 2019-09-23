@@ -21,6 +21,8 @@ stemmer = SnowballStemmer(language='english')
 def sent_search(params):
     (task_list, query, input_dir) = params
 
+    stemmer = SnowballStemmer(language='english')
+
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
     freq = dict()
@@ -54,10 +56,12 @@ def sent_search(params):
                     if len(doc) >= 30:
                         continue
                     unigram = [token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
+                    uni_stem = [stemmer.stem(token) for token in unigram]
                     item_dict['unigram'] = unigram
+                    item_dict['stem'] = uni_stem
                     tokens = [token.text for token in doc]
                     pos = [token.pos_ for token in doc]
-                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos)
+                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
                     item_dict['phrases'] = list(phrases['counts'])
                     context[ent].append(item_dict)
 
@@ -72,7 +76,7 @@ def split(a, n):
     k, m = divmod(len(a), n)
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
-def main_thrd(query, num_process, input_dir):
+def main_thrd(query, num_process, input_dir, target):
     start_time = time.time()
     nlp = spacy.load('en_core_web_lg', disable=['ner']) 
     nlp.max_length = 50000000
@@ -107,18 +111,30 @@ def main_thrd(query, num_process, input_dir):
 
     start_time = time.time()
     unigrams = []
+    unistems = []
     for ent in query:
         for sent in search_merge[ent]:
             unigrams += sent['unigram']
+            unistems += sent['stem']
     unigram_set = set(unigrams)
-
-    # unigram_set = unigrams[0]
-    # for item in unigrams:
-    #     unigram_set = unigram_set.union(item)
+    unistems = set(unistems)
 
     for ent in query:
         unigram_set.discard(ent)
+        unistems.discard(stemmer.stem(ent))
 
+    N = 0
+    wordDictA = dict.fromkeys(unistems, 0)
+    for ent in query:
+        N += len(search_merge[ent])
+        for sent in search_merge[ent]:
+            for unigram in sent['stem']:
+                wordDictA[word] += 1
+
+    idf = {}
+    for key in unigram_set:
+        idf.update({key:np.log(N / wordDictA[key])})
+    
     unigram_sents = {}
     for ent in query:
         unigram_sents.update({ent:{}})  
@@ -155,16 +171,6 @@ def main_thrd(query, num_process, input_dir):
     print("--- unigram score %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
     
-    # context = ''
-    # for ent in query:
-    #     context += ' '.join([item['text'] for item in search_merge[ent]])
-
-    # doc = nlp(context)
-    # tokens = [token.text for token in doc]
-    # pos = [token.pos_ for token in doc]
-    # mined_phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
-    # mined_phrases = mined_phrases['counts']
-    
     start_time = time.time()
     
     mined_phrases = []
@@ -176,6 +182,15 @@ def main_thrd(query, num_process, input_dir):
     sys.stdout.flush()
 
     start_time = time.time()
+    
+    target_doc = nlp(target.lower().split(',')[0])
+    tf = dict(Counter(target_doc))
+    target_token = [[stemmer.stem(token.text) for token in target_doc]]
+    target_vec = []
+    for token in target_token:
+        if token in unistems:
+            target_vec.append(tf[token] * idf[token])
+
     tokenizer = MWETokenizer(separator=' ')
 
     for e in unigram_set:
@@ -193,9 +208,19 @@ def main_thrd(query, num_process, input_dir):
         tokenized_set = set(raw_tokenized)
         for token in tokenized_set.intersection(unigram_set):
             score += agg_score[token]
-        phrases_score.update({phrase:score/len(nonstop_tokens)})
+        
+        phrase_vec = []
+        tf = dict(Counter(nonstop_tokens))
+        for token in target_token:
+            if token in [stemmer.stem(t) for t in tokenized_set]:
+                phrase_vec.append(tf[token] * idf[token])
+            elif token in unistems:
+                phrase_vec.append(0)
 
-    phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1], reverse=True)
+        phrases_score.update({phrase:{'score': score/len(nonstop_tokens), 'tfidf_sim': np.dot(target_vec, phrase_vec)/(norm(target_vec) * norm(phrase_vec))}})
+
+    phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
+
 
     print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
 
@@ -227,21 +252,65 @@ def main():
 
     num_query = args.num_query
     query_length = args.query_length
-    bleu_eval = {}
+    eval_metric = {}
     smoothie = SmoothingFunction().method3 # NIST smoothing
 
     query_set = []
     for entry in sets:
         query_set.append(json.loads(entry))
 
-    for item in query_set:
+    # for item in query_set[0]:
+    #     score = 0
+    #     recall = 0
+    #     seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
+    #     target = item['title'].lower().split(',')[0]
+    #     target_token = [[stemmer.stem(token.text) for token in nlp(target)]]
+    #     index = 0
+    #     retry = 0
+    #     while index < num_query:
+    #         if retry > 1000:
+    #             break
+    #         query = list(np.random.choice(seeds, query_length))
+    #         if len(set(query).intersection(entityset)) != len(query):
+    #             retry += 1
+    #             continue
+    #         labels = main_thrd(query, args.num_process, args.input_dir)
+    #         candidate = [stemmer.stem(token.text) for token in nlp(labels[0][0])]
+    #         # for lab in labels:
+    #         #     doc = nlp(lab)
+    #         #     candidate.append([token.text for token in doc])
+    #         bleu = sentence_bleu(target_token, candidate, smoothing_function=smoothie)
+    #         score += bleu
+    #         index += 1
+    #         best_bleu = 0
+    #         best_phrase = ''
+    #         for label in labels:
+    #             candidate = [stemmer.stem(token.text) for token in nlp(label[0])]
+    #             tmp_bleu = sentence_bleu(target_token, candidate, smoothing_function=smoothie)
+    #             if tmp_bleu > best_bleu:
+    #                 best_bleu = tmp_bleu
+    #                 best_phrase = label[0]
+    #         recall += best_bleu
+    #         meta = {'query':query, 'target': target, 'top5': labels[:5], 'top1_bleu':bleu, 'top100_recall': (best_phrase, best_bleu)}
+    #         print(meta)
+    #         with open('log-{}.txt'.format(query_length), 'a+') as f:
+    #             f.write(json.dumps(meta) + '\n')
+    #         f.close()
+    #     if retry > 1000:
+    #         continue
+    #     score /= num_query
+    #     recall /= num_query
+    #     eval_metric.update({target:{'top1_bleu': score, 'top100_reall': recall}})
+
+    #     with open('bleu-{}.txt'.format(query_length), 'a+') as f:
+    #         f.write(json.dumps(eval_metric) + '\n')
+    #     f.close()
+
+    for item in query_set[0]:
         score = 0
         recall = 0
         seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
-        target = item['title'].lower().split(',')[0]
-        target_token = [[stemmer.stem(token.text) for token in nlp(target)]]
-        index = 0
-        retry = 0
+        target = item['title']
         while index < num_query:
             if retry > 1000:
                 break
@@ -249,24 +318,12 @@ def main():
             if len(set(query).intersection(entityset)) != len(query):
                 retry += 1
                 continue
-            labels = main_thrd(query, args.num_process, args.input_dir)
-            candidate = [stemmer.stem(token.text) for token in nlp(labels[0][0])]
-            # for lab in labels:
-            #     doc = nlp(lab)
-            #     candidate.append([token.text for token in doc])
-            bleu = sentence_bleu(target_token, candidate, smoothing_function=smoothie)
-            score += bleu
-            index += 1
-            best_bleu = 0
-            best_phrase = ''
-            for label in labels:
-                candidate = [stemmer.stem(token.text) for token in nlp(label[0])]
-                tmp_bleu = sentence_bleu(target_token, candidate, smoothing_function=smoothie)
-                if tmp_bleu > best_bleu:
-                    best_bleu = tmp_bleu
-                    best_phrase = label[0]
-            recall += best_bleu
-            meta = {'query':query, 'target': target, 'top5': labels[:5], 'top1_bleu':bleu, 'top100_recall': (best_phrase, best_bleu)}
+            labels = main_thrd(query, args.num_process, args.input_dir, target)
+            top5 = [(lb[0], lb[1]['score']) for lb in labels[:5]]
+            recall_sorted = sorted(labels, key=lambda x: x[1]['tfidf_sim'], reverse=True)
+            recall += recall_sorted[0][1]['tfidf_sim']
+            score += labels[0][1]['tfidf_sim']
+            meta = {'query':query, 'target': target, 'top5': top5, 'top1_tfidf_sim':labels[0][1]['tfidf_sim'], 'top100_recall': (recall_sorted[0][0], recall_sorted[0][1]['tfidf_sim'])}
             print(meta)
             with open('log-{}.txt'.format(query_length), 'a+') as f:
                 f.write(json.dumps(meta) + '\n')
@@ -275,10 +332,9 @@ def main():
             continue
         score /= num_query
         recall /= num_query
-        bleu_eval.update({target:{'top1_bleu': score, 'top100_reall': recall}})
-
-        with open('bleu-{}.txt'.format(query_length), 'a+') as f:
-            f.write(json.dumps(bleu_eval) + '\n')
+        eval_metric.update({target:{'top1_tfidf_sim': score, 'top100_reall': recall}})
+        with open('tfidf_sim-{}.txt'.format(query_length), 'a+') as f:
+            f.write(json.dumps(eval_metric) + '\n')
         f.close()
 
 if __name__ == '__main__':
