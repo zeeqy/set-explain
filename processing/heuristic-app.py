@@ -12,6 +12,7 @@ from nltk.corpus import stopwords
 import nltk
 import phrasemachine
 import time
+from collections import Counter
 from scipy.stats import skew
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from nltk.stem.snowball import SnowballStemmer
