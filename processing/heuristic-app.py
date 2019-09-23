@@ -334,7 +334,7 @@ def main():
             recall_sorted = sorted(labels, key=lambda x: x[1]['tfidf_sim'], reverse=True)
             recall += recall_sorted[0][1]['tfidf_sim']
             score += labels[0][1]['tfidf_sim']
-            meta = {'query':query, 'target': target, 'top5': top5, 'top1_tfidf_sim':(labels[0][0].labels[0][1]['tfidf_sim']), 'top100_recall': (recall_sorted[0][0], recall_sorted[0][1]['tfidf_sim'])}
+            meta = {'query':query, 'target': target, 'top5': top5, 'top1_tfidf_sim':(labels[0][0], labels[0][1]['tfidf_sim']), 'top100_recall': (recall_sorted[0][0], recall_sorted[0][1]['tfidf_sim'])}
             print(meta)
             with open('log-{}.txt'.format(query_length), 'a+') as f:
                 f.write(json.dumps(meta) + '\n')
