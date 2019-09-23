@@ -224,7 +224,6 @@ def main_thrd(query, num_process, input_dir, target):
             elif token in unistems:
                 phrase_vec.append(0)
                 valid_token += 1
-        phrase_vec /= valid_token
         phrase_vec = [x / valid_token for x in phrase_vec]
 
         phrases_score.update({phrase:{'score': score/len(nonstop_tokens), 'tfidf_sim': np.dot(target_vec, phrase_vec)/(np.linalg.norm(target_vec) * np.linalg.norm(phrase_vec))}})
