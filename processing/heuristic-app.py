@@ -129,7 +129,7 @@ def main_thrd(query, num_process, input_dir, target):
         N += len(search_merge[ent])
         for sent in search_merge[ent]:
             for unigram in sent['stem']:
-                wordDictA[word] += 1
+                wordDictA[unigram] += 1
 
     idf = {}
     for key in unigram_set:
