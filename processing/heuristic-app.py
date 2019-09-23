@@ -119,17 +119,17 @@ def main_thrd(query, num_process, input_dir, target):
     unigram_set = set(unigrams)
     unistems = set(unistems)
 
-    for ent in query:
-        unigram_set.discard(ent)
-        unistems.discard(stemmer.stem(ent))
-
     N = 0
     wordDictA = dict.fromkeys(unistems, 0)
     for ent in query:
         N += len(search_merge[ent])
         for sent in search_merge[ent]:
-            for unigram in sent['stem']:
+            for unigram in sent['stem'] :
                 wordDictA[unigram] += 1
+
+    for ent in query:
+        unigram_set.discard(ent)
+        unistems.discard(stemmer.stem(ent))
 
     idf = {}
     for key in unigram_set:
