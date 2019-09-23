@@ -185,8 +185,8 @@ def main_thrd(query, num_process, input_dir, target):
     start_time = time.time()
     
     target_doc = nlp(target.lower().split(',')[0])
-    tf = dict(Counter(target_doc))
     target_token = [stemmer.stem(token.text) for token in target_doc]
+    tf = dict(Counter(target_token))
     target_vec = []
     for token in target_token:
         if token in unistems:
