@@ -311,6 +311,8 @@ def main():
         recall = 0
         seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
         target = item['title']
+        index = 0
+        retry = 0
         while index < num_query:
             if retry > 1000:
                 break
