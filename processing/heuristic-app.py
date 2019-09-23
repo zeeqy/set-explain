@@ -211,9 +211,10 @@ def main_thrd(query, num_process, input_dir, target):
             score += agg_score[token]
         
         phrase_vec = []
-        tf = dict(Counter(nonstop_tokens))
+        tokenized_stem = [stemmer.stem(t) for t in tokenized_set]
+        tf = dict(Counter(tokenized_stem))
         for token in target_token:
-            if token in [stemmer.stem(t) for t in tokenized_set]:
+            if token in tokenized_stem:
                 phrase_vec.append(tf[token] * idf[token])
             elif token in unistems:
                 phrase_vec.append(0)
