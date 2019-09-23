@@ -82,12 +82,19 @@ def cooccur_cluster(params):
         for seed in query:
             sentsPool.append(entityMentioned[seed][keyent])
 
-        index_list = [range(len(s)) for s in sentsPool]
         best_wmd = 1e6
         best_pair = []
-        prod = list(product(*index_list))
-        if len(prod) > 1e4:
+        length = 1
+        for s in sentsPool:
+            length *= len(s)
+            if length > 1e4:
+                break
+        
+        if len(length) > 1e4:
             continue
+
+        index_list = [range(len(s)) for s in sentsPool]
+        prod = list(product(*index_list))
         for pair in tqdm(prod, desc='wmd-{}'.format(keyent), mininterval=10):
             sentsPair = [sentsPool[index][pair[index]]['text'] for index in range(len(pair))]
 
