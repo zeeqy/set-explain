@@ -184,7 +184,7 @@ def main_thrd(query, num_process, input_dir, target):
 
     start_time = time.time()
     
-    target_doc = nlp(target.lower().split(',')[0])
+    target_doc = nlp(target)
     target_token = [stemmer.stem(token.text) for token in target_doc]
     tf = dict(Counter(target_token))
     target_vec = []
@@ -312,7 +312,7 @@ def main():
         score = 0
         recall = 0
         seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
-        target = item['title']
+        target = item['title'].lower().split(',')[0]
         index = 0
         retry = 0
         while index < num_query:
