@@ -132,7 +132,7 @@ def main_thrd(query, num_process, input_dir, target):
         unistems.discard(stemmer.stem(ent))
 
     idf = {}
-    for key in unigram_set:
+    for key in unistems:
         idf.update({key:np.log(N / wordDictA[key])})
     
     unigram_sents = {}
