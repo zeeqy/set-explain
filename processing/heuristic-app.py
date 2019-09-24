@@ -59,7 +59,7 @@ def sent_search(params):
                         continue
                     unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
                     item_dict['unigram'] = unigram
-                    tokens = [token.text for token in doc]
+                    tokens = [token.lemma_ for token in doc]
                     pos = [token.pos_ for token in doc]
                     phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
                     item_dict['phrases'] = list(phrases['counts'])
@@ -199,10 +199,8 @@ def main_thrd(query, num_process, input_dir, target):
     phrases_score = {}
     for phrase in tqdm(list_phrases, desc='phrase-eval'):
         score = 0
-        # tokens = nltk.word_tokenize(phrase)
-        # nonstop_tokens = [token for token in tokens if token not in stop]
-        tokens = nlp(phrase)
-        nonstop_tokens = [token.lemma_ for token in tokens if not token.is_stop]
+        tokens = nltk.word_tokenize(phrase)
+        nonstop_tokens = [token for token in tokens if token not in stop]
         if len(nonstop_tokens) / len(tokens) <= 0.5:
             continue
         raw_tokenized = tokenizer.tokenize(nonstop_tokens)
