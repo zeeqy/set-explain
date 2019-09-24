@@ -219,11 +219,11 @@ def main_thrd(query, num_process, input_dir, target):
         for token in target_token:
             phrase_vec.append(token_freq[token]/len(phrase_tokens) * idf[token])
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
-        if np.isnan(tfidf_sim):
-            continue
-        else:
-            stats['tfidf_sim'] = tfidf_sim
-            top100_phrase.append((phrase, stats))
+        # if np.isnan(tfidf_sim):
+        #     continue
+        # else:
+        stats['tfidf_sim'] = tfidf_sim
+        top100_phrase.append((phrase, stats))
 
     print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
