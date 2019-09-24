@@ -220,12 +220,12 @@ def main_thrd(query, num_process, input_dir, target):
                 phrase_vec.append(token_freq[token]/len(phrase_tokens) * idf[token])
             else:
                 phrase_vec.append(0)
-        tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
-        if np.isnan(tfidf_sim):
-            continue
+        if np.linalg.normnorm(phrase_vec) == 0:
+            stats['tfidf_sim'] = 0
         else:
+            tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
             stats['tfidf_sim'] = tfidf_sim
-            top100_phrase.append((phrase, stats))
+        top100_phrase.append((phrase, stats))
 
     print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
@@ -315,6 +315,7 @@ def main():
     for item in query_set:
         score = 0
         recall = 0
+        index = 0
         seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
         target = item['title'].lower().split(',')[0]
         valid_seeds = set(seeds).intersection(entityset)
@@ -324,20 +325,16 @@ def main():
         for query in queries:
             print('prcessing query: ', query)
             labels = main_thrd(query, args.num_process, args.input_dir, target)
+            if len(labels) < 100:
+                pass
             top5 = [lab[0] for lab in labels[:5]]
-            try:
-                best_phrase = labels[0][0]
-            except:
-                print('list index out of range.')
-                print(labels)
-                print(top5)
             best_sim = labels[0][1]['tfidf_sim']
             recall_rank = int(np.argmax([lab[1]['tfidf_sim'] for lab in labels]))
             recall_phrase = labels[recall_rank][0]
             recall_sim = labels[recall_rank][1]['tfidf_sim']
             recall += recall_sim
             score += best_sim
-            meta = {'query':query, 'target': target, 'top1':(best_phrase, best_sim), 'top5': top5, 'top100_recall':(recall_phrase, recall_rank, recall_sim)}
+            meta = {'query':query, 'target': target, 'top1':(best_phrase, best_sim), 'top5': top5, 'top100_recall':(recall_phrase, recall_rank+1, recall_sim)}
             print(meta)
             sys.stdout.flush()
             with open('log-{}.txt'.format(query_length), 'a+') as f:
