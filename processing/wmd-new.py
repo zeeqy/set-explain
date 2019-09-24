@@ -18,6 +18,11 @@ from itertools import combinations
 import phrasemachine
 from scipy.stats import skew
 stop = set(stopwords.words('english'))
+pronoun = set("he", "her", "hers", "herself", "him", "himself", "his", "i", 
+"it", "its", "me", "mine", "my", "myself", "our", "ours", "ourselves", 
+"she", "thee", "their", "them", "themselves", "they", "thou", 
+"thy", "thyself", "us", "we", "ye", "you", "your", "yours", "yourself",
+"we")
 
 def sent_search(params):
     (task_list, args) = params
@@ -54,15 +59,14 @@ def sent_search(params):
                     continue
                 else:
                     doc = nlp(item_dict['text'])
-                    if len(doc) >= 30:
+                    if len(doc) >= 30 or item_dict['nsubj'] == [] or set(item_dict['nsubj']).intersection(pronoun) != set():
                         continue
                     unigram = [token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
                     item_dict['unigram'] = unigram
-                    item_dict['phrases'] = [noun.text for noun in doc.noun_chunks]
-                    # tokens = [token.text for token in doc]
-                    # pos = [token.pos_ for token in doc]
-                    # phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
-                    # item_dict['phrases'] = list(phrases['counts'])
+                    tokens = [token.text for token in doc]
+                    pos = [token.pos_ for token in doc]
+                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
+                    item_dict['phrases'] = list(phrases['counts'])
                     context[ent].append(item_dict)
 
                     freq[ent]['total'] += 1
@@ -230,6 +234,31 @@ def main():
     for ent in query:
         coo_phrases = coo_phrases.intersection(set(mined_phrases[ent]))
 
+    tokenizer = MWETokenizer(separator=' ')
+
+    for ph in coo_phrases:
+        tokenizer.add_mwe(nltk.word_tokenize(ph))
+
+    search_refetch = {}
+    for ent in query:
+        search_refetch.update({ent:[]})
+        for sent in search_merge[ent]:
+            sent_tok = nltk.word_tokenize(sent['text'])
+            raw_tokenized = tokenizer.tokenize(sent_tok)
+            if len(tokenized_set) != 0:
+                sent['phrases'] = raw_tokenized
+                search_refetch[ent].append(sent)
+    
+    mined_phrases = {}
+    for ent in query:
+        mined_phrases.update({ent:[]})
+        for sent in search_refetch[ent]:
+            mined_phrases[ent] += sent['phrases']
+
+    coo_phrases = set(mined_phrases[query[0]])
+    for ent in query:
+        coo_phrases = coo_phrases.intersection(set(mined_phrases[ent]))
+
     print('number of cooccurred phrase: ', len(coo_phrases))
     print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
@@ -238,7 +267,7 @@ def main():
     phrase_sents = {}
     for ent in query:
         phrase_sents.update({ent:{}})
-        for sent in search_merge[ent]:
+        for sent in search_refetch[ent]:
             interc = set(sent['phrases']).intersection(coo_phrases)
             for item in interc:
                 if item in phrase_sents[ent].keys():
