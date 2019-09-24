@@ -325,9 +325,8 @@ def main():
         for query in queries:
             print('prcessing query: ', query)
             labels = main_thrd(query, args.num_process, args.input_dir, target)
-            if len(labels) < 100:
-                pass
             top5 = [lab[0] for lab in labels[:5]]
+            best_phrase = labels[0][0]
             best_sim = labels[0][1]['tfidf_sim']
             recall_rank = int(np.argmax([lab[1]['tfidf_sim'] for lab in labels]))
             recall_phrase = labels[recall_rank][0]
