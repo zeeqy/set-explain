@@ -330,7 +330,7 @@ def main():
             best_sim = labels[0][1]['tfidf_sim']
             recall_rank = np.argmax([lab[1]['tfidf_sim'] for lab in labels])
             recall_phrase = labels[recall_rank][0]
-            recall_sim = labels[best_rank][1]['tfidf_sim']
+            recall_sim = labels[recall_rank][1]['tfidf_sim']
             recall += recall_sim
             score += best_sim
             meta = {'query':query, 'target': target, 'top1':(best_phrase, best_sim), 'top5': top5, 'top100_recall':(recall_phrase, recall_rank, recall_sim)}
