@@ -329,7 +329,7 @@ def main():
             best_phrase = labels[0][0]
             best_sim = labels[0][1]['tfidf_sim']
             recall_rank = np.argmax([lab[1]['tfidf_sim'] for lab in labels])
-            recall_phrase = labels[best_rank][0]
+            recall_phrase = labels[recall_rank][0]
             recall_sim = labels[best_rank][1]['tfidf_sim']
             recall += recall_sim
             score += best_sim
