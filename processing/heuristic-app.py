@@ -319,15 +319,11 @@ def main():
         recall = 0
         seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
         target = item['title'].lower().split(',')[0]
-        index = 0
-        retry = 0
-        while index < num_query:
-            if retry > 1000:
-                break
-            query = list(np.random.choice(seeds, query_length))
-            if len(set(query).intersection(entityset)) != len(query):
-                retry += 1
-                continue
+        valid_seeds = set(seeds).intersection(entityset)
+        if len(valid_seeds) < query_length:
+            continue
+        queries = np.random.choice(list(valid_seeds),[num_query,query_length]).tolist()
+        for query in queries
             labels = main_thrd(query, args.num_process, args.input_dir, target)
             top5 = [lb[0] for lb in labels[:5]]
             recall_sorted = sorted(labels, key=lambda x: x[1]['tfidf_sim'], reverse=True)
@@ -340,9 +336,6 @@ def main():
             with open('log-{}.txt'.format(query_length), 'a+') as f:
                 f.write(json.dumps(meta) + '\n')
             f.close()
-            index += 1
-        if retry > 1000:
-            continue
         score /= num_query
         recall /= num_query
         eval_metric.update({target:{'top1_tfidf_sim': score, 'top100_reall': recall}})
