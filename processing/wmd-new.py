@@ -245,8 +245,10 @@ def main():
         for sent in search_merge[ent]:
             sent_tok = nltk.word_tokenize(sent['text'])
             raw_tokenized = tokenizer.tokenize(sent_tok)
-            if len(raw_tokenized) != 0:
-                sent['phrases'] = raw_tokenized
+            tokenized_set = set(raw_tokenized)
+            mentioned_phrase = list(tokenized_set.intersection(coo_phrases))
+            if len(mentioned_phrase) != 0:
+                sent['phrases'] = mentioned_phrase
                 search_refetch[ent].append(sent)
     
     mined_phrases = {}
