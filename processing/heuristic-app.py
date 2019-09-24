@@ -333,7 +333,7 @@ def main():
             recall_sim = labels[recall_rank][1]['tfidf_sim']
             recall += recall_sim
             score += best_sim
-            meta = {'query':query, 'target': target, 'top1':(best_phrase, best_sim), 'top5': top5, 'top100_recall':(recall_phrase, recall_rank+1, recall_sim)}
+            meta = {'query':query, 'target': target, 'target_token': target_token, 'target_vec': target_vec, 'top1':(best_phrase, best_sim), 'top5': top5, 'top100_recall':(recall_phrase, recall_rank+1, recall_sim)}
             print(meta)
             sys.stdout.flush()
             with open('log-{}.txt'.format(query_length), 'a+') as f:
