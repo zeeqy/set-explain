@@ -60,6 +60,7 @@ def sent_search(params):
                     unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
                     item_dict['unigram'] = unigram
                     tokens = [token.lemma_ for token in doc]
+                    item_dict['text'] = tokens
                     pos = [token.pos_ for token in doc]
                     phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
                     item_dict['phrases'] = list(phrases['counts'])
@@ -117,19 +118,19 @@ def main_thrd(query, num_process, input_dir, target):
     unigram_set = set(unigrams)
 
     N = 0
-    wordDictA = dict.fromkeys(unigram_set, 0)
+    cnt = Counter()
     for ent in query:
         N += len(search_merge[ent])
         for sent in search_merge[ent]:
-            for unigram in sent['unigram'] :
-                wordDictA[unigram] += 1
+            cnt.update(sent['text'])
+    cnt = dict(cnt)
 
     for ent in query:
         unigram_set.discard(ent)
 
     idf = {}
-    for key in unigram_set:
-        idf.update({key:np.log(N / wordDictA[key])})
+    for key in cnt.keys():
+        idf.update({key:np.log(N / cnt[key])})
     
     unigram_sents = {}
     for ent in query:
@@ -180,13 +181,13 @@ def main_thrd(query, num_process, input_dir, target):
     start_time = time.time()
     
     target_doc = nlp(target)
-    #target_token = [token.lemma_ for token in target_doc if not token.is_stop]
-    target_token = [token.lemma_ for token in target_doc if token.lemma_ in unigram_set]
+    target_token = [token.lemma_ for token in target_doc]
     token_freq = dict(Counter(target_token))
     target_vec = []
     for token in target_token:
         tfidf = token_freq[token] / len(target_token) * idf[token]
         target_vec.append(tfidf)
+    print('target_vec:' target_vec)
 
     tokenizer = MWETokenizer(separator=' ')
 
@@ -214,7 +215,7 @@ def main_thrd(query, num_process, input_dir, target):
     for meta in phrases_sorted[:min(100, len(phrases_sorted))]:
         phrase = meta[0]
         stats = meta[1]
-        phrase_tokens = [token.lemma_ for token in nlp(phrase) if token.lemma_ in unigram_set]
+        phrase_tokens = [token.lemma_ for token in nlp(phrase)]
         phrase_vec = []
         token_freq = dict(Counter(phrase_tokens))
         for token in target_token:
@@ -228,6 +229,7 @@ def main_thrd(query, num_process, input_dir, target):
         else:
             stats['tfidf_sim'] = tfidf_sim
             top100_phrase.append((phrase, stats))
+            print('phrase' phrase_vec)
 
     print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
