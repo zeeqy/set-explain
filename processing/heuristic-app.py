@@ -11,6 +11,7 @@ from nltk.tokenize import MWETokenizer
 from nltk.corpus import stopwords
 import nltk
 import phrasemachine
+from scipy import spatial
 import time
 from collections import Counter
 from scipy.stats import skew
@@ -219,7 +220,7 @@ def main_thrd(query, num_process, input_dir, target):
                 valid_token += 1
         phrase_vec = [x / valid_token for x in phrase_vec]
 
-        phrases_score.update({phrase:{'score': score/len(nonstop_tokens), 'tfidf_sim': np.dot(target_vec, phrase_vec)/(np.linalg.norm(target_vec) * np.linalg.norm(phrase_vec))}})
+        phrases_score.update({phrase:{'score': score/len(nonstop_tokens), 'tfidf_sim': 1 - spatial.distance.cosine(target_vec, phrase_vec)}})
 
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
 
