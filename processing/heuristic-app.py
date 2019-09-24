@@ -320,7 +320,7 @@ def main():
         valid_seeds = set(seeds).intersection(entityset)
         if len(valid_seeds) < query_length:
             continue
-        queries = [np.random.choice(valid_seeds, query_length, replace=False).tolist() for i in range(num_query)]
+        queries = [np.random.choice(list(valid_seeds), query_length, replace=False).tolist() for i in range(num_query)]
         for query in queries:
             print('prcessing query: ', query)
             labels = main_thrd(query, args.num_process, args.input_dir, target)
