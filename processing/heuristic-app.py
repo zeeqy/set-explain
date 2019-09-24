@@ -210,7 +210,7 @@ def main_thrd(query, num_process, input_dir, target):
         for token in tokenized_set.intersection(unigram_set):
             score += agg_score[token]
 
-    phrases_score.update({phrase:{'score': score/len(nonstop_tokens),'tokenized_set':tokenized_set}})
+        phrases_score.update({phrase:{'score': score/len(nonstop_tokens),'tokenized_set':tokenized_set}})
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
         
     top100_phrase = []
