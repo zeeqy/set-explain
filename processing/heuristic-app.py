@@ -180,7 +180,7 @@ def main_thrd(query, num_process, input_dir, target):
     start_time = time.time()
     
     target_doc = nlp(target)
-    target_token = [token.lemma_ for token in target_doc]
+    target_token = [token.lemma_ for token in target_doc if not token.is_stop]
     token_freq = dict(Counter(target_token))
     target_vec = []
     valid_token = 0
