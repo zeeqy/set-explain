@@ -23,8 +23,6 @@ stemmer = SnowballStemmer(language='english')
 def sent_search(params):
     (task_list, query, input_dir) = params
 
-    stemmer = SnowballStemmer(language='english')
-
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
     freq = dict()
@@ -99,7 +97,11 @@ def main_thrd(query, num_process, input_dir, target):
         tmp_freq = search_results[pid]['freq']
         for ent in query:
             search_merge[ent] += tmp_context[ent]
-            count_merge[ent]['total'] += tmp_freq[ent]['total']
+            try:
+                count_merge[ent]['total'] += tmp_freq[ent]['total']
+            except:
+                print(tmp_freq)
+                print(count_merge)
             tmp_freq[ent].pop('total', None)
             count_merge[ent].update(tmp_freq[ent])
     
