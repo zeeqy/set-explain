@@ -325,7 +325,12 @@ def main():
             print('prcessing query: ', query)
             labels = main_thrd(query, args.num_process, args.input_dir, target)
             top5 = [lab[0] for lab in labels[:5]]
-            best_phrase = labels[0][0]
+            try:
+                best_phrase = labels[0][0]
+            except:
+                print('list index out of range.')
+                print(labels)
+                print(top5)
             best_sim = labels[0][1]['tfidf_sim']
             recall_rank = int(np.argmax([lab[1]['tfidf_sim'] for lab in labels]))
             recall_phrase = labels[recall_rank][0]
