@@ -181,7 +181,7 @@ def main_thrd(query, num_process, input_dir, target):
     
     target_doc = nlp(target)
     #target_token = [token.lemma_ for token in target_doc if not token.is_stop]
-    target_token = [token.lemma_ for token in target_doc if token in unigram_set]
+    target_token = [token.lemma_ for token in target_doc if token.lemma_ in unigram_set]
     token_freq = dict(Counter(target_token))
     target_vec = []
     print('target_token:', target_token)
