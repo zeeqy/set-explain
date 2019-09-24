@@ -184,8 +184,11 @@ def main_thrd(query, num_process, input_dir, target):
     target_token = [token.lemma_ for token in target_doc if token in unigram_set]
     token_freq = dict(Counter(target_token))
     target_vec = []
+    print('target_token:', target_token)
     for token in target_token:
-        target_vec.append(token_freq[token] / len(target_token) * idf[token])
+        tfidf = token_freq[token] / len(target_token) * idf[token]
+        print(token, tfidf)
+        target_vec.append(tfidf)
 
     print('target_vec:', target_vec)
 
@@ -221,7 +224,7 @@ def main_thrd(query, num_process, input_dir, target):
         for token in target_token:
             phrase_vec.append(token_freq[token]/len(phrase_tokens) * idf[token])
 
-        print('target_vec:', phrase_vec)
+        print('phrase_vec:', phrase_vec)
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
         # if np.isnan(tfidf_sim):
         #     continue
