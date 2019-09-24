@@ -218,7 +218,7 @@ def main_thrd(query, num_process, input_dir, target):
     for meta in phrases_sorted[:min(100, len(phrases_sorted))]:
         phrase = meta[0]
         stats = meta[1]
-        phrase_tokens = [token.lemma_ for token in nlp(phrase) if token in unigram_set]
+        phrase_tokens = [token.lemma_ for token in nlp(phrase) if token.lemma_ in unigram_set]
         phrase_vec = []
         token_freq = dict(Counter(phrase_tokens))
         for token in target_token:
