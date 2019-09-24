@@ -209,7 +209,10 @@ def main_thrd(query, num_process, input_dir, target):
             score += agg_score[token]
 
         phrases_score.update({phrase:{'score': score/len(nonstop_tokens),'tokenized_set':tokenized_set}})
+    
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
+    print(phrases_sorted[:min(100, len(phrases_sorted))])
+    sys.stdout.flush()
         
     top100_phrase = []
     for meta in phrases_sorted[:min(100, len(phrases_sorted))]:
