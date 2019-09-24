@@ -97,11 +97,7 @@ def main_thrd(query, num_process, input_dir, target):
         tmp_freq = search_results[pid]['freq']
         for ent in query:
             search_merge[ent] += tmp_context[ent]
-            try:
-                count_merge[ent]['total'] += tmp_freq[ent]['total']
-            except:
-                print(tmp_freq)
-                print(count_merge)
+            count_merge[ent]['total'] += tmp_freq[ent]['total']
             tmp_freq[ent].pop('total', None)
             count_merge[ent].update(tmp_freq[ent])
     
@@ -324,7 +320,7 @@ def main():
         valid_seeds = set(seeds).intersection(entityset)
         if len(valid_seeds) < query_length:
             continue
-        queries = np.random.choice(list(valid_seeds),[num_query,query_length]).tolist()
+        queries = np.random.choice(list(valid_seeds),[num_query,query_length], replace=False).tolist()
         for query in queries:
             labels = main_thrd(query, args.num_process, args.input_dir, target)
             top5 = [lab[0] for lab in labels[:5]]
