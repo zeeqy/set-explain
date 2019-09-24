@@ -199,7 +199,7 @@ def main_thrd(query, num_process, input_dir, target):
     for phrase in tqdm(list_phrases, desc='phrase-eval'):
         score = 0
         tokens = nlp(phrase)
-        nonstop_tokens = [token.lemma_ for token in doc if not token.is_stop]
+        nonstop_tokens = [token.lemma_ for token in tokens if not token.is_stop]
         if len(nonstop_tokens) / len(tokens) <= 0.5:
             continue
         raw_tokenized = tokenizer.tokenize(nonstop_tokens)
