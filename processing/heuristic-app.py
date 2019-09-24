@@ -60,7 +60,7 @@ def sent_search(params):
                     unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
                     item_dict['unigram'] = unigram
                     tokens = [token.lemma_ for token in doc]
-                    item_dict['text'] = tokens
+                    item_dict['tokens'] = tokens
                     pos = [token.pos_ for token in doc]
                     phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
                     item_dict['phrases'] = list(phrases['counts'])
@@ -122,7 +122,7 @@ def main_thrd(query, num_process, input_dir, target):
     for ent in query:
         N += len(search_merge[ent])
         for sent in search_merge[ent]:
-            cnt.update(sent['text'])
+            cnt.update(sent['tokens'])
     cnt = dict(cnt)
 
     for ent in query:
@@ -317,12 +317,10 @@ def main():
     #     f.close()
 
     for item in query_set[:1]:
-        print(item)
         score = 0
         recall = 0
         seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
         target = item['title'].lower().split(',')[0]
-        print(target)
         index = 0
         retry = 0
         while index < num_query:
