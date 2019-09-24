@@ -97,7 +97,7 @@ def cooccur_cluster(params):
         index_list = [range(len(s)) for s in sentsPool]
         prod = list(product(*index_list))
         for pair in tqdm(prod, desc='wmd-{}'.format(keyent), mininterval=10):
-            sentsPair = [sentsPool[index][pair[index]]['doc'] for index in range(len(pair))]
+            sentsPair = [sentsPool[index][pair[index]]['text'] for index in range(len(pair))]
 
             comb = combinations(sentsPair, 2) 
             current_wmd = 0
