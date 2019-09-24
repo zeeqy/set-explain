@@ -339,6 +339,8 @@ def main():
             labels = main_thrd(query, args.num_process, args.input_dir, target)
             top5 = [lb[0] for lb in labels[:5]]
             recall_sorted = sorted(labels, key=lambda x: x[1]['tfidf_sim'], reverse=True)
+            print(recall_sorted)
+            sys.stdout.flush()
             recall += recall_sorted[0][1]['tfidf_sim']
             score += labels[0][1]['tfidf_sim']
             meta = {'query':query, 'target': target, 'top5': top5, 'top1_sim':(labels[0][0], labels[0][1]['tfidf_sim']), 'top_100_best': (recall_sorted[0][0], recall_sorted[0][1]['tfidf_sim'])}
