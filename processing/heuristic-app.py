@@ -180,15 +180,12 @@ def main_thrd(query, num_process, input_dir, target):
     start_time = time.time()
     
     target_doc = nlp(target)
-    target_token = [token.lemma_ for token in target_doc if not token.is_stop]
+    #target_token = [token.lemma_ for token in target_doc if not token.is_stop]
+    target_token = [token.lemma_ for token in target_doc if token in unigram_set]
     token_freq = dict(Counter(target_token))
     target_vec = []
-    valid_token = 0
     for token in target_token:
-        if token in unigram_set:
-            target_vec.append(token_freq[token] * idf[token])
-        valid_token += 1
-    target_vec = [x / valid_token for x in target_vec]
+        target_vec.append(token_freq[token] / len(target_token) * idf[token])
 
     tokenizer = MWETokenizer(separator=' ')
 
@@ -208,32 +205,24 @@ def main_thrd(query, num_process, input_dir, target):
         for token in tokenized_set.intersection(unigram_set):
             score += agg_score[token]
 
-        phrases_score.update({phrase:{'score': score/len(nonstop_tokens),'tokenized_set':tokenized_set}})
+        phrases_score.update({phrase:{'score': score/len(nonstop_tokens)}})
     
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
-    print(phrases_sorted[:min(100, len(phrases_sorted))])
     sys.stdout.flush()
         
     top100_phrase = []
     for meta in phrases_sorted[:min(100, len(phrases_sorted))]:
         phrase = meta[0]
         stats = meta[1]
-        tokenized_set = meta[1]['tokenized_set']
+        phrase_tokens = [token.lemma_ for token in nlp(phrase) if token in unigram_set]
         phrase_vec = []
-        token_freq = dict(Counter(tokenized_set))
-        valid_token = 0
+        token_freq = dict(Counter(phrase_tokens))
         for token in target_token:
-            if token in tokenized_set:
-                phrase_vec.append(token_freq[token] * idf[token])
-            elif token in unigram_set:
-                phrase_vec.append(0)
-            valid_token += 1
-        phrase_vec = [x / valid_token for x in phrase_vec]
+            phrase_vec.append(token_freq[token]/len(phrase_tokens) * idf[token])
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
         if np.isnan(tfidf_sim):
             continue
         else:
-            stats.pop('tokenized_set',None)
             stats['tfidf_sim'] = tfidf_sim
             top100_phrase.append((phrase, stats))
 
