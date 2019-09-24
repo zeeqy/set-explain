@@ -323,7 +323,7 @@ def main():
         if len(valid_seeds) < query_length:
             continue
         queries = np.random.choice(list(valid_seeds),[num_query,query_length]).tolist()
-        for query in queries
+        for query in queries:
             labels = main_thrd(query, args.num_process, args.input_dir, target)
             top5 = [lb[0] for lb in labels[:5]]
             recall_sorted = sorted(labels, key=lambda x: x[1]['tfidf_sim'], reverse=True)
