@@ -184,7 +184,7 @@ def main_thrd(query, num_process, input_dir, target):
     target_vec = []
     valid_token = 0
     for token in target_token:
-        if token in unistems:
+        if token in unigram_set:
             valid_token += 1
             target_vec.append(token_freq[token] * idf[token])
     target_vec = [x / valid_token for x in target_vec]
