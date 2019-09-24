@@ -187,7 +187,7 @@ def main_thrd(query, num_process, input_dir, target):
     for token in target_token:
         tfidf = token_freq[token] / len(target_token) * idf[token]
         target_vec.append(tfidf)
-    print('target_vec:' target_vec)
+    print('target_vec:', target_vec)
 
     tokenizer = MWETokenizer(separator=' ')
 
@@ -229,7 +229,7 @@ def main_thrd(query, num_process, input_dir, target):
         else:
             stats['tfidf_sim'] = tfidf_sim
             top100_phrase.append((phrase, stats))
-            print('phrase' phrase_vec)
+            print('phrase', phrase_vec)
 
     print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
