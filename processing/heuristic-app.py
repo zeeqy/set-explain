@@ -187,6 +187,8 @@ def main_thrd(query, num_process, input_dir, target):
     for token in target_token:
         target_vec.append(token_freq[token] / len(target_token) * idf[token])
 
+    print('target_vec:', target_vec)
+
     tokenizer = MWETokenizer(separator=' ')
 
     for e in unigram_set:
@@ -218,6 +220,8 @@ def main_thrd(query, num_process, input_dir, target):
         token_freq = dict(Counter(phrase_tokens))
         for token in target_token:
             phrase_vec.append(token_freq[token]/len(phrase_tokens) * idf[token])
+
+        print('target_vec:', phrase_vec)
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
         # if np.isnan(tfidf_sim):
         #     continue
