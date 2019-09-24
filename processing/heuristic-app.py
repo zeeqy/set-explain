@@ -318,10 +318,12 @@ def main():
     #     f.close()
 
     for item in query_set[:1]:
+        print(item)
         score = 0
         recall = 0
         seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
         target = item['title'].lower().split(',')[0]
+        print(target)
         index = 0
         retry = 0
         while index < num_query:
