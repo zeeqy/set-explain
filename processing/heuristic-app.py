@@ -314,7 +314,7 @@ def main():
     #         f.write(json.dumps(eval_metric) + '\n')
     #     f.close()
 
-    for item in query_set[:1]:
+    for item in query_set:
         score = 0
         recall = 0
         seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
@@ -325,12 +325,15 @@ def main():
         queries = np.random.choice(list(valid_seeds),[num_query,query_length]).tolist()
         for query in queries:
             labels = main_thrd(query, args.num_process, args.input_dir, target)
-            top5 = [lb[0] for lb in labels[:5]]
-            recall_sorted = sorted(labels, key=lambda x: x[1]['tfidf_sim'], reverse=True)
-            sys.stdout.flush()
-            recall += recall_sorted[0][1]['tfidf_sim']
-            score += labels[0][1]['tfidf_sim']
-            meta = {'query':query, 'target': target, 'top5': top5, 'top1_sim':(labels[0][0], labels[0][1]['tfidf_sim']), 'top_100_best': (recall_sorted[0][0], recall_sorted[0][1]['tfidf_sim'])}
+            top5 = [lab[0] for lab in labels[:5]]
+            best_phrase = labels[0][0]
+            best_sim = labels[0][1]['tfidf_sim']
+            recall_rank = np.argmax([lab[1]['tfidf_sim'] for lab in labels])
+            recall_phrase = labels[best_rank][0]
+            recall_sim = labels[best_rank][1]['tfidf_sim']
+            recall += recall_sim
+            score += best_sim
+            meta = {'query':query, 'target': target, 'top1':(best_phrase, best_sim), 'top5': top5, 'top100_recall':(recall_phrase, recall_rank, recall_sim)}
             print(meta)
             sys.stdout.flush()
             with open('log-{}.txt'.format(query_length), 'a+') as f:
@@ -338,7 +341,7 @@ def main():
             f.close()
         score /= num_query
         recall /= num_query
-        eval_metric.update({target:{'top1_tfidf_sim': score, 'top100_reall': recall}})
+        eval_metric.update({target:{'top1': score, 'top100_reall': recall}})
         with open('tfidf_sim-{}.txt'.format(query_length), 'a+') as f:
             f.write(json.dumps(eval_metric) + '\n')
         f.close()
