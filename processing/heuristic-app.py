@@ -220,7 +220,7 @@ def main_thrd(query, num_process, input_dir, target):
                 phrase_vec.append(token_freq[token]/len(phrase_tokens) * idf[token])
             else:
                 phrase_vec.append(0)
-        if np.linalg.normnorm(phrase_vec) == 0:
+        if np.linalg.norm(phrase_vec) == 0:
             stats['tfidf_sim'] = 0
         else:
             tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
