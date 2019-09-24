@@ -230,7 +230,7 @@ def main_thrd(query, num_process, input_dir, target):
     print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
 
-    return top100_phrase
+    return top100_phrase, target_token, target_vec
 
 def main():
     parser = argparse.ArgumentParser(description="heuristic approach")
@@ -324,7 +324,7 @@ def main():
         queries = [np.random.choice(list(valid_seeds), query_length, replace=False).tolist() for i in range(num_query)]
         for query in queries:
             print('prcessing query: ', query)
-            labels = main_thrd(query, args.num_process, args.input_dir, target)
+            labels, target_token, target_vec = main_thrd(query, args.num_process, args.input_dir, target)
             top5 = [lab[0] for lab in labels[:5]]
             best_phrase = labels[0][0]
             best_sim = labels[0][1]['tfidf_sim']
