@@ -18,11 +18,11 @@ from itertools import combinations
 import phrasemachine
 from scipy.stats import skew
 stop = set(stopwords.words('english'))
-pronoun = set("he", "her", "hers", "herself", "him", "himself", "his", "i", 
+pronoun = set(["he", "her", "hers", "herself", "him", "himself", "his", "i", 
 "it", "its", "me", "mine", "my", "myself", "our", "ours", "ourselves", 
 "she", "thee", "their", "them", "themselves", "they", "thou", 
 "thy", "thyself", "us", "we", "ye", "you", "your", "yours", "yourself",
-"we")
+"we"])
 
 def sent_search(params):
     (task_list, args) = params
