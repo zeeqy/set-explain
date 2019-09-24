@@ -207,7 +207,15 @@ def main_thrd(query, num_process, input_dir, target):
         tokenized_set = set(raw_tokenized)
         for token in tokenized_set.intersection(unigram_set):
             score += agg_score[token]
+
+    phrases_score.update({phrase:{'score': score/len(nonstop_tokens),'tokenized_set':tokenized_set}})
+    phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
         
+    top100_phrase = []
+    for meta in phrases_sorted[:min(100, len(phrases_sorted))]:
+        phrase = meta[0]
+        stats = meta[1]
+        tokenized_set = meta[1]['tokenized_set']
         phrase_vec = []
         token_freq = dict(Counter(tokenized_set))
         valid_token = 0
@@ -219,15 +227,18 @@ def main_thrd(query, num_process, input_dir, target):
                 phrase_vec.append(0)
                 valid_token += 1
         phrase_vec = [x / valid_token for x in phrase_vec]
-
-        phrases_score.update({phrase:{'score': score/len(nonstop_tokens), 'tfidf_sim': 1 - spatial.distance.cosine(target_vec, phrase_vec)}})
-
-    phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
-
+        tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
+        if np.isnan(tfidf_sim):
+            continue
+        else:
+            stats.pop('tokenized_set',None)
+            stats['tfidf_sim'] = tfidf_sim
+            top100_phrase.append((phrase, stats))
 
     print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
+    sys.stdout.flush()
 
-    return [phrase for phrase in phrases_sorted[:min(100, len(phrases_sorted))]]
+    return top100_phrase
 
 def main():
     parser = argparse.ArgumentParser(description="heuristic approach")
@@ -324,12 +335,13 @@ def main():
                 retry += 1
                 continue
             labels = main_thrd(query, args.num_process, args.input_dir, target)
-            top5 = [(lb[0], lb[1]['score']) for lb in labels[:5]]
+            top5 = [lb[0] for lb in labels[:5]]
             recall_sorted = sorted(labels, key=lambda x: x[1]['tfidf_sim'], reverse=True)
             recall += recall_sorted[0][1]['tfidf_sim']
             score += labels[0][1]['tfidf_sim']
-            meta = {'query':query, 'target': target, 'top5': top5, 'top1_tfidf_sim':(labels[0][0], labels[0][1]['tfidf_sim']), 'top100_recall': (recall_sorted[0][0], recall_sorted[0][1]['tfidf_sim'])}
+            meta = {'query':query, 'target': target, 'top5': top5, 'top1_sim':(labels[0][0], labels[0][1]['tfidf_sim']), 'top_100_best': (recall_sorted[0][0], recall_sorted[0][1]['tfidf_sim'])}
             print(meta)
+            sys.stdout.flush()
             with open('log-{}.txt'.format(query_length), 'a+') as f:
                 f.write(json.dumps(meta) + '\n')
             f.close()
