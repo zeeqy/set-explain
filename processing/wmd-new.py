@@ -245,7 +245,7 @@ def main():
         for sent in search_merge[ent]:
             sent_tok = nltk.word_tokenize(sent['text'])
             raw_tokenized = tokenizer.tokenize(sent_tok)
-            if len(tokenized_set) != 0:
+            if len(raw_tokenized) != 0:
                 sent['phrases'] = raw_tokenized
                 search_refetch[ent].append(sent)
     
