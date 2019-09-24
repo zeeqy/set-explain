@@ -55,7 +55,7 @@ def sent_search(params):
                     doc = nlp(item_dict['text'])
                     if len(doc) >= 30:
                         continue
-                    unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
+                    unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1, filter_nums=True, filter_punct=True, filter_stops=True)]
                     item_dict['unigram'] = unigram
                     tokens = [token.lemma_ for token in doc]
                     item_dict['tokens'] = tokens
@@ -179,12 +179,8 @@ def main_thrd(query, num_process, input_dir, target):
     start_time = time.time()
     
     target_doc = nlp(target)
-    target_token = [token.lemma_ for token in target_doc if token.lemma_ in cnt.keys()]
-    token_freq = dict(Counter(target_token))
-    target_vec = []
-    for token in target_token:
-        tfidf = token_freq[token] / len(target_token) * idf[token]
-        target_vec.append(tfidf)
+    target_token = [token.lemma_ for token in target_doc if token.lemma_]
+    target_token_freq = dict(Counter(target_token))
 
     tokenizer = MWETokenizer(separator=' ')
 
@@ -214,13 +210,15 @@ def main_thrd(query, num_process, input_dir, target):
         stats = meta[1]
         phrase_tokens = [token.lemma_ for token in nlp(phrase)]
         phrase_vec = []
+        target_vec = []
         token_freq = dict(Counter(phrase_tokens))
-        for token in target_token:
-            if token in phrase_tokens:
-                phrase_vec.append(token_freq[token]/len(phrase_tokens) * idf[token])
+        for token in phrase_tokens:
+            phrase_vec.append(token_freq[token]/len(phrase_tokens) * idf[token])
+            if token in target_token:
+                target_vec.append(target_token_freq[token]/len(target_token) * idf[token])
             else:
-                phrase_vec.append(0)
-        if np.linalg.norm(phrase_vec) == 0:
+                target_vec.append(0)
+        if np.linalg.norm(target_vec) == 0:
             stats['tfidf_sim'] = 0
         else:
             tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
