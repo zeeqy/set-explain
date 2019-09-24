@@ -56,10 +56,8 @@ def sent_search(params):
                     doc = nlp(item_dict['text'])
                     if len(doc) >= 30:
                         continue
-                    unigram = [token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
-                    uni_stem = [stemmer.stem(token) for token in unigram]
+                    unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
                     item_dict['unigram'] = unigram
-                    item_dict['stem'] = uni_stem
                     tokens = [token.text for token in doc]
                     pos = [token.pos_ for token in doc]
                     phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
@@ -112,28 +110,24 @@ def main_thrd(query, num_process, input_dir, target):
 
     start_time = time.time()
     unigrams = []
-    unistems = []
     for ent in query:
         for sent in search_merge[ent]:
             unigrams += sent['unigram']
-            unistems += sent['stem']
     unigram_set = set(unigrams)
-    unistems = set(unistems)
 
     N = 0
-    wordDictA = dict.fromkeys(unistems, 0)
+    wordDictA = dict.fromkeys(unigram_set, 0)
     for ent in query:
         N += len(search_merge[ent])
         for sent in search_merge[ent]:
-            for unigram in sent['stem'] :
+            for unigram in sent['unigram'] :
                 wordDictA[unigram] += 1
 
     for ent in query:
         unigram_set.discard(ent)
-        unistems.discard(stemmer.stem(ent))
 
     idf = {}
-    for key in unistems:
+    for key in unigram_set:
         idf.update({key:np.log(N / wordDictA[key])})
     
     unigram_sents = {}
@@ -185,7 +179,7 @@ def main_thrd(query, num_process, input_dir, target):
     start_time = time.time()
     
     target_doc = nlp(target)
-    target_token = [stemmer.stem(token.text) for token in target_doc]
+    target_token = [token.lemma_ for token in target_doc]
     token_freq = dict(Counter(target_token))
     target_vec = []
     valid_token = 0
@@ -204,8 +198,8 @@ def main_thrd(query, num_process, input_dir, target):
     phrases_score = {}
     for phrase in tqdm(list_phrases, desc='phrase-eval'):
         score = 0
-        tokens = nltk.word_tokenize(phrase)
-        nonstop_tokens = [token for token in tokens if token not in stop]
+        tokens = nlp(phrase)
+        nonstop_tokens = [token.lemma_ for token in doc if not token.is_stop]
         if len(nonstop_tokens) / len(tokens) <= 0.5:
             continue
         raw_tokenized = tokenizer.tokenize(nonstop_tokens)
@@ -214,14 +208,13 @@ def main_thrd(query, num_process, input_dir, target):
             score += agg_score[token]
         
         phrase_vec = []
-        tokenized_stem = [stemmer.stem(t) for t in tokenized_set]
-        token_freq = dict(Counter(tokenized_stem))
+        token_freq = dict(Counter(tokenized_set))
         valid_token = 0
         for token in target_token:
-            if token in tokenized_stem:
+            if token in tokenized_set:
                 phrase_vec.append(token_freq[token] * idf[token])
                 valid_token += 1
-            elif token in unistems:
+            elif token in unigram_set:
                 phrase_vec.append(0)
                 valid_token += 1
         phrase_vec = [x / valid_token for x in phrase_vec]
