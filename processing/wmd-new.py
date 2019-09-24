@@ -25,7 +25,6 @@ def sent_search(params):
     query = args.query_string.split(',')
 
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
-    nlp.add_pipe(wmd.WMD.SpacySimilarityHook(nlp), last=True)
 
     freq = dict()
 
@@ -60,7 +59,6 @@ def sent_search(params):
                     unigram = [token.text for token in textacy.extract.ngrams(doc,n=1,filter_nums=True, filter_punct=True, filter_stops=True)]
                     item_dict['unigram'] = unigram
                     item_dict['phrases'] = list(doc.noun_chunks)
-                    item_dict['doc'] = doc
                     # tokens = [token.text for token in doc]
                     # pos = [token.pos_ for token in doc]
                     # phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
@@ -104,9 +102,9 @@ def cooccur_cluster(params):
             comb = combinations(sentsPair, 2) 
             current_wmd = 0
             for group in comb:
-                # doc1 = nlp(group[0])
-                # doc2 = nlp(group[1])
-                current_wmd += group[0].similarity(group[1])
+                doc1 = nlp(group[0])
+                doc2 = nlp(group[1])
+                current_wmd += doc1.similarity(doc2)
 
             if current_wmd < best_wmd:
                 best_wmd = current_wmd
