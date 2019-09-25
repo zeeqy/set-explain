@@ -110,7 +110,7 @@ def cooccur_cluster(params):
 
             if current_wmd < best_wmd:
                 best_wmd = current_wmd
-                best_pair = sentsPair
+                best_pair = [sent.text for sent in sentsPair]
         
         context.update({keyent:{'best_pair':best_pair, 'best_wmd':best_wmd}})
     
