@@ -260,8 +260,11 @@ def main():
             mined_phrases[ent] += sent['phrases']
             ent_phrase += sent['phrases']
 
+        ent_phrase_set = set(ent_phrase)
+        for ent in query:
+            ent_phrase_set.discard(ent)
         with open('phrase-mined-{}.txt'.format(fid), "w+") as f:
-            for ph in ent_phrase:
+            for ph in ent_phrase_set:
                 f.write(ph + '\n')
         f.close()
         fid += 1
