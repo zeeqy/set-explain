@@ -317,7 +317,7 @@ def main():
     #         f.write(json.dumps(eval_metric) + '\n')
     #     f.close()
 
-    for item in [s in query_set if s['title']=='fast-food restaurants']:
+    for item in [s for s in query_set if s['title']=='fast-food restaurants']:
         score = 0
         recall = 0
         index = 0
