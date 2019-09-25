@@ -205,7 +205,7 @@ def main_thrd(query, num_process, input_dir, target):
         
     top100_phrase = []
     index = 0
-    for phra
+    for phrase in phrases_sorted[:100]:
         phrase = phrases_sorted[index][0]
         stats = phrases_sorted[index][1]
         phrase_doc = nlp(phrase)
@@ -267,7 +267,7 @@ def main():
     num_query = args.num_query
     query_length = args.query_length
     eval_metric = {}
-    #smoothie = SmoothingFunction().method3 # NIST smoothing
+    smoothie = SmoothingFunction().method3 # NIST smoothing
 
     query_set = []
     for entry in sets:
