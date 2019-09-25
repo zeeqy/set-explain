@@ -14,6 +14,7 @@ import phrasemachine
 from scipy import spatial
 import time
 from collections import Counter
+from scipy.stats.mstats import gmean
 from scipy.stats import skew
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 from nltk.stem.snowball import SnowballStemmer
@@ -155,7 +156,7 @@ def main_thrd(query, num_process, input_dir, target):
     agg_score = {}
     for ug in score_dist.keys():
         tmp_res = [item[1] for item in score_dist[ug].items()]
-        agg_score.update({ug: (np.mean(tmp_res) - np.std(tmp_res)) * idf[ug]})
+        agg_score.update({ug: gmean(tmp_res)})
 
 
     score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
