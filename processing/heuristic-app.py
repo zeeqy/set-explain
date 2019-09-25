@@ -161,6 +161,7 @@ def main_thrd(query, num_process, input_dir, target):
     score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
 
     print("--- unigram score %s seconds ---" % (time.time() - start_time))
+    print(score_sorted[:10])
     sys.stdout.flush()
     
     start_time = time.time()
