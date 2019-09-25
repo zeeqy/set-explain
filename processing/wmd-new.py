@@ -129,7 +129,6 @@ def main():
     args = parser.parse_args()
     query = args.query_string.split(',')
     nlp = spacy.load('en_core_web_lg', disable=['ner']) 
-    nlp.max_length = 10000000
 
     print(query)
     sys.stdout.flush()
@@ -231,6 +230,8 @@ def main():
     coo_phrases = set(mined_phrases[query[0]])
     for ent in query:
         coo_phrases = coo_phrases.intersection(set(mined_phrases[ent]))
+
+    print(coo_phrases)
 
     tokenizer = MWETokenizer(separator=' ')
 
