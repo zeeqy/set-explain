@@ -77,8 +77,7 @@ def split(a, n):
 
 def main_thrd(query, num_process, input_dir, target):
     start_time = time.time()
-    nlp = spacy.load('en_core_web_lg', disable=['ner']) 
-    nlp.max_length = 50000000
+    nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
     ##### sentence search #####
     input_files = os.listdir(input_dir)
@@ -151,8 +150,6 @@ def main_thrd(query, num_process, input_dir, target):
                 did = set()
                 for sent in unigram_sents[ent][ug]:
                     score_dist[ug][ent] += sent['doc_score']
-                    #if sent['did'] not in did:
-                        #score_dist[ug][ent] += sent['doc_score']
                     did.add(sent['did'])
 
     agg_score = {}
@@ -179,7 +176,7 @@ def main_thrd(query, num_process, input_dir, target):
     start_time = time.time()
     
     target_doc = nlp(target)
-    target_token = [token.lemma_ for token in target_doc if token.lemma_]
+    target_token = [token.lemma_ for token in target_doc]
     target_token_freq = dict(Counter(target_token))
 
     tokenizer = MWETokenizer(separator=' ')
@@ -205,30 +202,38 @@ def main_thrd(query, num_process, input_dir, target):
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
         
     top100_phrase = []
-    for meta in phrases_sorted[:min(100, len(phrases_sorted))]:
-        phrase = meta[0]
-        stats = meta[1]
-        phrase_tokens = [token.lemma_ for token in nlp(phrase)]
+    index = 0
+    while len(top100_phrase) < 100:
+        phrase = phrases_sorted[index][0]
+        stats = phrases_sorted[index][1]
+        phrase_doc = nlp(phrase)
+        phrase_tokens = [token.lemma_ for token in phrase_doc]
+        if not set(phrase_tokens).issubset(set(idf.keys())):
+            index += 1
+            continue
         phrase_vec = []
         target_vec = []
-        token_freq = dict(Counter(phrase_tokens))
+        phrase_token_freq = dict(Counter(phrase_tokens))
         for token in phrase_tokens:
-            phrase_vec.append(token_freq[token]/len(phrase_tokens) * idf[token])
+            phrase_vec.append(phrase_token_freq[token]/len(phrase_tokens) * idf[token])
             if token in target_token:
                 target_vec.append(target_token_freq[token]/len(target_token) * idf[token])
             else:
                 target_vec.append(0)
+        
         if np.linalg.norm(target_vec) == 0:
             stats['tfidf_sim'] = 0
         else:
             tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
             stats['tfidf_sim'] = tfidf_sim
+        
         top100_phrase.append((phrase, stats))
+        index += 1
 
     print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
 
-    return top100_phrase, target_token, target_vec
+    return top100_phrase, target_token, target_vec, index
 
 def main():
     parser = argparse.ArgumentParser(description="heuristic approach")
@@ -322,7 +327,7 @@ def main():
         queries = [np.random.choice(list(valid_seeds), query_length, replace=False).tolist() for i in range(num_query)]
         for query in queries:
             print('prcessing query: ', query)
-            labels, target_token, target_vec = main_thrd(query, args.num_process, args.input_dir, target)
+            labels, target_token, target_vec, index = main_thrd(query, args.num_process, args.input_dir, target)
             top5 = [lab[0] for lab in labels[:5]]
             best_phrase = labels[0][0]
             best_sim = labels[0][1]['tfidf_sim']
@@ -332,7 +337,7 @@ def main():
             recall += recall_sim
             score += best_sim
             meta = {'query':query, 'target': target, 'target_token': target_token, 'target_vec': target_vec, 'top1':(best_phrase, best_sim), 'top5': top5, 'top100_recall':(recall_phrase, recall_rank+1, recall_sim)}
-            print(meta)
+            print(meta, index)
             sys.stdout.flush()
             with open('log-{}.txt'.format(query_length), 'a+') as f:
                 f.write(json.dumps(meta) + '\n')
