@@ -232,6 +232,7 @@ def main():
         coo_phrases = coo_phrases.intersection(set(mined_phrases[ent]))
 
     print(coo_phrases)
+    print(mined_phrases)
 
     tokenizer = MWETokenizer(separator=' ')
 
