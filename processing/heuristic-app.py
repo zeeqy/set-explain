@@ -156,7 +156,7 @@ def main_thrd(query, num_process, input_dir, target):
     agg_score = {}
     for ug in score_dist.keys():
         tmp_res = [item[1] for item in score_dist[ug].items()]
-        agg_score.update({ug: gmean(tmp_res)})
+        agg_score.update({ug: gmean(tmp_res) * idf[ug] })
 
 
     score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
