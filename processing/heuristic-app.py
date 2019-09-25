@@ -205,29 +205,32 @@ def main_thrd(query, num_process, input_dir, target):
         
     top100_phrase = []
     index = 0
-    while len(top100_phrase) < 100:
+    for phra
         phrase = phrases_sorted[index][0]
         stats = phrases_sorted[index][1]
         phrase_doc = nlp(phrase)
-        phrase_tokens = [token.lemma_ for token in phrase_doc]
-        if not set(phrase_tokens).issubset(set(idf.keys())):
-            index += 1
-            continue
-        phrase_vec = []
-        target_vec = []
-        phrase_token_freq = dict(Counter(phrase_tokens))
-        for token in phrase_tokens:
-            phrase_vec.append(phrase_token_freq[token]/len(phrase_tokens) * idf[token])
-            if token in target_token:
-                target_vec.append(target_token_freq[token]/len(target_token) * idf[token])
-            else:
-                target_vec.append(0)
         
-        if np.linalg.norm(target_vec) == 0:
-            stats['tfidf_sim'] = 0
-        else:
-            tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
-            stats['tfidf_sim'] = tfidf_sim
+        # phrase_tokens = [token.lemma_ for token in phrase_doc]
+        # if not set(phrase_tokens).issubset(set(idf.keys())):
+        #     index += 1
+        #     continue
+        # phrase_vec = []
+        # target_vec = []
+        # phrase_token_freq = dict(Counter(phrase_tokens))
+        # for token in phrase_tokens:
+        #     phrase_vec.append(phrase_token_freq[token]/len(phrase_tokens) * idf[token])
+        #     if token in target_token:
+        #         target_vec.append(target_token_freq[token]/len(target_token) * idf[token])
+        #     else:
+        #         target_vec.append(0)
+        
+        # if np.linalg.norm(target_vec) == 0:
+        #     stats['eval'] = 0
+        # else:
+        #     tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
+        #     stats['eval'] = tfidf_sim
+
+        stats['eval'] = target_doc.similarity(phrase_doc)
         
         top100_phrase.append((phrase, stats))
         index += 1
@@ -264,7 +267,7 @@ def main():
     num_query = args.num_query
     query_length = args.query_length
     eval_metric = {}
-    smoothie = SmoothingFunction().method3 # NIST smoothing
+    #smoothie = SmoothingFunction().method3 # NIST smoothing
 
     query_set = []
     for entry in sets:
@@ -317,7 +320,7 @@ def main():
     #         f.write(json.dumps(eval_metric) + '\n')
     #     f.close()
 
-    for item in [s for s in query_set if s['title']=='fast-food restaurants']:
+    for item in query_set[:5]:
         score = 0
         recall = 0
         index = 0
@@ -332,14 +335,14 @@ def main():
             labels = main_thrd(query, args.num_process, args.input_dir, target)
             top5 = [lab[0] for lab in labels[:5]]
             best_phrase = labels[0][0]
-            best_sim = labels[0][1]['tfidf_sim']
-            recall_rank = int(np.argmax([lab[1]['tfidf_sim'] for lab in labels]))
+            best_sim = labels[0][1]['eval']
+            recall_rank = int(np.argmax([lab[1]['eval'] for lab in labels]))
             recall_phrase = labels[recall_rank][0]
-            recall_sim = labels[recall_rank][1]['tfidf_sim']
+            recall_sim = labels[recall_rank][1]['eval']
             recall += recall_sim
             score += best_sim
             meta = {'query':query, 'target': target, 'top1':(best_phrase, best_sim), 'top5': top5, 'top100_recall':(recall_phrase, recall_rank+1, recall_sim)}
-            print(meta, index)
+            print(meta)
             sys.stdout.flush()
             with open('log-{}.txt'.format(query_length), 'a+') as f:
                 f.write(json.dumps(meta) + '\n')
@@ -347,7 +350,7 @@ def main():
         score /= num_query
         recall /= num_query
         eval_metric.update({target:{'top1': score, 'top100_recall': recall}})
-        with open('tfidf_sim-{}.txt'.format(query_length), 'a+') as f:
+        with open('w2vec_sim-{}.txt'.format(query_length), 'a+') as f:
             f.write(json.dumps(eval_metric) + '\n')
         f.close()
 
