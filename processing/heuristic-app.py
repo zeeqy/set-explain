@@ -209,7 +209,8 @@ def main_thrd(query, num_process, input_dir, target):
         phrase = phrases_sorted[index][0]
         stats = phrases_sorted[index][1]
         phrase_doc = nlp(phrase)
-        
+        phrase_lemma = nlp(' '.join([token.lemma_ for token in phrase_doc]))
+        target_lemma = nlp(' '.join(target_token))
         # phrase_tokens = [token.lemma_ for token in phrase_doc]
         # if not set(phrase_tokens).issubset(set(idf.keys())):
         #     index += 1
@@ -230,7 +231,7 @@ def main_thrd(query, num_process, input_dir, target):
         #     tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
         #     stats['eval'] = tfidf_sim
 
-        stats['eval'] = target_doc.similarity(phrase_doc)
+        stats['eval'] = target_lemma.similarity(phrase_lemma)
         
         top100_phrase.append((phrase, stats))
         index += 1
