@@ -252,10 +252,19 @@ def main():
                 search_refetch[ent].append(sent)
     
     mined_phrases = {}
+    fid = 0
     for ent in query:
+        ent_phrase = []
         mined_phrases.update({ent:[]})
         for sent in search_refetch[ent]:
             mined_phrases[ent] += sent['phrases']
+            ent_phrase += sent['phrases']
+
+        with open('phrase-mined-{}.txt'.format(fid), "w+") as f:
+            for ph in ent_phrase:
+                f.write(ph + '\n')
+        f.close()
+        fid += 1
 
     coo_phrases = set(mined_phrases[query[0]])
     for ent in query:
@@ -286,32 +295,32 @@ def main():
         f.close()
         fid += 1
 
-    print("--- phrase sent dist use %s seconds ---" % (time.time() - start_time))
+    # print("--- phrase sent dist use %s seconds ---" % (time.time() - start_time))
 
-    start_time = time.time()
+    # start_time = time.time()
 
-    tasks = list(split(list(coo_phrases), args.num_process))
-    inputs = [(tasks[i], phrase_sents, query) for i in range(args.num_process)]
+    # tasks = list(split(list(coo_phrases), args.num_process))
+    # inputs = [(tasks[i], phrase_sents, query) for i in range(args.num_process)]
 
-    with Pool(args.num_process) as p:
-        wmd_results = p.map(cooccur_cluster, inputs)
+    # with Pool(args.num_process) as p:
+    #     wmd_results = p.map(cooccur_cluster, inputs)
 
-    wmd_merge = wmd_results[0]
-    for pid in range(1, len(wmd_results)):
-        tmp_res = wmd_results[pid]
-        wmd_merge.update(tmp_res)
+    # wmd_merge = wmd_results[0]
+    # for pid in range(1, len(wmd_results)):
+    #     tmp_res = wmd_results[pid]
+    #     wmd_merge.update(tmp_res)
 
-    sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
+    # sorted_wmd = sorted(wmd_merge.items(), key=lambda x : x[1]['best_wmd'])
 
-    print("--- wmd process use %s seconds ---" % (time.time() - start_time))
+    # print("--- wmd process use %s seconds ---" % (time.time() - start_time))
 
-    with open('wmd.txt', "w+") as f:
-        for item in sorted_wmd:
-            keyent = item[0]
-            data = item[1]
-            data.update({'key':keyent})
-            f.write(json.dumps(data) + '\n')
-    f.close()
+    # with open('wmd.txt', "w+") as f:
+    #     for item in sorted_wmd:
+    #         keyent = item[0]
+    #         data = item[1]
+    #         data.update({'key':keyent})
+    #         f.write(json.dumps(data) + '\n')
+    # f.close()
 
     ##### wmd based on cooccurrence #####
     # tasks = list(split(list(unigram_set), args.num_process))
