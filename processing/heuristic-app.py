@@ -224,18 +224,9 @@ def main_thrd(query, num_process, input_dir, target):
         tokenized_set = set(raw_tokenized)
         for token in tokenized_set.intersection(unigram_set):
             score += agg_score[token]
-
-        phrases_score.update({phrase:{'score': score/len(nonstop_tokens)}})
-    
-    phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
+        score /= len(nonstop_tokens)
         
-    top100_phrase = []
-    for meta in phrases_sorted[:min(100, len(phrases_sorted))]:
-        phrase = meta[0]
-        stats = meta[1]
         phrase_doc = nlp(phrase)
-        # phrase_lemma = nlp(' '.join([token.lemma_ for token in phrase_doc]))
-        # target_lemma = nlp(' '.join(target_token))
         phrase_tokens = [token.lemma_ for token in phrase_doc]
         phrase_vec = []
         phrase_token_freq = dict(Counter(phrase_tokens))
@@ -248,13 +239,14 @@ def main_thrd(query, num_process, input_dir, target):
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
         stats['eval'] = tfidf_sim
 
-        #stats['eval'] = target_lemma.similarity(phrase_lemma)
-        top100_phrase.append((phrase, stats))
+        phrases_score.update({phrase:{'score': score, 'eval': tfidf_sim}})
+    
+    phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
 
     print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
 
-    return top100_phrase
+    return phrases_sorted
 
 def main():
     parser = argparse.ArgumentParser(description="heuristic approach")
@@ -339,6 +331,7 @@ def main():
     for item in query_set:
         score = 0
         recall = 0
+        norm_score = 0
         index = 0
         seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
         target = item['title'].lower().split(',')[0]
@@ -352,12 +345,15 @@ def main():
             top5 = [lab[0] for lab in labels[:5]]
             best_phrase = labels[0][0]
             best_sim = labels[0][1]['eval']
+            length_labels = len(labels)
             recall_rank = int(np.argmax([lab[1]['eval'] for lab in labels]))
             recall_phrase = labels[recall_rank][0]
             recall_sim = labels[recall_rank][1]['eval']
+            norm_best_sim = best_sim / recall_sim if recall_sim != 0 else 0
             recall += recall_sim
             score += best_sim
-            meta = {'query':query, 'target': target, 'top1':(best_phrase, best_sim), 'top5': top5, 'top100_recall':(recall_phrase, recall_rank+1, recall_sim)}
+            norm_score += norm_best_sim
+            meta = {'query':query, 'target': target, 'top1':(best_phrase, best_sim), 'top5': top5, 'recall':(recall_phrase, recall_rank+1, recall_sim), 'norm_top1': norm_best_sim}
             print(meta)
             sys.stdout.flush()
             with open('log-{}.txt'.format(query_length), 'a+') as f:
@@ -365,7 +361,8 @@ def main():
             f.close()
         score /= num_query
         recall /= num_query
-        eval_metric.update({target:{'top1': score, 'top100_recall': recall}})
+        norm_score /= num_query
+        eval_metric.update({target:{'top1': score, 'recall': recall, 'norm_top1': norm_score}})
         with open('tfidf-sim-{}.txt'.format(query_length), 'a+') as f:
             f.write(json.dumps(eval_metric) + '\n')
         f.close()
