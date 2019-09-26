@@ -223,7 +223,7 @@ def main_thrd(query, num_process, input_dir, target):
             if token in phrase_vec:
                 phrase_vec.append(phrase_token_freq[token]/len(phrase_tokens) * idf[token])
             else:
-                target_vec.append(0)
+                phrase_vec.append(0)
         
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
         stats['eval'] = tfidf_sim
