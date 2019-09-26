@@ -153,6 +153,27 @@ def main_thrd(query, num_process, input_dir, target):
                     score_dist[ug][ent] += sent['doc_score']
                     did.add(sent['did'])
 
+    #using rank to score unigram
+    score_redist = {}
+    for ent in query:
+        score_redist.update({ent:{dict.fromkeys(unigram_set, 0)}})
+        for ug in unigram_set:
+            score_redist[ent][ug] = score_dist[ug][ent]    
+        sorted_score = sorted(score_redist[ent].items(), key=lambda item: item[1])
+        rank, count, previous, result = 0, 0, None, {}
+        for key, num in sorted_score:
+            count += 1
+            if num != previous:
+                rank += count
+                previous = num
+                count = 0
+            result[key] = 1 / rank
+        score_redist[ent] = result
+
+    for ug in unigram_set:
+        for ent in query:
+            score_dist[ug][ent] = score_redist[ent]
+
     agg_score = {}
     for ug in score_dist.keys():
         tmp_res = [item[1] for item in score_dist[ug].items()]
@@ -346,7 +367,7 @@ def main():
         score /= num_query
         recall /= num_query
         eval_metric.update({target:{'top1': score, 'top100_recall': recall}})
-        with open('w2vec_sim-{}.txt'.format(query_length), 'a+') as f:
+        with open('tfidf-sim-{}.txt'.format(query_length), 'a+') as f:
             f.write(json.dumps(eval_metric) + '\n')
         f.close()
 
