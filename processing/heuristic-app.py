@@ -336,7 +336,7 @@ def main():
     #         f.write(json.dumps(eval_metric) + '\n')
     #     f.close()
 
-    for item in query_set[:3]:
+    for item in query_set:
         score = 0
         recall = 0
         index = 0
