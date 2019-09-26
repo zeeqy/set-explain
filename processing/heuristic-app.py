@@ -74,6 +74,8 @@ def sent_search(params):
 def phrase_eval(params):
     list_phrases, unigram_set, target_vec, idf, agg_score = params
 
+    idf_list = [*idf]
+
     tokenizer = MWETokenizer(separator=' ')
     for e in unigram_set:
         tokenizer.add_mwe(nltk.word_tokenize(e))
@@ -91,13 +93,11 @@ def phrase_eval(params):
             score += agg_score[token]
         score /= len(nonstop_tokens)
         
-        phrase_vec = []
+        phrase_vec = [0] * len(idf_list)
         phrase_token_freq = dict(Counter(tokens))
-        for token in idf.keys():
-            if token in tokens:
-                phrase_vec.append(phrase_token_freq[token]/len(tokens) * idf[token])
-            else:
-                phrase_vec.append(0)
+        for token in tokens:
+            index = idf_list.index(token)
+            phrase_vec[index] = phrase_token_freq[token]/len(tokens) * idf[token]
         
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
 
@@ -230,18 +230,16 @@ def main_thrd(query, num_process, input_dir, target):
     sys.stdout.flush()
 
     start_time = time.time()
-    
+
+    idf_list = [*idf]
     target_doc = nlp(target)
-    target_vec = []
+    target_vec = [0] * len(idf_list)
     target_token = [token.lemma_ for token in target_doc]
     target_token_freq = dict(Counter(target_token))
-    for token in idf.keys():
-        if token in target_token:
-            target_vec.append(target_token_freq[token]/len(target_token) * idf[token])
-        else:
-            target_vec.append(0)
+    for token in target_token:
+        index = idf_list.index(token)
+        target_vec[index] = target_token_freq[token]/len(target_token) * idf[token]
 
-    
     list_phrases = list(set(mined_phrases))
 
     tasks = list(split(list_phrases, num_process))
