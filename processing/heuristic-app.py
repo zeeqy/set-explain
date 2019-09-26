@@ -59,7 +59,7 @@ def sent_search(params):
                     item_dict['unigram'] = unigram
                     tokens = [token.lemma_ for token in doc if not token.is_punct]
                     item_dict['tokens'] = tokens
-                    pos = [token.pos_ for token in doc]
+                    pos = [token.pos_ for token in doc if not token.is_punct]
                     phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
                     item_dict['phrases'] = list(phrases['counts'])
                     context[ent].append(item_dict)
