@@ -158,7 +158,7 @@ def main_thrd(query, num_process, input_dir, target):
         score_redist.update({ent:dict.fromkeys(unigram_set, 0)})
         for ug in unigram_set:
             score_redist[ent][ug] = score_dist[ug][ent]    
-        sorted_score = sorted(score_redist[ent].items(), key=lambda item: item[1])
+        sorted_score = sorted(score_redist[ent].items(), key=lambda item: item[1], reverse=True)
         rank, count, previous, result = 0, 0, None, {}
         for key, num in sorted_score:
             count += 1
