@@ -69,6 +69,7 @@ def sent_search(params):
                         freq[ent][item_dict['did']] += 1
                     else:
                         freq[ent].update({item_dict['did']:1})
+    
     return {'context':context, 'freq':freq}
 
 def phrase_eval(params):
