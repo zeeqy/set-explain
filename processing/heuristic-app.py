@@ -223,11 +223,21 @@ def main_thrd(query, num_process, input_dir, target):
     sys.stdout.flush()
     
     start_time = time.time()
+
+    tokenizer = MWETokenizer(separator=' ')
+    for ent in query:
+        tokenizer.add_mwe(nltk.word_tokenize(ent))
     
     mined_phrases = []
+    query_set = set(query)
     for ent in query:
         for sent in search_merge[ent]:
-            mined_phrases += sent['phrases']
+            for phrase in sent['phrases']:
+                tokens = nltk.word_tokenize(phrase)
+                raw_tokenized = tokenizer.tokenize(tokens)
+                tokenized_set = set(raw_tokenized)
+                if tokenized_set.intersection(query_set) == set():
+                    mined_phrases.append(phrase)
 
     print("--- phrase mining %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
