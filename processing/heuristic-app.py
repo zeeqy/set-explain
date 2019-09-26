@@ -178,8 +178,14 @@ def main_thrd(query, num_process, input_dir, target):
     start_time = time.time()
     
     target_doc = nlp(target)
+    target_vec = []
     target_token = [token.lemma_ for token in target_doc]
     target_token_freq = dict(Counter(target_token))
+    for token in idf.keys():
+        if token in target_token:
+            target_vec.append(target_token_freq[token]/len(target_token) * idf[token])
+        else:
+            target_vec.append(0)
 
     tokenizer = MWETokenizer(separator=' ')
 
@@ -204,37 +210,26 @@ def main_thrd(query, num_process, input_dir, target):
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
         
     top100_phrase = []
-    index = 0
-    for phrase in phrases_sorted[:100]:
-        phrase = phrases_sorted[index][0]
-        stats = phrases_sorted[index][1]
+    for meta in phrases_sorted[:min(100, len(phrases_sorted))]:
+        phrase = meta[0]
+        stats = meta[1]
         phrase_doc = nlp(phrase)
-        phrase_lemma = nlp(' '.join([token.lemma_ for token in phrase_doc]))
-        target_lemma = nlp(' '.join(target_token))
-        # phrase_tokens = [token.lemma_ for token in phrase_doc]
-        # if not set(phrase_tokens).issubset(set(idf.keys())):
-        #     index += 1
-        #     continue
-        # phrase_vec = []
-        # target_vec = []
-        # phrase_token_freq = dict(Counter(phrase_tokens))
-        # for token in phrase_tokens:
-        #     phrase_vec.append(phrase_token_freq[token]/len(phrase_tokens) * idf[token])
-        #     if token in target_token:
-        #         target_vec.append(target_token_freq[token]/len(target_token) * idf[token])
-        #     else:
-        #         target_vec.append(0)
+        # phrase_lemma = nlp(' '.join([token.lemma_ for token in phrase_doc]))
+        # target_lemma = nlp(' '.join(target_token))
+        phrase_tokens = [token.lemma_ for token in phrase_doc]
+        phrase_vec = []
+        phrase_token_freq = dict(Counter(phrase_tokens))
+        for token in idf.keys():
+            if token in phrase_vec:
+                phrase_vec.append(phrase_token_freq[token]/len(phrase_tokens) * idf[token])
+            else:
+                target_vec.append(0)
         
-        # if np.linalg.norm(target_vec) == 0:
-        #     stats['eval'] = 0
-        # else:
-        #     tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
-        #     stats['eval'] = tfidf_sim
+        tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
+        stats['eval'] = tfidf_sim
 
-        stats['eval'] = target_lemma.similarity(phrase_lemma)
-        
+        #stats['eval'] = target_lemma.similarity(phrase_lemma)
         top100_phrase.append((phrase, stats))
-        index += 1
 
     print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
@@ -321,7 +316,7 @@ def main():
     #         f.write(json.dumps(eval_metric) + '\n')
     #     f.close()
 
-    for item in query_set[:5]:
+    for item in query_set[:3]:
         score = 0
         recall = 0
         index = 0
