@@ -72,7 +72,7 @@ def sent_search(params):
     return {'context':context, 'freq':freq}
 
 def phrase_eval(params):
-    list_phrases, unigram_set, target_vec, idf = params
+    list_phrases, unigram_set, target_vec, idf, agg_score = params
 
     tokenizer = MWETokenizer(separator=' ')
     for e in unigram_set:
@@ -246,7 +246,7 @@ def main_thrd(query, num_process, input_dir, target):
 
     tasks = list(split(list_phrases, num_process))
     
-    inputs = [(tasks[i], unigram_set, target_vec, idf) for i in range(num_process)]
+    inputs = [(tasks[i], unigram_set, target_vec, idf, agg_score) for i in range(num_process)]
 
     phrases_score = {}
     with Pool(num_process) as p:
