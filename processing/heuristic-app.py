@@ -237,7 +237,6 @@ def main_thrd(query, num_process, input_dir, target):
                 phrase_vec.append(0)
         
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
-        stats['eval'] = tfidf_sim
 
         phrases_score.update({phrase:{'score': score, 'eval': tfidf_sim}})
     
