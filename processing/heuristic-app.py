@@ -71,6 +71,40 @@ def sent_search(params):
                         freq[ent].update({item_dict['did']:1})
     return {'context':context, 'freq':freq}
 
+def phrase_eval(params):
+    list_phrases, unigram_set, target_vec, idf = params
+
+    tokenizer = MWETokenizer(separator=' ')
+    for e in unigram_set:
+        tokenizer.add_mwe(nltk.word_tokenize(e))
+
+    phrases_score = {}
+    for phrase in tqdm(list_phrases, desc='phrase-eval', mininterval=10):
+        score = 0
+        tokens = nltk.word_tokenize(phrase)
+        nonstop_tokens = [token for token in tokens if token not in stop]
+        if len(nonstop_tokens) / len(tokens) <= 0.5:
+            continue
+        raw_tokenized = tokenizer.tokenize(nonstop_tokens)
+        tokenized_set = set(raw_tokenized)
+        for token in tokenized_set.intersection(unigram_set):
+            score += agg_score[token]
+        score /= len(nonstop_tokens)
+        
+        phrase_vec = []
+        phrase_token_freq = dict(Counter(tokens))
+        for token in idf.keys():
+            if token in tokens:
+                phrase_vec.append(phrase_token_freq[token]/len(tokens) * idf[token])
+            else:
+                phrase_vec.append(0)
+        
+        tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
+
+        phrases_score.update({phrase:{'score': score, 'eval': tfidf_sim}})
+
+    return phrases_score
+
 def split(a, n):
     k, m = divmod(len(a), n)
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
@@ -207,36 +241,19 @@ def main_thrd(query, num_process, input_dir, target):
         else:
             target_vec.append(0)
 
-    tokenizer = MWETokenizer(separator=' ')
-
-    for e in unigram_set:
-        tokenizer.add_mwe(nltk.word_tokenize(e))
     
-    list_phrases = set(mined_phrases)
-    phrases_score = {}
-    for phrase in tqdm(list_phrases, desc='phrase-eval'):
-        score = 0
-        tokens = nltk.word_tokenize(phrase)
-        nonstop_tokens = [token for token in tokens if token not in stop]
-        if len(nonstop_tokens) / len(tokens) <= 0.5:
-            continue
-        raw_tokenized = tokenizer.tokenize(nonstop_tokens)
-        tokenized_set = set(raw_tokenized)
-        for token in tokenized_set.intersection(unigram_set):
-            score += agg_score[token]
-        score /= len(nonstop_tokens)
-        
-        phrase_vec = []
-        phrase_token_freq = dict(Counter(tokens))
-        for token in idf.keys():
-            if token in tokens:
-                phrase_vec.append(phrase_token_freq[token]/len(tokens) * idf[token])
-            else:
-                phrase_vec.append(0)
-        
-        tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
+    list_phrases = list(set(mined_phrases))
 
-        phrases_score.update({phrase:{'score': score, 'eval': tfidf_sim}})
+    tasks = list(split(list_phrases, num_process))
+    
+    inputs = [(tasks[i], unigram_set, target_vec, idf) for i in range(num_process)]
+
+    phrases_score = {}
+    with Pool(num_process) as p:
+        eval_results = p.map(phrase_eval, inputs)
+
+    for tmp_res in eval_results:
+        phrases_score.update(tmp_res)
     
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
 
