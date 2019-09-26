@@ -75,6 +75,7 @@ def phrase_eval(params):
     list_phrases, unigram_set, target_vec, idf, agg_score = params
 
     idf_list = [*idf]
+    idf_set = set(idf_list)
 
     tokenizer = MWETokenizer(separator=' ')
     for e in unigram_set:
@@ -84,6 +85,8 @@ def phrase_eval(params):
     for phrase in tqdm(list_phrases, desc='phrase-eval', mininterval=10):
         score = 0
         tokens = nltk.word_tokenize(phrase)
+        if not set(tokens).issubset(idf_set):
+            continue
         nonstop_tokens = [token for token in tokens if token not in stop]
         if len(nonstop_tokens) / len(tokens) <= 0.5:
             continue
