@@ -17,6 +17,7 @@ from itertools import product
 from itertools import combinations
 import phrasemachine
 from scipy.stats import skew
+from collections import Counter
 stop = set(stopwords.words('english'))
 pronoun = set(["he", "her", "hers", "herself", "him", "himself", "his", "i", 
 "it", "its", "me", "mine", "my", "myself", "our", "ours", "ourselves", 
@@ -255,17 +256,17 @@ def main():
     fid = 0
     for ent in query:
         ent_phrase = []
+        phrase_cnt = Counter()
         mined_phrases.update({ent:[]})
         for sent in search_refetch[ent]:
             mined_phrases[ent] += sent['phrases']
-            ent_phrase += sent['phrases']
+            phrase_cnt.update(sent['phrases'])
 
-        ent_phrase_set = set(ent_phrase)
         for ent in query:
-            ent_phrase_set.discard(ent)
+            phrase_cnt.pop(ent, None)
         with open('phrase-mined-{}.txt'.format(fid), "w+") as f:
-            for ph in ent_phrase_set:
-                f.write(ph + '\n')
+            for pair in sorted(phrase_cnt.items(), key=lambda kv: kv[1]):
+                f.write('{} {} \n'.format(pair[0], pair[1]))
         f.close()
         fid += 1
 
