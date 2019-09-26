@@ -57,9 +57,9 @@ def sent_search(params):
                         continue
                     unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1, filter_nums=True, filter_punct=True, filter_stops=True)]
                     item_dict['unigram'] = unigram
-                    tokens = [token.lemma_ for token in doc if not token.is_punct]
-                    item_dict['tokens'] = tokens
-                    pos = [token.pos_ for token in doc if not token.is_punct]
+                    tokens = [token.lemma_ for token in doc]
+                    item_dict['tokens'] = [token.lemma_ for token in doc if not token.is_punct]
+                    pos = [token.pos_ for token in doc]
                     phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
                     item_dict['phrases'] = list(phrases['counts'])
                     context[ent].append(item_dict)
