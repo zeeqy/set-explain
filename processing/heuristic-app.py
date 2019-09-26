@@ -166,12 +166,12 @@ def main_thrd(query, num_process, input_dir, target):
                 rank += count
                 previous = num
                 count = 0
-            result[key] = 1 / rank
+            result[key] = 1.0 / rank
         score_redist[ent] = result
 
     for ug in unigram_set:
         for ent in query:
-            score_dist[ug][ent] = score_redist[ent]
+            score_dist[ug][ent] = score_redist[ent][ug]
 
     agg_score = {}
     for ug in score_dist.keys():
