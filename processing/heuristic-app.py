@@ -17,9 +17,8 @@ from collections import Counter
 from scipy.stats.mstats import gmean, hmean
 from scipy.stats import skew
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
-from nltk.stem.snowball import SnowballStemmer
 stop = set(stopwords.words('english'))
-stemmer = SnowballStemmer(language='english')
+
 
 def sent_search(params):
     (task_list, query, input_dir) = params
@@ -156,7 +155,7 @@ def main_thrd(query, num_process, input_dir, target):
     #using rank to score unigram
     score_redist = {}
     for ent in query:
-        score_redist.update({ent:{dict.fromkeys(unigram_set, 0)}})
+        score_redist.update({ent:dict.fromkeys(unigram_set, 0)})
         for ug in unigram_set:
             score_redist[ent][ug] = score_dist[ug][ent]    
         sorted_score = sorted(score_redist[ent].items(), key=lambda item: item[1])
