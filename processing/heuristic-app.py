@@ -220,7 +220,7 @@ def main_thrd(query, num_process, input_dir, target):
         phrase_vec = []
         phrase_token_freq = dict(Counter(phrase_tokens))
         for token in idf.keys():
-            if token in phrase_vec:
+            if token in phrase_tokens:
                 phrase_vec.append(phrase_token_freq[token]/len(phrase_tokens) * idf[token])
             else:
                 phrase_vec.append(0)
