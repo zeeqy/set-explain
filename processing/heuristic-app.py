@@ -226,13 +226,11 @@ def main_thrd(query, num_process, input_dir, target):
             score += agg_score[token]
         score /= len(nonstop_tokens)
         
-        phrase_doc = nlp(phrase)
-        phrase_tokens = [token.lemma_ for token in phrase_doc]
         phrase_vec = []
-        phrase_token_freq = dict(Counter(phrase_tokens))
+        phrase_token_freq = dict(Counter(tokens))
         for token in idf.keys():
-            if token in phrase_tokens:
-                phrase_vec.append(phrase_token_freq[token]/len(phrase_tokens) * idf[token])
+            if token in tokens:
+                phrase_vec.append(phrase_token_freq[token]/len(tokens) * idf[token])
             else:
                 phrase_vec.append(0)
         
