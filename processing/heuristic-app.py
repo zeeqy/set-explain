@@ -73,7 +73,7 @@ def sent_search(params):
     return {'context':context, 'freq':freq}
 
 def phrase_eval(params):
-    list_phrases, unigram_set, target_vec, idf, agg_score = params
+    list_phrases, unigram_set, target_vec, idf, agg_score, pid = params
 
     idf_list = [*idf]
     idf_set = set(idf_list)
@@ -83,7 +83,7 @@ def phrase_eval(params):
         tokenizer.add_mwe(nltk.word_tokenize(e))
 
     phrases_score = {}
-    for phrase in tqdm(list_phrases, desc='phrase-eval', mininterval=10):
+    for phrase in tqdm(list_phrases, desc='phrase-eval-{}'.format(pid), mininterval=10):
         score = 0
         tokens = nltk.word_tokenize(phrase)
         if not set(tokens).issubset(idf_set):
@@ -100,7 +100,11 @@ def phrase_eval(params):
         phrase_vec = [0] * len(idf_list)
         phrase_token_freq = dict(Counter(tokens))
         for token in tokens:
-            index = idf_list.index(token)
+            try:
+                index = idf_list.index(token)
+            except:
+                print(idf_list)
+                print(phrase, tokens)
             phrase_vec[index] = phrase_token_freq[token]/len(tokens) * idf[token]
         
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
@@ -258,7 +262,7 @@ def main_thrd(query, num_process, input_dir, target):
 
     tasks = list(split(list_phrases, num_process))
     
-    inputs = [(tasks[i], unigram_set, target_vec, idf, agg_score) for i in range(num_process)]
+    inputs = [(tasks[i], unigram_set, target_vec, idf, agg_score, i+1) for i in range(num_process)]
 
     phrases_score = {}
     with Pool(num_process) as p:
@@ -365,7 +369,7 @@ def main():
         if len(valid_seeds) < query_length:
             continue
         queries = [np.random.choice(list(valid_seeds), query_length, replace=False).tolist() for i in range(num_query)]
-        for query in queries:
+        for query in [['krispy kreme', 'taco bell', 'burger king']]#queries:
             print('prcessing query: ', query)
             labels = main_thrd(query, args.num_process, args.input_dir, target)
             top5 = [lab[0] for lab in labels[:5]]
