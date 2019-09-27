@@ -43,6 +43,9 @@ def sent_search(params):
                 print(fname, item)
                 sys.stdout.flush()
                 continue
+            
+            if item_dict['text'].split() > 30:
+                continue
 
             entity_text = set([em for em in item_dict['entityMentioned']])
 
@@ -51,8 +54,6 @@ def sent_search(params):
                     continue
                 else:
                     doc = nlp(item_dict['text'])
-                    if len(doc) >= 30:
-                        continue
                     unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1, filter_nums=True, filter_punct=True, filter_stops=True)]
                     item_dict['unigram'] = unigram
                     tokens = [token.lemma_ for token in doc]
@@ -284,7 +285,7 @@ def main():
     args = parser.parse_args()
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
-    with open('{}/valid_set.txt'.format(args.query_dir), 'r') as f:
+    with open('{}/set_prob.txt'.format(args.query_dir), 'r') as f:
         sets = f.read().split('\n')
     f.close()
 
@@ -309,12 +310,11 @@ def main():
         recall = 0
         norm_score = 0
         index = 0
-        seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
+        seeds = item['entities']
         target = item['title'].lower().split(',')[0]
-        valid_seeds = set(seeds).intersection(entityset)
-        if len(valid_seeds) < query_length:
+        if np.count_nonzero(list(item['prob'].values())) < query_length * 2:
             continue
-        queries = [np.random.choice(list(valid_seeds), query_length, replace=False).tolist() for i in range(num_query)]
+        queries = [np.random.choice(list(item['prob'].keys()), query_length, replace=False, p=list(item['prob'].values())).tolist() for i in range(num_query)]
         for query in queries:
             print('prcessing query: ', query)
             labels = main_thrd(query, args.num_process, args.input_dir, target)
