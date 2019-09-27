@@ -71,7 +71,10 @@ def main_thrd(query_set, num_process, input_dir):
                 search_merge[i]['prob'][ent] += search_results[pid][i]['prob'][ent]
 
     for i in range(len(search_merge)):
-        search_merge[i]['prob'] = {k: v / total for total in (sum(search_merge[i]['prob'].values()),) for k, v in search_merge[i]['prob'].items()}
+        try:
+            search_merge[i]['prob'] = {k: v / total for total in (sum(search_merge[i]['prob'].values()),) for k, v in search_merge[i]['prob'].items()}
+        except:
+            print(search_merge[i])
 
     with open('{}/set_prob.txt'.format(args.query_dir), 'w+') as f:
         for item in search_merge:
