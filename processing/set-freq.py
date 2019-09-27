@@ -70,19 +70,18 @@ def main_thrd(query_set, num_process, input_dir):
             for ent in search_merge[i]['prob'].keys():
                 search_merge[i]['prob'][ent] += search_results[pid][i]['prob'][ent]
 
-    for i in range(len(search_merge)):
+    results = []
+    for item in search_merge:
         try:
-            search_merge[i]['prob'] = {k: v / total for total in (sum(search_merge[i]['prob'].values()),) for k, v in search_merge[i]['prob'].items()}
+            item['prob'] = {k: v / total for total in (sum(item['prob'].values()),) for k, v in item['prob'].items()}
+            results.append(item)
         except:
-            print(search_merge[i])
-
-    with open('{}/set_prob.txt'.format(args.query_dir), 'w+') as f:
-        for item in search_merge:
-            f.write(json.dumps(item) + '\n')
-    f.close()
+            print(item)
 
     print("--- search use %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
+
+    return results
 
 def main():
     parser = argparse.ArgumentParser(description="seeds freq")
@@ -101,7 +100,12 @@ def main():
     for entry in sets:
         query_set.append(json.loads(entry))
 
-    main_thrd(query_set, args.num_process, args.input_dir)
+    results = main_thrd(query_set, args.num_process, args.input_dir)
+
+    with open('{}/set_prob.txt'.format(args.query_dir), 'w+') as f:
+        for item in results:
+            f.write(json.dumps(item) + '\n')
+    f.close()
 
 if __name__ == '__main__':
     main()
