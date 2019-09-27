@@ -82,9 +82,6 @@ def main():
     with open('{}/valid_set.txt'.format(args.query_dir), 'r') as f:
         sets = f.read().split('\n')
     f.close()
-
-    entityset = set(raw_list.split('\n'))
-
     sets = [line for line in sets if line != '']
 
     query_set = []
