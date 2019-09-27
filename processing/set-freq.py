@@ -98,7 +98,7 @@ def main():
     for entry in sets:
         query_set.append(json.loads(entry))
 
-    main_thrd(seeds, args.num_process, args.input_dir, query_set)
+    main_thrd(query_set, args.num_process, args.input_dir)
 
 if __name__ == '__main__':
     main()
