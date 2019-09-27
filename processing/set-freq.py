@@ -50,9 +50,9 @@ def main_thrd(query_set, num_process, input_dir):
     start_time = time.time()
 
     query_set_prob = []
-    for query in query_set:
+    for item in query_set:
         item['entities'] = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
-        query_set_prob.append(query)
+        query_set_prob.append(item)
 
     ##### sentence search #####
     input_files = os.listdir(input_dir)
