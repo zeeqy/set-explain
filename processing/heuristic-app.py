@@ -44,7 +44,7 @@ def sent_search(params):
                 sys.stdout.flush()
                 continue
             
-            if item_dict['text'].split() > 30:
+            if len(item_dict['text'].split()) > 30:
                 continue
 
             entity_text = set([em for em in item_dict['entityMentioned']])
