@@ -65,7 +65,7 @@ def main_thrd(query_set, num_process, input_dir):
     
     search_merge = search_results[0]
     
-    for pid in range(1, len(search_results))
+    for pid in range(1, len(search_results)):
         for i in range(len(query_set_prob)):
             for ent in search_merge[i]['prob'].keys():
                 search_merge[i]['prob'][ent] += search_results[pid][i]['prob'][ent]
