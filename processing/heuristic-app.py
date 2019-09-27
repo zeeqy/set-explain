@@ -96,11 +96,11 @@ def phrase_eval(params):
             score += agg_score[token]
         score /= len(nonstop_tokens)
         
-        phrase_vec = [0] * len(idf_list)
+        phrase_vec = dict.fromkeys(idf_list, 0)
         phrase_token_freq = dict(Counter(tokens))
         for token in tokens:
-            index = idf_list.index(token)
-            phrase_vec[index] = phrase_token_freq[token]/len(tokens) * idf[token]
+            phrase_vec[token] = phrase_token_freq[token]/len(tokens) * idf[token]
+        phrase_vec = list(phrase_vec.values())
         
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
 
