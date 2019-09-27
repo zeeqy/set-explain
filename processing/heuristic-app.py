@@ -16,9 +16,7 @@ import time
 from collections import Counter
 from scipy.stats.mstats import gmean, hmean
 from scipy.stats import skew
-from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 stop = set(stopwords.words('english'))
-
 
 def sent_search(params):
     (task_list, query, input_dir) = params
@@ -100,11 +98,7 @@ def phrase_eval(params):
         phrase_vec = [0] * len(idf_list)
         phrase_token_freq = dict(Counter(tokens))
         for token in tokens:
-            try:
-                index = idf_list.index(token)
-            except:
-                print(idf_list)
-                print(phrase, tokens)
+            index = idf_list.index(token)
             phrase_vec[index] = phrase_token_freq[token]/len(tokens) * idf[token]
         
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
@@ -252,7 +246,7 @@ def main_thrd(query, num_process, input_dir, target):
     idf_list = [*idf]
     target_doc = nlp(target)
     target_vec = [0] * len(idf_list)
-    target_token = [token.lemma_ for token in target_doc]
+    target_token = [token.lemma_ for token in target_doc if not token.is_punct]
     target_token_freq = dict(Counter(target_token))
     for token in target_token:
         index = idf_list.index(token)
@@ -262,7 +256,7 @@ def main_thrd(query, num_process, input_dir, target):
 
     tasks = list(split(list_phrases, num_process))
     
-    inputs = [(tasks[i], unigram_set, target_vec, idf, agg_score, i+1) for i in range(num_process)]
+    inputs = [(tasks[i], unigram_set, target_vec, idf, agg_score, i) for i in range(num_process)]
 
     phrases_score = {}
     with Pool(num_process) as p:
@@ -305,58 +299,10 @@ def main():
     num_query = args.num_query
     query_length = args.query_length
     eval_metric = {}
-    smoothie = SmoothingFunction().method3 # NIST smoothing
 
     query_set = []
     for entry in sets:
         query_set.append(json.loads(entry))
-
-    # for item in query_set[0]:
-    #     score = 0
-    #     recall = 0
-    #     seeds = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
-    #     target = item['title'].lower().split(',')[0]
-    #     target_token = [[stemmer.stem(token.text) for token in nlp(target)]]
-    #     index = 0
-    #     retry = 0
-    #     while index < num_query:
-    #         if retry > 1000:
-    #             break
-    #         query = list(np.random.choice(seeds, query_length))
-    #         if len(set(query).intersection(entityset)) != len(query):
-    #             retry += 1
-    #             continue
-    #         labels = main_thrd(query, args.num_process, args.input_dir)
-    #         candidate = [stemmer.stem(token.text) for token in nlp(labels[0][0])]
-    #         # for lab in labels:
-    #         #     doc = nlp(lab)
-    #         #     candidate.append([token.text for token in doc])
-    #         bleu = sentence_bleu(target_token, candidate, smoothing_function=smoothie)
-    #         score += bleu
-    #         index += 1
-    #         best_bleu = 0
-    #         best_phrase = ''
-    #         for label in labels:
-    #             candidate = [stemmer.stem(token.text) for token in nlp(label[0])]
-    #             tmp_bleu = sentence_bleu(target_token, candidate, smoothing_function=smoothie)
-    #             if tmp_bleu > best_bleu:
-    #                 best_bleu = tmp_bleu
-    #                 best_phrase = label[0]
-    #         recall += best_bleu
-    #         meta = {'query':query, 'target': target, 'top5': labels[:5], 'top1_bleu':bleu, 'top100_recall': (best_phrase, best_bleu)}
-    #         print(meta)
-    #         with open('log-{}.txt'.format(query_length), 'a+') as f:
-    #             f.write(json.dumps(meta) + '\n')
-    #         f.close()
-    #     if retry > 1000:
-    #         continue
-    #     score /= num_query
-    #     recall /= num_query
-    #     eval_metric.update({target:{'top1_bleu': score, 'top100_reall': recall}})
-
-    #     with open('bleu-{}.txt'.format(query_length), 'a+') as f:
-    #         f.write(json.dumps(eval_metric) + '\n')
-    #     f.close()
 
     for item in query_set:
         score = 0
@@ -369,7 +315,7 @@ def main():
         if len(valid_seeds) < query_length:
             continue
         queries = [np.random.choice(list(valid_seeds), query_length, replace=False).tolist() for i in range(num_query)]
-        for query in [['krispy kreme', 'taco bell', 'burger king']]: #queries:
+        for query in queries:
             print('prcessing query: ', query)
             labels = main_thrd(query, args.num_process, args.input_dir, target)
             top5 = [lab[0] for lab in labels[:5]]
