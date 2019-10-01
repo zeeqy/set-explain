@@ -67,7 +67,7 @@ def main():
 
 	limit = 80
 
-	chunks = [titles[i:i + 80] for i in range(0, len(wikititle), 80)]
+	chunks = [wikititle[i:i + 80] for i in range(0, len(wikititle), 80)]
 	for c in chunks:
 		aio.each(
 			fetch, 
