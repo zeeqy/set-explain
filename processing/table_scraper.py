@@ -17,7 +17,7 @@ async def fetch(t, session):
 	title_text = t[8:]
 	async with session.get(url) as response:
 		res = await response.read()
-		soup = BeautifulSoup(website_url,'lxml')
+		soup = BeautifulSoup(res,'lxml')
 		_table = soup.find('table',{'class':'wikitable'})
 		if _table is None or _table.tbody is None:
 			return
