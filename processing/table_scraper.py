@@ -10,10 +10,11 @@ import json
 import time
 from bs4 import BeautifulSoup
 
-freq_collect = {}
 entityset = set()
+table_collect = []
 
 async def fetch(t, session):
+	global table_collect
 	url = 'https://en.wikipedia.org/wiki/{}'.format(t.replace(' ', '_'))
 	title_text = t[8:]
 	async with session.get(url) as response:
@@ -46,10 +47,10 @@ async def fetch(t, session):
 					ent.append(string.split(',')[0])
 		if len(ent) >= 10:
 			tid = np.random.randint(10000, high=99999, size=None, dtype='int64')
-			freq_collect.update({title_text:{'entities':ent, 'id':'WL{}'.format(tid), 'url':url}})
+			table_collect.append({'id':'WL{}'.format(tid), 'title':title_text, "entities":ent, 'url':url})
 
 def main():
-
+	global table_collect
 	parser = argparse.ArgumentParser(description="Page table scraper")
 	parser.add_argument('--entity_dir', type=str, default='', help='dump file directory')
 	parser.add_argument('--title_dir', type=str, default='', help='dump file directory')
@@ -81,15 +82,15 @@ def main():
 		)
 		time.sleep(1)
 
-		if freq_collect != {}:
+		if len(table_collect) != 0:
+
 			with open('{}/SCRAPER_{}'.format(args.output_dir,i), 'w+') as f:
-				f.write(json.dumps(freq_collect))
+				f.write(json.dumps(table_collect))
 			f.close()
 			i += 1
-
-		freq_collect = {}
 		
-
+		table_collect = []
+		
 	return 0
 
 if __name__ == '__main__':
