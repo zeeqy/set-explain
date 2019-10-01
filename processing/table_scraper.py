@@ -69,6 +69,7 @@ def main():
 	limit = 80
 
 	chunks = [wikititle[i:i + 80] for i in range(0, len(wikititle), 80)]
+	i = 1
 	for c in chunks:
 		aio.each(
 			fetch, 
@@ -85,6 +86,7 @@ def main():
 		f.close()
 
 		freq_collect = []
+		i += 1
 
 	return 0
 
