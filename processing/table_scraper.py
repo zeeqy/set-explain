@@ -73,7 +73,7 @@ wikititle = raw_list.split('\n')
 
 tasks = list(split(wikititle, 10))
 
-inputs = [(tasks[i], entityset, i) for i in range(num_process)]
+inputs = [(tasks[i], entityset, i) for i in range(10)]
 
 with Pool(10) as p:
     p.map(scraper, inputs)
