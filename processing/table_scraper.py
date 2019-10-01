@@ -10,7 +10,7 @@ import json
 import time
 from bs4 import BeautifulSoup
 
-freq_collect = []
+freq_collect = {}
 entityset = set()
 
 async def fetch(t, session):
@@ -46,7 +46,7 @@ async def fetch(t, session):
 					ent.append(string.split(',')[0])
 		if len(ent) >= 10:
 			tid = np.random.randint(10000, high=99999, size=None, dtype='int64')
-			freq_collect.append({'id':'WL{}'.format(tid), 'title':title_text, "entities":ent, 'url':url})
+			freq_collect.update({title_text:{'entities':ent, 'id':'WL{}'.format(tid), 'url':url}})
 
 def main():
 
@@ -81,12 +81,14 @@ def main():
 		)
 		time.sleep(1)
 
-		with open('{}/SCRAPER_{}'.format(args.output_dir,i), 'w+') as f:
-			f.write(json.dumps(freq_collect))
-		f.close()
+		if freq_collect != {}:
+			with open('{}/SCRAPER_{}'.format(args.output_dir,i), 'w+') as f:
+				f.write(json.dumps(freq_collect))
+			f.close()
+			i += 1
 
-		freq_collect = []
-		i += 1
+		freq_collect = {}
+		
 
 	return 0
 
