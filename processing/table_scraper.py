@@ -50,10 +50,10 @@ def scraper(params):
             tid +=1
         
     if len(tables) != 0:
-    with open('/mnt/nfs/work1/allan/zhiqihuang/set-explain/data/SCRAPER_{}'.format(pid+1), 'w+') as f:
-        for s in tables:
-            f.write(json.dumps(s)+'\n')
-    f.close()
+        with open('/mnt/nfs/work1/allan/zhiqihuang/set-explain/data/SCRAPER_{}'.format(pid+1), 'w+') as f:
+            for s in tables:
+                f.write(json.dumps(s)+'\n')
+        f.close()
 
 
 def split(a, n):
