@@ -20,7 +20,7 @@ async def fetch(t, session):
 		soup = BeautifulSoup(website_url,'lxml')
 		_table = soup.find('table',{'class':'wikitable'})
 		if _table is None or _table.tbody is None:
-			continue
+			return
 		ent = []
 		for row in _table.tbody.findAll('tr')[1:]:
 			if len(row.findAll('td')) == 0:
