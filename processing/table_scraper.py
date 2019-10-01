@@ -1,7 +1,7 @@
 import multiprocessing as mp
 from multiprocessing import Pool
 import sys, os, time
-import request
+import requests
 import argparse
 from tqdm import tqdm
 import json
