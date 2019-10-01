@@ -85,7 +85,8 @@ def main():
 		if len(table_collect) != 0:
 
 			with open('{}/SCRAPER_{}'.format(args.output_dir,i), 'w+') as f:
-				f.write(json.dumps(table_collect))
+				for s in table_collect:
+					f.write(json.dumps(s)+'\n')
 			f.close()
 			i += 1
 		
