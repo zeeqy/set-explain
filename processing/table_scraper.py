@@ -11,6 +11,7 @@ import time
 from bs4 import BeautifulSoup
 
 freq_collect = []
+entityset = set()
 
 async def fetch(t, session):
 	url = 'https://en.wikipedia.org/wiki/{}'.format(t.replace(' ', '_'))
