@@ -4,6 +4,7 @@ import sys, os, time
 from pypeln import asyncio_task as aio
 import urllib
 import argparse
+from tqdm import tqdm
 import json
 import re
 import json
@@ -71,7 +72,7 @@ def main():
 
 	chunks = [wikititle[i:i + 80] for i in range(0, len(wikititle), 80)]
 	i = 1
-	for c in chunks:
+	for c in tqdm(chunks, desc='processing-chunks', mininterval=10):
 		aio.each(
 			fetch, 
 			c,
