@@ -271,6 +271,8 @@ def main_thrd(query, num_process, input_dir, target):
     list_phrases = list(set(mined_phrases))
 
     tasks = list(split(list_phrases, num_process))
+
+    print('target_token', target_token)
     
     inputs = [(tasks[i], unigram_set, target_token, idf, agg_score, i) for i in range(num_process)]
 
