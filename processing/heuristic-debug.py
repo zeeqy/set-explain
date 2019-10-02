@@ -99,8 +99,8 @@ def phrase_eval(params):
         
 
         vocab = list(set(target_token).union(set(tokens)))
-        target_token = [0] * vocab
-        phrase_vec = [0] * vocab
+        target_token = [0] * len(vocab)
+        phrase_vec = [0] * len(vocab)
         
         target_token_freq = dict(Counter(target_token))
         for token in target_token:
