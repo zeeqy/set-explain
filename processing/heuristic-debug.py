@@ -103,7 +103,9 @@ def phrase_eval(params):
         phrase_vec = [0] * len(vocab)
         
         target_token_freq = dict(Counter(target_token))
+        print('vocab', vocab)
         for token in target_token:
+            print('error at token', token)
             index = vocab.index(token)
             target_vec[index] = target_token_freq[token]/len(target_token) * idf[token]
         
