@@ -73,7 +73,7 @@ def sent_search(params):
     return {'context':context, 'freq':freq}
 
 def phrase_eval(params):
-    list_phrases, unigram_set, target_vec, idf, agg_score, pid = params
+    list_phrases, unigram_set, target_token, idf, agg_score, pid = params
 
     idf_list = [*idf]
     idf_set = set(idf_list)
@@ -97,10 +97,19 @@ def phrase_eval(params):
             score += agg_score[token]
         score /= len(nonstop_tokens)
         
-        phrase_vec = [0] * len(idf_list)
+
+        vocab = list(set(target_token).union(set(tokens)))
+        target_token = [0] * vocab
+        phrase_vec = [0] * vocab
+        
+        target_token_freq = dict(Counter(target_token))
+        for token in target_token:
+            index = vocab.index(token)
+            target_vec[index] = target_token_freq[token]/len(target_token) * idf[token]
+        
         phrase_token_freq = dict(Counter(tokens))
         for token in tokens:
-            index = idf_list.index(token)
+            index = vocab.index(token)
             phrase_vec[index] = phrase_token_freq[token]/len(tokens) * idf[token]
         
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
@@ -249,16 +258,16 @@ def main_thrd(query, num_process, input_dir, target):
     target_doc = nlp(target)
     target_vec = [0] * len(idf_list)
     target_token = [token.lemma_ for token in target_doc if not token.is_punct]
-    target_token_freq = dict(Counter(target_token))
-    for token in target_token:
-        index = idf_list.index(token)
-        target_vec[index] = target_token_freq[token]/len(target_token) * idf[token]
+    # target_token_freq = dict(Counter(target_token))
+    # for token in target_token:
+    #     index = idf_list.index(token)
+    #     target_vec[index] = target_token_freq[token]/len(target_token) * idf[token]
 
     list_phrases = list(set(mined_phrases))
 
     tasks = list(split(list_phrases, num_process))
     
-    inputs = [(tasks[i], unigram_set, target_vec, idf, agg_score, i) for i in range(num_process)]
+    inputs = [(tasks[i], unigram_set, target_token, idf, agg_score, i) for i in range(num_process)]
 
     phrases_score = {}
     with Pool(num_process) as p:
