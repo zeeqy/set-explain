@@ -186,7 +186,7 @@ def main_thrd(query, num_process, input_dir, target):
             if ug in unigram_sents[ent].keys():
                 did = set()
                 for sent in unigram_sents[ent][ug]:
-                    score_dist[ug][ent] += sent['doc_score']
+                    score_dist[ug][ent] += sent['doc_score'] * idf[ug]
                     did.add(sent['did'])
 
     #using rank to score unigram
@@ -210,10 +210,15 @@ def main_thrd(query, num_process, input_dir, target):
         for ent in query:
             score_dist[ug][ent] = score_redist[ent][ug]
 
+    query_weight = []
+    for ent in query:
+        query_weight.append(1/skew([sent['doc_score'] for sent in search_merge[ent]]))
+             
     agg_score = {}
     for ug in score_dist.keys():
         tmp_res = [item[1] for item in score_dist[ug].items()]
-        agg_score.update({ug: gmean(tmp_res)})
+        wgmean = np.exp(sum(query_weight * np.log(tmp_res)) / sum(query_weight))
+        agg_score.update({ug: wgmean})
 
 
     score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
