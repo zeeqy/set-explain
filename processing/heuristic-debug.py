@@ -122,6 +122,11 @@ def split(a, n):
     k, m = divmod(len(a), n)
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
+def sublist1(lst1, lst2):
+    ls1 = [element for element in lst1 if element in lst2]
+    ls2 = [element for element in lst2 if element in lst1]
+    return ls1 == ls2
+
 def main_thrd(query, num_process, input_dir, target):
     start_time = time.time()
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
@@ -321,39 +326,27 @@ def main():
     score = 0
     recall = 0
     norm_score = 0
-    index = 0
-    seeds = item['entities']
-    target = item['title'].lower().split(',')[0]
+    query = ['belleville', 'kitchener', 'kenora']
+    target = 'cities in ontario'
     # if np.count_nonzero(list(item['prob'].values())) < query_length * 2:
     #     continue
-    queries = [np.random.choice(list(item['prob'].keys()), query_length, replace=False, p=list(item['prob'].values())).tolist() for i in range(num_query)]
-    for query in queries:
-        print('prcessing query: ', query)
-        labels = main_thrd(query, args.num_process, args.input_dir, target)
-        top5 = [lab[0] for lab in labels[:5]]
-        best_phrase = labels[0][0]
-        best_sim = labels[0][1]['eval']
-        length_labels = len(labels)
-        recall_rank = int(np.argmax([lab[1]['eval'] for lab in labels]))
-        recall_phrase = labels[recall_rank][0]
-        recall_sim = labels[recall_rank][1]['eval']
-        norm_best_sim = best_sim / recall_sim if recall_sim != 0 else 0
-        recall += recall_sim
-        score += best_sim
-        norm_score += norm_best_sim
-        meta = {'query':query, 'target': target, 'top1':(best_phrase, best_sim), 'top5': top5, 'recall':(recall_phrase, recall_rank+1, recall_sim), 'norm_top1': norm_best_sim}
-        print(meta)
-        sys.stdout.flush()
-        with open('log-{}.txt'.format(query_length), 'a+') as f:
-            f.write(json.dumps(meta) + '\n')
-        f.close()
-    score /= num_query
-    recall /= num_query
-    norm_score /= num_query
-    eval_metric.update({target:{'top1': score, 'recall': recall, 'norm_top1': norm_score}})
-    with open('tfidf-sim-{}.txt'.format(query_length), 'a+') as f:
-        f.write(json.dumps(eval_metric) + '\n')
-    f.close()
+
+    print('prcessing query: ', query)
+    labels = main_thrd(query, args.num_process, args.input_dir, target)
+    top5 = [lab[0] for lab in labels[:5]]
+    best_phrase = labels[0][0]
+    best_sim = labels[0][1]['eval']
+    length_labels = len(labels)
+    recall_rank = int(np.argmax([lab[1]['eval'] for lab in labels]))
+    recall_phrase = labels[recall_rank][0]
+    recall_sim = labels[recall_rank][1]['eval']
+    norm_best_sim = best_sim / recall_sim if recall_sim != 0 else 0
+    recall += recall_sim
+    score += best_sim
+    norm_score += norm_best_sim
+    meta = {'query':query, 'target': target, 'top1':(best_phrase, best_sim), 'top5': top5, 'recall':(recall_phrase, recall_rank+1, recall_sim), 'norm_top1': norm_best_sim}
+    print(meta)
+    sys.stdout.flush()
 
 if __name__ == '__main__':
     main()
