@@ -315,8 +315,8 @@ def main():
     index = 0
     seeds = item['entities']
     target = item['title'].lower().split(',')[0]
-    if np.count_nonzero(list(item['prob'].values())) < query_length * 2:
-        continue
+    # if np.count_nonzero(list(item['prob'].values())) < query_length * 2:
+    #     continue
     queries = [np.random.choice(list(item['prob'].keys()), query_length, replace=False, p=list(item['prob'].values())).tolist() for i in range(num_query)]
     for query in queries:
         print('prcessing query: ', query)
