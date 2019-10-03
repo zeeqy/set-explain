@@ -74,7 +74,7 @@ def main():
         for key in inverted_index.keys():
             inverted_index[key] += res[key]
 
-    with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
+    with open('{}/inverted_index.txt'.format(args.output_dir), "w+") as f:
         f.write(json.dumps(inverted_index))
     f.close()
 
