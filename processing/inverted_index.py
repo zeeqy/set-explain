@@ -16,7 +16,9 @@ create inverted index
 
 """
 
-def merge_task(task_list, args):
+def merge_task(params):
+    task_list, args = params
+
     with open('{}/wiki_quality.txt'.format(args.entity_dir), 'r') as f:
         raw_list = f.read()
     f.close()
