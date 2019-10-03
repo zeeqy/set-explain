@@ -49,7 +49,7 @@ def main():
             for ent in item_dict['entityMentioned']:
                 context[ent].append(item_dict['iid'])
 
-    print(len(context['boston']))
+    print(len(context['amherst']))
 
     # with open('{}/inverted_index.txt'.format(args.output_dir), "w+") as f:
     #     for key, values in tqdm(context.items(), desc='dump', mininterval=10):
