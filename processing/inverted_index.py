@@ -36,26 +36,23 @@ def main():
     print("successfully read entity file and initialized tokenizer")
     sys.stdout.flush()
 
-    context = dict.fromkeys(entityset, [])
+    context = {}
+    for ent in entityset:
+        context.update({ent:[]})
 
-    #for fname in tqdm(input_dir, desc='file', mininterval=10):
-    fname = 'INVERTED_INDEX_AA'
+    for fname in tqdm(input_dir, desc='file', mininterval=10):
+        with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
+            doc = f.readlines()
+        f.close()
 
-    with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
-        doc = f.readlines()
+        for item in doc:
+            item_dict = json.loads(item)
+            for ent in item_dict['entityMentioned']:
+                context[ent].append(item_dict['iid'])
+
+    with open('{}/inverted_index.txt'.format(args.output_dir), "w+") as f:
+        json.dump(context, f)
     f.close()
-
-    for item in doc:
-        item_dict = json.loads(item)
-        for ent in item_dict['entityMentioned']:
-            context[ent].append(item_dict['iid'])
-
-    print(len(context['amherst']))
-
-    # with open('{}/inverted_index.txt'.format(args.output_dir), "w+") as f:
-    #     for key, values in tqdm(context.items(), desc='dump', mininterval=10):
-    #         f.write(json.dumps({key:values}) + '\n')
-    # f.close()
 
 if __name__ == '__main__':
     main()
