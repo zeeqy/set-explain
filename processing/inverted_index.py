@@ -30,14 +30,7 @@ def merge_task(task_list, args):
         raw_list = f.read()
     f.close()
 
-    nlp = spacy.load('en_core_web_lg', disable=['ner'])
-
     entityset = set(raw_list.split('\n'))
-
-    tokenizer = MWETokenizer(separator=' ')
-
-    for e in entityset:
-        tokenizer.add_mwe(nltk.word_tokenize(e))
 
     print("successfully read entity file and initialized tokenizer")
     sys.stdout.flush()
@@ -54,7 +47,7 @@ def merge_task(task_list, args):
             item_dict = json.loads(item)
             if len(item_dict['text'].split()) > 30 or set(item_dict['nsubj']).intersection(pronoun) != set():
                 continue
-            for ent in item_dict['en']:
+            for ent in item_dict['entityMentioned']:
                 context[ent].append(item_dict)
 
         with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
