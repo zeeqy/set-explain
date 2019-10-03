@@ -50,7 +50,8 @@ def main():
                 context[ent].append(item_dict['iid'])
 
     with open('{}/inverted_index.txt'.format(args.output_dir), "w+") as f:
-        json.dump(context, f)
+        for key, values in tqdm(context.items(), desc='dump', mininterval=10):
+            json.dump({key:values}, f) + '\n'
     f.close()
 
 if __name__ == '__main__':
