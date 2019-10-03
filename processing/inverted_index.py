@@ -37,7 +37,7 @@ def merge_task(task_list, args):
 
     for fname in task_list:
         outputname = 'INVERTED_INDEX_{}'.format(fname.split('_')[-1])
-        context = dict.fromkeys(entityset, [])
+        context = []#dict.fromkeys(entityset, [])
 
         with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
             doc = f.readlines()
@@ -47,11 +47,13 @@ def merge_task(task_list, args):
             item_dict = json.loads(item)
             if len(item_dict['text'].split()) > 30 or set(item_dict['nsubj']).intersection(pronoun) != set():
                 continue
-            for ent in item_dict['entityMentioned']:
-                context[ent].append(item_dict)
+            # for ent in item_dict['entityMentioned']:
+            #     context[ent].append(item_dict)
+            item_dict['iid'] = '{}{}{}'.format(item_dict['did'],item_dict['pid'],item_dict['sid'])
+            context.append(json.dumps(item_dict))
 
         with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-            f.write(json.dumps(context))
+            f.write('\n'.join(context))
         f.close()
 
 def split(a, n):
