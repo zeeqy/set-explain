@@ -73,12 +73,12 @@ def main():
 
     inverted_index = dict.fromkeys(entityset, [])
 
-    for res in merge_results:
-        for key in inverted_index.keys():
+    for key in inverted_index.keys():
+        for res in merge_results:
             inverted_index[key] += res[key]
 
     with open('{}/inverted_index.txt'.format(args.output_dir), "w+") as f:
-        f.write(json.dumps(inverted_index))
+        json.dump(inverted_index, f)
     f.close()
 
 if __name__ == '__main__':
