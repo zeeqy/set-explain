@@ -38,16 +38,17 @@ def main():
 
     context = dict.fromkeys(entityset, [])
 
-    for fname in tqdm(input_dir, desc='file', mininterval=10):
+    #for fname in tqdm(input_dir, desc='file', mininterval=10):
+    fname = 'INVERTED_INDEX_AA'
 
-        with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
-            doc = f.readlines()
-        f.close()
+    with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
+        doc = f.readlines()
+    f.close()
 
-        for item in doc:
-            item_dict = json.loads(item)
-            for ent in item_dict['entityMentioned']:
-                context[ent].append(item_dict['iid'])
+    for item in doc:
+        item_dict = json.loads(item)
+        for ent in item_dict['entityMentioned']:
+            context[ent].append(item_dict['iid'])
 
     print(len(context['amherst']))
 
