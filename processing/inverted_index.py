@@ -49,10 +49,13 @@ def main():
             for ent in item_dict['entityMentioned']:
                 context[ent].append(item_dict['iid'])
 
-    with open('{}/inverted_index.txt'.format(args.output_dir), "w+") as f:
-        for key, values in tqdm(context.items(), desc='dump', mininterval=10):
-            f.write(json.dumps({key:values}) + '\n')
-    f.close()
+    print(len(context['boston']))
+    print(context['boston'])
+
+    # with open('{}/inverted_index.txt'.format(args.output_dir), "w+") as f:
+    #     for key, values in tqdm(context.items(), desc='dump', mininterval=10):
+    #         f.write(json.dumps({key:values}) + '\n')
+    # f.close()
 
 if __name__ == '__main__':
     main()
