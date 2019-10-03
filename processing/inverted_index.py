@@ -2,6 +2,7 @@ import json, sys, os, re
 import argparse
 import bisect
 import multiprocessing as mp
+from multiprocessing import Pool
 from tqdm import tqdm
 import string
 import phrasemachine
