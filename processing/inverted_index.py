@@ -73,9 +73,8 @@ def main():
 
     inverted_index = dict.fromkeys(entityset, [])
 
-    for key in tqdm(inverted_index.keys(), desc='merge', mininterval=10):
-        for res in merge_results:
-            inverted_index[key] += res[key]
+    for res in tqdm(merge_results, desc='merge', mininterval=10):
+        inverted_index = {key: value + res[key] for key, value in inverted_index.items()}
 
     print(len(inverted_index['boston']))
     sys.stdout.flush()
