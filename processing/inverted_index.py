@@ -60,7 +60,7 @@ def main():
 
     inputs = [(tasks[i], args) for i in range(args.num_process)]
 
-    with Pool(num_process) as p:
+    with Pool(args.num_process) as p:
         merge_results = p.map(merge_task, inputs)
 
     with open('{}/wiki_quality.txt'.format(args.entity_dir), 'r') as f:
