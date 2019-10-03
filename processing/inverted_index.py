@@ -16,8 +16,16 @@ create inverted index
 
 """
 
-def merge_task(params):
-    task_list, args = params
+def main():
+    parser = argparse.ArgumentParser(description="inverted index")
+    parser.add_argument('--input_dir', type=str, default='', help='json document directory')
+    parser.add_argument('--output_dir', type=str, default='', help='output directory')
+    parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
+    parser.add_argument('--entity_dir', type=str, default='', help='entity files directory')
+    
+    args = parser.parse_args()
+
+    input_dir = os.listdir(args.input_dir)
 
     with open('{}/wiki_quality.txt'.format(args.entity_dir), 'r') as f:
         raw_list = f.read()
@@ -30,54 +38,18 @@ def merge_task(params):
 
     context = dict.fromkeys(entityset, [])
 
-    for fname in task_list:
-        outputname = 'INVERTED_INDEX_{}'.format(fname.split('_')[-1])
+    for fname in tqdm(input_dir, desc='file', mininterval=10):
 
         with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
             doc = f.readlines()
         f.close()
 
-        for item in tqdm(doc, desc='{}'.format(fname), mininterval=30):
+        for item in doc:
             item_dict = json.loads(item)
             for ent in item_dict['entityMentioned']:
                 context[ent].append(item_dict['iid'])
 
-    return context
-
-def split(a, n):
-    k, m = divmod(len(a), n)
-    return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
-
-def main():
-    parser = argparse.ArgumentParser(description="inverted index")
-    parser.add_argument('--input_dir', type=str, default='', help='json document directory')
-    parser.add_argument('--output_dir', type=str, default='', help='output directory')
-    parser.add_argument('--num_process', type=int, default=2, help='number of parallel')
-    parser.add_argument('--entity_dir', type=str, default='', help='entity files directory')
-    
-    args = parser.parse_args()
-
-    input_dir = os.listdir(args.input_dir)
-    tasks = list(split(input_dir, args.num_process))
-
-    inputs = [(tasks[i], args) for i in range(args.num_process)]
-
-    with Pool(args.num_process) as p:
-        merge_results = p.map(merge_task, inputs)
-
-    with open('{}/wiki_quality.txt'.format(args.entity_dir), 'r') as f:
-        raw_list = f.read()
-    f.close()
-
-    entityset = set(raw_list.split('\n'))
-
     inverted_index = dict.fromkeys(entityset, [])
-
-    for res in tqdm(merge_results, desc='merge', mininterval=10):
-        inverted_index = {key: value + res[key] for key, value in inverted_index.items()}
-
-    print(len(inverted_index['boston']))
-    sys.stdout.flush()
 
     with open('{}/inverted_index.txt'.format(args.output_dir), "w+") as f:
         json.dump(inverted_index, f)
