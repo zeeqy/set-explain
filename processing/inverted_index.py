@@ -49,10 +49,8 @@ def main():
             for ent in item_dict['entityMentioned']:
                 context[ent].append(item_dict['iid'])
 
-    inverted_index = dict.fromkeys(entityset, [])
-
     with open('{}/inverted_index.txt'.format(args.output_dir), "w+") as f:
-        json.dump(inverted_index, f)
+        json.dump(context, f)
     f.close()
 
 if __name__ == '__main__':
