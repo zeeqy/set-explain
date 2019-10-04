@@ -308,6 +308,8 @@ def main():
     parser.add_argument('--query_length', type=int, default=3, help='query length')
     parser.add_argument('--entity_dir', type=str, default='', help='entity files directory')
     parser.add_argument('--inverted_dir', type=str, default='', help='inverted index directory')
+    parser.add_argument('--sampling_method', type=str, default='random', help='query sampling method')
+    parser.add_argument('--output_dir', type=str, default='', help='output dict')
     
     args = parser.parse_args()
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
@@ -344,9 +346,11 @@ def main():
         index = 0
         seeds = item['entities']
         target = item['title'].lower().split(',')[0]
-        if np.count_nonzero(list(item['prob'].values())) < query_length * 2:
+        if np.count_nonzero(list(item['prob'].values())) < 7:
             continue
-        queries = [np.random.choice(list(item['prob'].keys()), query_length, replace=False, p=list(item['prob'].values())).tolist() for i in range(num_query)]
+        #queries = [np.random.choice(list(item['prob'].keys()), query_length, replace=False, p=list(item['prob'].values())).tolist() for i in range(num_query)]
+        if args.sampling_method == 'random':
+            queries = [np.random.choice(item['entities'], query_length, replace=False).tolist() for i in range(num_query)]
         for query in queries:
             print('prcessing query: ', query)
             labels = main_thrd(query, args.num_process, args.input_dir, target, iindex)
@@ -364,14 +368,14 @@ def main():
             meta = {'query':query, 'target': target, 'top1':(best_phrase, best_sim), 'top5': top5, 'recall':(recall_phrase, recall_rank+1, recall_sim), 'norm_top1': norm_best_sim}
             print(meta)
             sys.stdout.flush()
-            with open('log-{}.txt'.format(query_length), 'a+') as f:
+            with open('{}/log-{}.txt'.format(args.output_dir, query_length), 'a+') as f:
                 f.write(json.dumps(meta) + '\n')
             f.close()
         score /= num_query
         recall /= num_query
         norm_score /= num_query
         eval_metric.update({target:{'top1': score, 'recall': recall, 'norm_top1': norm_score}})
-        with open('tfidf-sim-{}.txt'.format(query_length), 'a+') as f:
+        with open('{}/tfidf-sim-{}.txt'.format(args.output_dir, query_length), 'a+') as f:
             f.write(json.dumps(eval_metric) + '\n')
         f.close()
 
