@@ -26,25 +26,10 @@ create inverted index
 """
 
 def merge_task(task_list, args):
-    with open('{}/wiki_quality.txt'.format(args.entity_dir), 'r') as f:
-        raw_list = f.read()
-    f.close()
-
-    nlp = spacy.load('en_core_web_lg', disable=['ner'])
-
-    entityset = set(raw_list.split('\n'))
-
-    tokenizer = MWETokenizer(separator=' ')
-
-    for e in entityset:
-        tokenizer.add_mwe(nltk.word_tokenize(e))
-
-    print("successfully read entity file and initialized tokenizer")
-    sys.stdout.flush()
 
     for fname in task_list:
         outputname = 'INVERTED_INDEX_{}'.format(fname.split('_')[-1])
-        context = dict.fromkeys(entityset, [])
+        context = []#dict.fromkeys(entityset, [])
 
         with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
             doc = f.readlines()
@@ -54,11 +39,11 @@ def merge_task(task_list, args):
             item_dict = json.loads(item)
             if set(item_dict['nsubj']).intersection(pronoun) != set():
                 continue
-            for ent in item_dict['en']:
-                context[ent].append(item_dict)
+            item_dict['iid'] = '{}{}{}'.format(item_dict['did'],item_dict['pid'],item_dict['sid'])
+            context.append(json.dumps(item_dict))
 
         with open('{}/{}'.format(args.output_dir, outputname), "w+") as f:
-            f.write(json.dumps(context))
+            f.write('\n'.join(context))
         f.close()
 
 def split(a, n):
@@ -87,3 +72,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
