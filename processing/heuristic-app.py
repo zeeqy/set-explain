@@ -72,8 +72,18 @@ def sent_search(params):
     return {'context':context, 'freq':freq}
 
 def phrase_eval(params):
-    list_phrases, unigram_set, target_vec, idf, agg_score, pid = params
+    list_phrases, unigram_set, target_token, idf, agg_score, pid = params
 
+    sorted_score = sorted(agg_score.items(), key=lambda item: item[1], reverse=True)
+    rank, count, previous, agg_score_sorted = 0, 0, None, {}
+    for key, num in sorted_score:
+        count += 1
+        if num != previous:
+            rank += count
+            previous = num
+            count = 0
+        agg_score_sorted[key] = 1.0 / rank
+    
     idf_list = [*idf]
     idf_set = set(idf_list)
 
@@ -90,16 +100,26 @@ def phrase_eval(params):
         nonstop_tokens = [token for token in tokens if token not in stop]
         if len(nonstop_tokens) / len(tokens) <= 0.5:
             continue
-        raw_tokenized = tokenizer.tokenize(nonstop_tokens)
+        raw_tokenized = tokenizer.tokenize(tokens)
         tokenized_set = set(raw_tokenized)
-        for token in tokenized_set.intersection(unigram_set):
-            score += agg_score[token]
+        keywords = tokenized_set.intersection(unigram_set)
+        for token in keywords:
+            score += agg_score_sorted[token]
         score /= len(nonstop_tokens)
         
-        phrase_vec = [0] * len(idf_list)
+
+        vocab = list(set(target_token).union(set(tokens)))
+        target_vec = [0] * len(vocab)
+        phrase_vec = [0] * len(vocab)
+        
+        target_token_freq = dict(Counter(target_token))
+        for token in target_token:
+            index = vocab.index(token)
+            target_vec[index] = target_token_freq[token]/len(target_token) * idf[token]
+        
         phrase_token_freq = dict(Counter(tokens))
         for token in tokens:
-            index = idf_list.index(token)
+            index = vocab.index(token)
             phrase_vec[index] = phrase_token_freq[token]/len(tokens) * idf[token]
         
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
@@ -112,19 +132,24 @@ def split(a, n):
     k, m = divmod(len(a), n)
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
-def main_thrd(query, num_process, input_dir, target):
+def main_thrd(query, num_process, input_dir, target, iindex):
     start_time = time.time()
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
+    
+    # ##### sentence search #####
+    query_iid = {}
 
-    ##### sentence search #####
+    for ent in query:
+        query_iid.update({ent:set(iindex[ent])})
+
     input_files = os.listdir(input_dir)
     tasks = list(split(input_files, num_process))
-    
-    inputs = [(tasks[i], query, input_dir) for i in range(num_process)]
+
+    inputs = [(tasks[i], query_iid, input_dir) for i in range(num_process)]
 
     with Pool(num_process) as p:
         search_results = p.map(sent_search, inputs)
-    
+
     search_merge = search_results[0]['context']
     count_merge = search_results[0]['freq']
 
@@ -136,7 +161,7 @@ def main_thrd(query, num_process, input_dir, target):
             count_merge[ent]['total'] += tmp_freq[ent]['total']
             tmp_freq[ent].pop('total', None)
             count_merge[ent].update(tmp_freq[ent])
-    
+
     for ent in query:
         for index in range(len(search_merge[ent])):
             search_merge[ent][index]['doc_score'] = count_merge[ent][search_merge[ent][index]['did']]/count_merge[ent]['total']
@@ -160,12 +185,14 @@ def main_thrd(query, num_process, input_dir, target):
     cnt = dict(cnt)
 
     for ent in query:
-        unigram_set.discard(ent)
+        for word in nltk.word_tokenize(ent):
+            unigram_set.discard(word)
+            unigram_set.discard(LEMMA.lemmatize(word))
 
     idf = {}
     for key in cnt.keys():
-        idf.update({key:np.log(N / cnt[key])})
-    
+        idf.update({key:np.log(2*(N / cnt[key]))})
+        
     unigram_sents = {}
     for ent in query:
         unigram_sents.update({ent:{}})  
@@ -184,17 +211,16 @@ def main_thrd(query, num_process, input_dir, target):
         for ent in query:
             score_dist[ug].update({ent:0})
             if ug in unigram_sents[ent].keys():
-                did = set()
                 for sent in unigram_sents[ent][ug]:
-                    score_dist[ug][ent] += sent['doc_score'] * idf[ug]
-                    did.add(sent['did'])
+                     score_dist[ug][ent] += sent['doc_score']
+                score_dist[ug][ent] *= skew([sent['doc_score'] for sent in unigram_sents[ent][ug]])
 
     #using rank to score unigram
     score_redist = {}
     for ent in query:
-        score_redist.update({ent:dict.fromkeys(unigram_set, 0)})
+        score_redist.update({ent:{}})
         for ug in unigram_set:
-            score_redist[ent][ug] = score_dist[ug][ent]    
+            score_redist[ent].update({ug:score_dist[ug][ent]})
         sorted_score = sorted(score_redist[ent].items(), key=lambda item: item[1], reverse=True)
         rank, count, previous, result = 0, 0, None, {}
         for key, num in sorted_score:
@@ -213,6 +239,7 @@ def main_thrd(query, num_process, input_dir, target):
     query_weight = []
     for ent in query:
         query_weight.append(1/skew([sent['doc_score'] for sent in search_merge[ent]]))
+        #query_weight.append(1/kurtosis([sent['doc_score'] for sent in search_merge[ent]]))
              
     agg_score = {}
     for ug in score_dist.keys():
@@ -229,19 +256,16 @@ def main_thrd(query, num_process, input_dir, target):
     
     start_time = time.time()
 
-    tokenizer = MWETokenizer(separator=' ')
-    for ent in query:
-        tokenizer.add_mwe(nltk.word_tokenize(ent))
-    
     mined_phrases = []
     query_set = set(query)
     for ent in query:
         for sent in search_merge[ent]:
             for phrase in sent['phrases']:
-                tokens = nltk.word_tokenize(phrase)
-                raw_tokenized = tokenizer.tokenize(tokens)
-                tokenized_set = set(raw_tokenized)
-                if tokenized_set.intersection(query_set) == set():
+                add = True
+                for seed in query:
+                    if seed in phrase:
+                        add = False
+                if add:
                     mined_phrases.append(phrase)
 
     print("--- phrase mining %s seconds ---" % (time.time() - start_time))
@@ -253,16 +277,12 @@ def main_thrd(query, num_process, input_dir, target):
     target_doc = nlp(target)
     target_vec = [0] * len(idf_list)
     target_token = [token.lemma_ for token in target_doc if not token.is_punct]
-    target_token_freq = dict(Counter(target_token))
-    for token in target_token:
-        index = idf_list.index(token)
-        target_vec[index] = target_token_freq[token]/len(target_token) * idf[token]
 
     list_phrases = list(set(mined_phrases))
 
     tasks = list(split(list_phrases, num_process))
-    
-    inputs = [(tasks[i], unigram_set, target_vec, idf, agg_score, i) for i in range(num_process)]
+
+    inputs = [(tasks[i], unigram_set, target_token, idf, agg_score, i) for i in range(num_process)]
 
     phrases_score = {}
     with Pool(num_process) as p:
@@ -270,10 +290,11 @@ def main_thrd(query, num_process, input_dir, target):
 
     for tmp_res in eval_results:
         phrases_score.update(tmp_res)
-    
+
     phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
 
     print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
+    print(phrases_sorted[:10])
     sys.stdout.flush()
 
     return phrases_sorted
@@ -286,6 +307,7 @@ def main():
     parser.add_argument('--num_query', type=int, default=5, help='number of query per set')
     parser.add_argument('--query_length', type=int, default=3, help='query length')
     parser.add_argument('--entity_dir', type=str, default='', help='entity files directory')
+    parser.add_argument('--inverted_dir', type=str, default='', help='inverted index directory')
     
     args = parser.parse_args()
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
@@ -301,6 +323,11 @@ def main():
     entityset = set(raw_list.split('\n'))
 
     sets = [line for line in sets if line != '']
+
+    with open('{}/inverted_index.txt'.format(args.input_dir), "r") as f:
+        raw = f.read()
+    f.close()
+    iindex = json.loads(raw)
 
     num_query = args.num_query
     query_length = args.query_length
@@ -322,7 +349,7 @@ def main():
         queries = [np.random.choice(list(item['prob'].keys()), query_length, replace=False, p=list(item['prob'].values())).tolist() for i in range(num_query)]
         for query in queries:
             print('prcessing query: ', query)
-            labels = main_thrd(query, args.num_process, args.input_dir, target)
+            labels = main_thrd(query, args.num_process, args.input_dir, target, iindex)
             top5 = [lab[0] for lab in labels[:5]]
             best_phrase = labels[0][0]
             best_sim = labels[0][1]['eval']

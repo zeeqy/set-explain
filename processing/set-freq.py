@@ -13,7 +13,9 @@ def sent_search(params):
 
     query_set_prob = copy.deepcopy(query_set)
     for i in range(len(query_set_prob)):
-        query_set_prob[i]['prob'] = dict.fromkeys(query_set_prob[i]['entities'],0)
+        query_set_prob[i].update({'prob':{}})
+        for ent in query_set_prob[i]['entities']:
+            query_set_prob[i]['prob'].update({ent:0})
 
     for fname in task_list:
 
@@ -27,9 +29,6 @@ def sent_search(params):
             except:
                 print(fname, item)
                 sys.stdout.flush()
-                continue
-
-            if len(item_dict['text'].split()) > 30:
                 continue
 
             entity_text = set([em for em in item_dict['entityMentioned']])
@@ -49,10 +48,18 @@ def split(a, n):
 def main_thrd(query_set, num_process, input_dir):
     start_time = time.time()
 
+    regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
     query_set_prob = []
     for item in query_set:
-        item['entities'] = [w.lower().replace('-', ' ').replace('_', ' ') for w in item['entities']]
-        query_set_prob.append(item)
+        clean_set = []
+        for ent in item['entities']:
+            if regex.search(ent) == None: 
+                clean_set.append(ent.lower())
+        if len(clean_set) > 7 and regex.search(item['title']) == None:
+            item['title'] = item['title'].lower()
+            item['entities'] = clean_set
+            query_set_prob.append(item)
 
     ##### sentence search #####
     input_files = os.listdir(input_dir)
