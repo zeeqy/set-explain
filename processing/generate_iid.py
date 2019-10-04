@@ -37,7 +37,7 @@ def merge_task(task_list, args):
 
         for item in tqdm(doc, desc='{}'.format(fname), mininterval=30):
             item_dict = json.loads(item)
-            if set(item_dict['nsubj']).intersection(pronoun) != set():
+            if set(item_dict['nsubj']).issubset(pronoun):
                 continue
             item_dict['iid'] = '{}{}{}'.format(item_dict['did'],item_dict['pid'],item_dict['sid'])
             context.append(json.dumps(item_dict))
