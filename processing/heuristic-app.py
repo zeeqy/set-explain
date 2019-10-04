@@ -351,7 +351,8 @@ def main():
         if args.sampling_method == 'freq':
             queries = [np.random.choice(list(item['prob'].keys()), query_length, replace=False, p=list(item['prob'].values())).tolist() for i in range(num_query)]
         if args.sampling_method == 'random':
-            queries = [np.random.choice(item['entities'], query_length, replace=False).tolist() for i in range(num_query)]
+            valid_ent = [ent for ent in item['prob'].items() if ent[1] > 0]
+            queries = [np.random.choice(valid_ent, query_length, replace=False).tolist() for i in range(num_query)]
         for query in queries:
             print('prcessing query: ', query)
             labels = main_thrd(query, args.num_process, args.input_dir, target, iindex)
