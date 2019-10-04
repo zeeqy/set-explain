@@ -326,7 +326,7 @@ def main():
 
     sets = [line for line in sets if line != '']
 
-    with open('{}/inverted_index.txt'.format(args.input_dir), "r") as f:
+    with open('{}/inverted_index.txt'.format(args.inverted_dir), "r") as f:
         raw = f.read()
     f.close()
     iindex = json.loads(raw)
