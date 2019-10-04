@@ -13,10 +13,21 @@ import nltk
 import phrasemachine
 from scipy import spatial
 import time
+from itertools import product, combinations
 from collections import Counter
 from scipy.stats.mstats import gmean, hmean
-from scipy.stats import skew
+from scipy.stats import skew, kurtosis
 stop = set(stopwords.words('english'))
+#f = open('/mnt/nfs/work1/allan/zhiqihuang/HiExpan/src/tools/AutoPhrase/data/EN/stopwords.txt', 'r')
+#other_stop = set(f.read().split('\n'))
+#stop = stop.union(other_stop)
+import nltk
+import copy
+nltk.download('stopwords')
+nltk.download('punkt')
+nltk.download('wordnet')
+from nltk.stem import WordNetLemmatizer
+LEMMA = WordNetLemmatizer()
 
 def sent_search(params):
     (task_list, query, input_dir) = params
