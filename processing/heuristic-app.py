@@ -30,7 +30,7 @@ from nltk.stem import WordNetLemmatizer
 LEMMA = WordNetLemmatizer()
 
 def sent_search(params):
-    (task_list, query_iid, input_dir) = params
+    (corpus_list, query_iid) = params
 
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
@@ -41,13 +41,9 @@ def sent_search(params):
 
     context = dict((ent,[]) for ent in query_iid.keys())
 
-    for fname in task_list:
+    for subcorpus in corpus_list:
 
-        with open('{}/{}'.format(input_dir,fname), 'r') as f:
-            doc = f.readlines()
-        f.close()
-
-        for item in tqdm(doc, desc='{}'.format(fname), mininterval=10):
+        for item in tqdm(subcorpus, desc='{}'.format(fname), mininterval=10):
             try:
                 item_dict = json.loads(item)
             except:
@@ -143,7 +139,7 @@ def split(a, n):
     k, m = divmod(len(a), n)
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
-def main_thrd(queries, num_process, input_dir, target, iindex):
+def main_thrd(queries, num_process, corpus, target, iindex):
     start_time = time.time()
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
     
@@ -157,10 +153,10 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
     for ent in unique_ent:
         query_iid.update({ent:set(iindex[ent])})
 
-    input_files = os.listdir(input_dir)
+    input_files = list(range(len(corpus)))
     tasks = list(split(input_files, num_process))
 
-    inputs = [(tasks[i], query_iid, input_dir) for i in range(num_process)]
+    inputs = [([corpus[j] for j in tasks[i]], query_iid) for i in range(num_process)]
 
     with Pool(num_process) as p:
         search_results = p.map(sent_search, inputs)
@@ -373,6 +369,30 @@ def main():
     f.close()
     iindex = json.loads(raw)
 
+    files = os.listdir(args.input_dir)
+    corpus = []
+    
+    for fname in tqdm(files, desc='loading-corpus', mininterval=10):
+        with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
+            doc = f.readlines()
+        f.close()
+        
+        subcorpus = []
+
+        for item in doc:
+            try:
+                item_dict = json.loads(item)
+                subcorpus.append(item_dict)
+            except:
+                print(fname, item)
+                sys.stdout.flush()
+                continue
+
+        corpus.append(subcorpus)
+
+    print('load corpus successfully!')
+    sys.stdout.flush()
+
     num_query = args.num_query
     query_length = args.query_length
     eval_metric = {}
@@ -400,7 +420,7 @@ def main():
         
         print('prcessing set: ', target)
         sys.stdout.flush()
-        results = main_thrd(queries, args.num_process, args.input_dir, target, iindex)
+        results = main_thrd(queries, args.num_process, corpus, target, iindex)
         for query, labels in zip(queries, results):
             top10 = [lab[0] for lab in labels[:10]]
             best_phrase = labels[0][0]
