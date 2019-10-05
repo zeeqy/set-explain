@@ -188,6 +188,9 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
     results = []
     for query in queries:
 
+        print('prcessing query: ', query)
+        sys.stdout.flush()
+
         start_time = time.time()
         unigrams = []
         for ent in query:
@@ -380,7 +383,8 @@ def main():
             valid_ent = [ent[0] for ent in item['prob'].items() if ent[1] > 0]
             queries = [np.random.choice(valid_ent, query_length, replace=False).tolist() for i in range(num_query)]
         
-        print('prcessing query: ', target)
+        print('prcessing set: ', target)
+        sys.stdout.flush()
         results = main_thrd(queries, args.num_process, args.input_dir, target, iindex)
         for query, labels in zip(queries, results):
             top10 = [lab[0] for lab in labels[:10]]
