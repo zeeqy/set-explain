@@ -103,7 +103,7 @@ def phrase_eval(params):
         tokenizer.add_mwe(nltk.word_tokenize(e))
 
     phrases_score = {}
-    for phrase in tqdm(list_phrases, desc='phrase-eval-{}'.format(pid), mininterval=10):
+    for phrase in list_phrases:
         score = 0
         tokens = nltk.word_tokenize(phrase)
         if not set(tokens).issubset(idf_set):
@@ -198,6 +198,9 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
                 unigrams += sent['unigram']
         unigram_set = set(unigrams)
 
+        print('(1/7) generate unigrams')
+        sys.stdout.flush()
+
         N = 0
         cnt = Counter()
         for ent in query:
@@ -213,7 +216,10 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
 
         idf = {}
         for key in cnt.keys():
-            idf.update({key:np.log(2*(N / cnt[key]))})
+            idf.update({key:np.log((N / cnt[key]))})
+
+        print('(2/7) compute idf')
+        sys.stdout.flush()
             
         unigram_sents = {}
         for ent in query:
@@ -227,6 +233,9 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
                     else:
                         unigram_sents[ent].update({item:[sent]})
 
+        print('(3/7) group sents by unigrams')
+        sys.stdout.flush()
+
         score_dist = {}
         for ug in unigram_set:
             score_dist.update({ug:{}})
@@ -239,6 +248,9 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
                         n = len([rec for rec in unigram_sents[ent][ug] if rec['did'] == sent['did']])
                         score_dist[ug][ent] += (1/(sent['pid']+1)) * sent['doc_score'] * np.log(N/n)
 
+        print('(4/7) score unigrams')
+        sys.stdout.flush()
+        
         #using rank to score unigram
         score_redist = {}
         for ent in query:
@@ -260,6 +272,9 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
             for ent in query:
                 score_dist[ug][ent] = score_redist[ent][ug]
 
+        print('(5/7) map score to rank')
+        sys.stdout.flush()
+
         query_weight = []
         for ent in query:
             doc_skew = skew([sent['doc_score'] for sent in search_merge[ent]])
@@ -274,14 +289,10 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
             wgmean = np.exp(sum(query_weight * np.log(tmp_res)) / sum(query_weight))
             agg_score.update({ug: wgmean})
 
-
         score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
-
-        print("--- unigram score %s seconds ---" % (time.time() - start_time))
-        print(score_sorted[:10])
+        print('(6/7) aggegrate ranks')
         sys.stdout.flush()
-        
-        start_time = time.time()
+
 
         mined_phrases = []
         query_set = set(query)
@@ -294,9 +305,6 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
                             add = False
                     if add:
                         mined_phrases.append(phrase)
-
-        print("--- phrase mining %s seconds ---" % (time.time() - start_time))
-        sys.stdout.flush()
 
         start_time = time.time()
 
@@ -320,7 +328,7 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
 
         phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
         results.append(phrases_sorted[:100])
-        print("--- phrase eval use %s seconds ---" % (time.time() - start_time))
+        print('(7/7) evaluate phrases')
         print(phrases_sorted[:10])
         sys.stdout.flush()
 
