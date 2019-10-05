@@ -39,7 +39,7 @@ def sent_search(params):
     for ent in query_iid.keys():
         freq.update({ent:{'total':0}})
 
-    context = dict((ent,[]) for ent in query)
+    context = dict((ent,[]) for ent in query_iid.keys())
 
     for fname in task_list:
 
