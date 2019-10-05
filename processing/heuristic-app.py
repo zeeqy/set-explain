@@ -222,9 +222,11 @@ def main_thrd(query, num_process, input_dir, target, iindex):
         for ent in query:
             score_dist[ug].update({ent:0})
             if ug in unigram_sents[ent].keys():
+                did = set([sent['did'] for sent in unigram_sents[ent][ug]])
                 for sent in unigram_sents[ent][ug]:
-                     score_dist[ug][ent] += sent['doc_score']
-                score_dist[ug][ent] *= skew([sent['doc_score'] for sent in unigram_sents[ent][ug]])
+                    N = count_merge[ent][sent['did']]
+                    n = len([rec for rec in unigram_sents[ent][ug] if rec['did'] == sent['did']])
+                    score_dist[ug][ent] += (1/(sent['pid']+1)) * sent['doc_score'] * np.log(N/n)
 
     #using rank to score unigram
     score_redist = {}
@@ -250,7 +252,6 @@ def main_thrd(query, num_process, input_dir, target, iindex):
     query_weight = []
     for ent in query:
         query_weight.append(1/skew([sent['doc_score'] for sent in search_merge[ent]]))
-        #query_weight.append(1/kurtosis([sent['doc_score'] for sent in search_merge[ent]]))
              
     agg_score = {}
     for ug in score_dist.keys():
@@ -351,7 +352,9 @@ def main():
         query_set.append(json.loads(entry))
 
     for item in query_set:
-        score = 0
+        top1_score = 0
+        top5_score = 0
+        top10_score = 0
         recall = 0
         norm_score = 0
         index = 0
@@ -367,28 +370,33 @@ def main():
         for query in queries:
             print('prcessing query: ', query)
             labels = main_thrd(query, args.num_process, args.input_dir, target, iindex)
-            top5 = [lab[0] for lab in labels[:5]]
+            top10 = [lab[0] for lab in labels[:10]]
             best_phrase = labels[0][0]
             best_sim = labels[0][1]['eval']
-            length_labels = len(labels)
+            top5_sim = max([lab[1]['eval'] for lab in labels[:5]])
+            top10_sim = max([lab[1]['eval'] for lab in labels[:10]])
             recall_rank = int(np.argmax([lab[1]['eval'] for lab in labels]))
             recall_phrase = labels[recall_rank][0]
             recall_sim = labels[recall_rank][1]['eval']
             norm_best_sim = best_sim / recall_sim if recall_sim != 0 else 0
             recall += recall_sim
-            score += best_sim
+            top1_score += best_sim
+            top5_score += top5_sim
+            top10_score += top10_sim
             norm_score += norm_best_sim
-            meta = {'query':query, 'target': target, 'top1':(best_phrase, best_sim), 'top5': top5, 'recall':(recall_phrase, recall_rank+1, recall_sim), 'norm_top1': norm_best_sim}
+            meta = {'query':query, 'target': target, 'top10': top10, 'sim@1':best_sim, 'sim@5': top5_sim, 'sim@10': top10_sim, 'sim@full':(recall_phrase, recall_rank+1, recall_sim), 'norm_sim@1': norm_best_sim}
             print(meta)
             sys.stdout.flush()
-            with open('{}/log-{}.txt'.format(args.output_dir, query_length), 'a+') as f:
+            with open('{}/log-{}-{}.txt'.format(args.output_dir, query_length, args.sampling_method), 'a+') as f:
                 f.write(json.dumps(meta) + '\n')
             f.close()
-        score /= num_query
+        top1_score /= num_query
+        top5_score /= num_query
+        top10_score /= num_query
         recall /= num_query
         norm_score /= num_query
-        eval_metric.update({target:{'top1': score, 'recall': recall, 'norm_top1': norm_score}})
-        with open('{}/tfidf-sim-{}.txt'.format(args.output_dir, query_length), 'a+') as f:
+        eval_metric.update({target:{'sim@1': top1_score, 'sim@5': top5_score, 'sim@10': top10_score, 'sim@full': recall, 'norm_sim@1': norm_score}})
+        with open('{}/tfidf-sim-{}-{}.txt'.format(args.output_dir, query_length, args.sampling_method), 'a+') as f:
             f.write(json.dumps(eval_metric) + '\n')
         f.close()
 
