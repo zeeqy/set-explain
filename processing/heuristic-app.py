@@ -182,6 +182,9 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
             search_merge[ent][index]['doc_score'] = count_merge[ent][search_merge[ent][index]['did']]/count_merge[ent]['total']
 
     print("--- search use %s seconds ---" % (time.time() - start_time))
+    print(queries)
+    print(search_merge.keys())
+
     sys.stdout.flush()
 
     ### query processing ###
