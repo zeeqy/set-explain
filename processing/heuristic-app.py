@@ -236,17 +236,24 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
         print('(3/7) group sents by unigrams')
         sys.stdout.flush()
 
+        unigram_idf = {}
+        for ug in unigram_set:
+            unigram_idf.update({ug:{}})
+            for ent in query:
+                did_list = [sent['did'] for sent in unigram_sents[ent][ug]]
+                did_freq = Counter(did_list)
+                unigram_idf[ug].update({ent:{k: np.log(count_merge[ent][k]/v) for k,v in did_freq.items()}})
+
+
         score_dist = {}
         for ug in unigram_set:
             score_dist.update({ug:{}})
             for ent in query:
                 score_dist[ug].update({ent:0})
                 if ug in unigram_sents[ent].keys():
-                    did = set([sent['did'] for sent in unigram_sents[ent][ug]])
                     for sent in unigram_sents[ent][ug]:
-                        N = count_merge[ent][sent['did']]
-                        n = len([rec for rec in unigram_sents[ent][ug] if rec['did'] == sent['did']])
-                        score_dist[ug][ent] += (1/(sent['pid']+1)) * sent['doc_score'] * np.log(N/n)
+                        did = sent['did']
+                        score_dist[ug][ent] += (1/(sent['pid']+1)) * sent['doc_score'] * unigram_idf[ug][ent][did]
 
         print('(4/7) score unigrams')
         sys.stdout.flush()
