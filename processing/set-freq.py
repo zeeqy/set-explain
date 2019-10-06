@@ -51,9 +51,9 @@ def main_thrd(query_set, num_process, input_dir):
     #regex = re.compile('[@_!#$%^&*()<>?/\|}{~:-,.]')
 
     query_set_prob = []
-    for item in set(query_set):
+    for item in query_set:
         clean_set = []
-        for ent in item['entities']:
+        for ent in set(item['entities']):
             if all(x.isalpha() or x.isspace() for x in ent): 
                 clean_set.append(ent.lower())
         if len(clean_set) > 7 and all(x.isalpha() or x.isspace() for x in item['title']):
