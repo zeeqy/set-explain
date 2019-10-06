@@ -15,7 +15,7 @@ def scraper(params):
 
     tables = []
     tid = 1
-    regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+    regex = re.compile('[@_!#$%^&*()<>?/\|}{~:-]')
     for title in tqdm(wikititle, desc='processing-{}'.format(pid), mininterval=10):
         url = 'https://en.wikipedia.org/wiki/{}'.format(title.replace(' ', '_'))
         website_url = requests.get(url).text
@@ -53,6 +53,7 @@ def scraper(params):
                 string = string.lower()
                 if string.split(',')[0] in entityset:
                     ent.append(string.split(',')[0])
+        ent = list(set(ent))
         if len(ent) >= 7:
             tables.append({'id':'SCR{}{}'.format(pid,tid), 'title':title_text, "entities":ent, 'url':url})
             tid +=1
