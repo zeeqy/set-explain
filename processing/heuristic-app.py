@@ -242,9 +242,10 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
         for ug in unigram_set:
             unigram_idf.update({ug:{}})
             for ent in query:
-                did_list = [sent['did'] for sent in unigram_sents[ent][ug]]
-                did_freq = Counter(did_list)
-                unigram_idf[ug].update({ent:{k: np.log(count_merge[ent][k]/v) for k,v in did_freq.items()}})
+                if ug in unigram_sents[ent].keys():
+                    did_list = [sent['did'] for sent in unigram_sents[ent][ug]]
+                    did_freq = Counter(did_list)
+                    unigram_idf[ug].update({ent:{k: np.log(count_merge[ent][k]/v) for k,v in did_freq.items()}})
 
 
         score_dist = {}
