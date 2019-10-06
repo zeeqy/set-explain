@@ -403,7 +403,7 @@ def main():
 
     inputs = [(tasks[i], args.input_dir, i) for i in range(args.num_process)]
 
-    with Pool(num_process) as p:
+    with Pool(args.num_process) as p:
         subcorpus = p.map(corpus_loader, inputs)
 
     for parts in subcorpus:
