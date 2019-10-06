@@ -168,12 +168,14 @@ def split(a, n):
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
 def main_thrd(queries, num_process, corpus, target, iindex):
-    start_time = time.time()
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
     
     unique_ent = set()
     for query in queries:
         unique_ent = unique_ent.union(set(query))
+
+    print('query has {} unique entities'.format(len(unique_ent)))
+    sys.stdout.flush()
 
     # ##### sentence search #####
     query_iid = {}
@@ -183,6 +185,10 @@ def main_thrd(queries, num_process, corpus, target, iindex):
 
     input_files = list(range(len(corpus)))
     tasks = list(split(input_files, num_process))
+
+    print(tasks)
+    print('corpus has {} parts'.format(len(corpus)))
+    sys.stdout.flush()
 
     inputs = [([corpus[j] for j in tasks[i]], query_iid) for i in range(num_process)]
 
@@ -205,7 +211,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
         for index in range(len(search_merge[ent])):
             search_merge[ent][index]['doc_score'] = count_merge[ent][search_merge[ent][index]['did']]/count_merge[ent]['total']
 
-    print("--- search use %s seconds ---" % (time.time() - start_time))
+    print('(1/8) finish sentence search')
     sys.stdout.flush()
 
     ### query processing ###
@@ -222,7 +228,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
                 unigrams += sent['unigram']
         unigram_set = set(unigrams)
 
-        print('(1/7) generate unigrams')
+        print('(2/8) generate unigrams')
         sys.stdout.flush()
 
         N = 0
@@ -242,7 +248,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
         for key in cnt.keys():
             idf.update({key:np.log((N / cnt[key]))})
 
-        print('(2/7) compute idf')
+        print('(3/8) compute idf')
         sys.stdout.flush()
             
         unigram_sents = {}
@@ -257,7 +263,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
                     else:
                         unigram_sents[ent].update({item:[sent]})
 
-        print('(3/7) group sents by unigrams')
+        print('(4/8) group sents by unigrams')
         sys.stdout.flush()
 
         unigram_idf = {}
@@ -279,7 +285,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
                         did = sent['did']
                         score_dist[ug][ent] += (1/(sent['pid']+1)) * sent['doc_score'] * unigram_idf[ug][ent][did]
 
-        print('(4/7) score unigrams')
+        print('(5/8) score unigrams')
         sys.stdout.flush()
         
         #using rank to score unigram
@@ -303,7 +309,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
             for ent in query:
                 score_dist[ug][ent] = score_redist[ent][ug]
 
-        print('(5/7) map score to rank')
+        print('(6/8) map score to rank')
         sys.stdout.flush()
 
         query_weight = []
@@ -321,7 +327,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
             agg_score.update({ug: wgmean})
 
         score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
-        print('(6/7) aggegrate ranks')
+        print('(7/8) aggegrate ranks')
         sys.stdout.flush()
 
 
@@ -359,7 +365,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
 
         phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
         results.append(phrases_sorted[:100])
-        print('(7/7) evaluate phrases')
+        print('(8/8) evaluate phrases')
         print(phrases_sorted[:10])
         sys.stdout.flush()
 
