@@ -28,6 +28,7 @@ nltk.download('punkt')
 nltk.download('wordnet')
 from nltk.stem import WordNetLemmatizer
 LEMMA = WordNetLemmatizer()
+CORPUS = []
 
 def corpus_loader(params):
 
@@ -58,7 +59,7 @@ def corpus_loader(params):
 
 
 def sent_search(params):
-    (corpus_list, query_iid) = params
+    (corpus_ids, query_iid) = params
 
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
@@ -69,7 +70,9 @@ def sent_search(params):
 
     context = dict((ent,[]) for ent in query_iid.keys())
 
-    for subcorpus in corpus_list:
+    for index in corpus_ids:
+
+        subcorpus = CORPUS[index]
 
         for item in tqdm(subcorpus, desc='{}'.format(fname), mininterval=10):
             try:
@@ -167,7 +170,7 @@ def split(a, n):
     k, m = divmod(len(a), n)
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
-def main_thrd(queries, num_process, corpus, target, iindex):
+def main_thrd(queries, num_process, target, iindex):
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
     
     unique_ent = set()
@@ -183,14 +186,14 @@ def main_thrd(queries, num_process, corpus, target, iindex):
     for ent in unique_ent:
         query_iid.update({ent:set(iindex[ent])})
 
-    input_files = list(range(len(corpus)))
+    input_files = list(range(len(CORPUS)))
     tasks = list(split(input_files, num_process))
 
     print(tasks)
     print('corpus has {} parts'.format(len(corpus)))
     sys.stdout.flush()
 
-    inputs = [([corpus[j] for j in tasks[i]], query_iid) for i in range(num_process)]
+    inputs = [(tasks[i], query_iid) for i in range(num_process)]
 
     with Pool(num_process) as p:
         search_results = p.map(sent_search, inputs)
@@ -403,7 +406,6 @@ def main():
     f.close()
     iindex = json.loads(raw)
 
-    corpus = []
     files = os.listdir(args.input_dir)
     tasks = list(split(files, args.num_process))
 
@@ -413,7 +415,7 @@ def main():
         subcorpus = p.map(corpus_loader, inputs)
 
     for parts in subcorpus:
-        corpus += parts
+        CORPUS += parts
 
     print('load corpus successfully!')
     sys.stdout.flush()
@@ -445,7 +447,7 @@ def main():
         
         print('prcessing set: ', target)
         sys.stdout.flush()
-        results = main_thrd(queries, args.num_process, corpus, target, iindex)
+        results = main_thrd(queries, args.num_process, target, iindex)
         for query, labels in zip(queries, results):
             top10 = [lab[0] for lab in labels[:10]]
             best_phrase = labels[0][0]
