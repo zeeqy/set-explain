@@ -32,7 +32,10 @@ def scraper(params):
         for row in My_table.tbody.findAll('tr')[1:]:
             if len(row.findAll('td')) == 0:
                 continue
-            first_column = row.findAll('td')[1]
+            try:
+                first_column = row.findAll('td')[1]
+            except:
+                continue
             try:
                 string = first_column.find('a').text
             except:
