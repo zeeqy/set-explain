@@ -48,10 +48,10 @@ def split(a, n):
 def main_thrd(query_set, num_process, input_dir):
     start_time = time.time()
 
-    regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+    regex = re.compile('[@_!#$%^&*()<>?/\|}{~:-,.]')
 
     query_set_prob = []
-    for item in query_set:
+    for item in set(query_set):
         clean_set = []
         for ent in item['entities']:
             if regex.search(ent) == None: 
