@@ -35,7 +35,7 @@ def corpus_loader(params):
 
     corpus = []
 
-    for fname in tqdm(files, desc='loading-corpus-{}'.foramt(pid), mininterval=10):
+    for fname in tqdm(files, desc='loading-corpus-{}'.format(pid), mininterval=10):
         
         with open('{}/{}'.format(input_dir,fname), 'r') as f:
             doc = f.readlines()
