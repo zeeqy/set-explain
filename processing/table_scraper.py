@@ -15,10 +15,15 @@ def scraper(params):
 
     tables = []
     tid = 1
+    regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
     for title in tqdm(wikititle, desc='processing-{}'.format(pid), mininterval=10):
         url = 'https://en.wikipedia.org/wiki/{}'.format(title.replace(' ', '_'))
         website_url = requests.get(url).text
         title_text = title[8:]
+        if regex.search(title_text) != None:
+            continue
+        if any(char.isdigit() for char in title_text):
+            continue
         soup = BeautifulSoup(website_url,'lxml')
         My_table = soup.find('table',{'class':'wikitable'})
         if My_table is None or My_table.tbody is None:
@@ -27,7 +32,7 @@ def scraper(params):
         for row in My_table.tbody.findAll('tr')[1:]:
             if len(row.findAll('td')) == 0:
                 continue
-            first_column = row.findAll('td')[0]
+            first_column = row.findAll('td')[1]
             try:
                 string = first_column.find('a').text
             except:
@@ -45,7 +50,7 @@ def scraper(params):
                 string = string.lower()
                 if string.split(',')[0] in entityset:
                     ent.append(string.split(',')[0])
-        if len(ent) >= 10:
+        if len(ent) >= 7:
             tables.append({'id':'SCR{}{}'.format(pid,tid), 'title':title_text, "entities":ent, 'url':url})
             tid +=1
         
