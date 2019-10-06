@@ -29,6 +29,34 @@ nltk.download('wordnet')
 from nltk.stem import WordNetLemmatizer
 LEMMA = WordNetLemmatizer()
 
+def corpus_loader(params):
+
+    files, input_dir, pid = params
+
+    corpus = []
+
+    for fname in tqdm(files, desc='loading-corpus-{}'.foramt(pid), mininterval=10):
+        
+        with open('{}/{}'.format(input_dir,fname), 'r') as f:
+            doc = f.readlines()
+        f.close()
+        
+        subcorpus = []
+
+        for item in doc:
+            try:
+                item_dict = json.loads(item)
+                subcorpus.append(item_dict)
+            except:
+                print(fname, item)
+                sys.stdout.flush()
+                continue
+
+        corpus.append(subcorpus)
+
+    return corpus
+
+
 def sent_search(params):
     (corpus_list, query_iid) = params
 
@@ -369,26 +397,17 @@ def main():
     f.close()
     iindex = json.loads(raw)
 
-    files = os.listdir(args.input_dir)
     corpus = []
-    
-    for fname in tqdm(files, desc='loading-corpus', mininterval=10):
-        with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
-            doc = f.readlines()
-        f.close()
-        
-        subcorpus = []
+    files = os.listdir(args.input_dir)
+    tasks = list(split(files, num_process))
 
-        for item in doc:
-            try:
-                item_dict = json.loads(item)
-                subcorpus.append(item_dict)
-            except:
-                print(fname, item)
-                sys.stdout.flush()
-                continue
+    inputs = [(tasks[i], args.input_dir, i) for i in range(num_process)]
 
-        corpus.append(subcorpus)
+    with Pool(num_process) as p:
+        subcorpus = p.map(corpus_loader, inputs)
+
+    for parts in subcorpus:
+        corpus += parts
 
     print('load corpus successfully!')
     sys.stdout.flush()
