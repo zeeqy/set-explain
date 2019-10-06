@@ -29,36 +29,8 @@ nltk.download('wordnet')
 from nltk.stem import WordNetLemmatizer
 LEMMA = WordNetLemmatizer()
 
-def corpus_loader(params):
-
-    files, input_dir, pid = params
-
-    corpus = []
-
-    for fname in tqdm(files, desc='loading-corpus-{}'.format(pid), mininterval=10):
-        
-        with open('{}/{}'.format(input_dir,fname), 'r') as f:
-            doc = f.readlines()
-        f.close()
-        
-        subcorpus = []
-
-        for item in doc:
-            try:
-                item_dict = json.loads(item)
-                subcorpus.append(item_dict)
-            except:
-                print(fname, item)
-                sys.stdout.flush()
-                continue
-
-        corpus.append(subcorpus)
-
-    return corpus
-
-
 def sent_search(params):
-    (corpus_ids, corpus, query_iid) = params
+    (task_list, query_iid, input_dir) = params
 
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
@@ -69,33 +41,46 @@ def sent_search(params):
 
     context = dict((ent,[]) for ent in query_iid.keys())
 
-    for index in corpus_ids:
+    subcorpus = []
+    
+    for fname in task_list:
 
-        subcorpus = corpus[index]
+        with open('{}/{}'.format(input_dir,fname), 'r') as f:
+            doc = f.readlines()
+        f.close()
 
-        for item_dict in tqdm(subcorpus, desc='{}'.format(fname), mininterval=10):
+        for item in doc:
+            try:
+                item_dict = json.loads(item)
+                subcorpus.append(item_dict)
+            except:
+                print(fname, item)
+                sys.stdout.flush()
+                continue
 
-            entity_text = set([em for em in item_dict['entityMentioned']])
+    for item_dict in tqdm(subcorpus, desc='{}'.format(fname), mininterval=10):
 
-            for ent in query_iid.keys():
-                if ent not in entity_text:
-                    continue
+        entity_text = set([em for em in item_dict['entityMentioned']])
+
+        for ent in query_iid.keys():
+            if ent not in entity_text:
+                continue
+            else:
+                doc = nlp(item_dict['text'])
+                unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1, filter_nums=True, filter_punct=True, filter_stops=True)]
+                item_dict['unigram'] = unigram
+                tokens = [token.lemma_ for token in doc]
+                item_dict['tokens'] = [token.lemma_ for token in doc if not token.is_punct]
+                pos = [token.pos_ for token in doc]
+                phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
+                item_dict['phrases'] = list(phrases['counts'])
+                context[ent].append(item_dict)
+
+                freq[ent]['total'] += 1
+                if item_dict['did'] in freq[ent]:
+                    freq[ent][item_dict['did']] += 1
                 else:
-                    doc = nlp(item_dict['text'])
-                    unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1, filter_nums=True, filter_punct=True, filter_stops=True)]
-                    item_dict['unigram'] = unigram
-                    tokens = [token.lemma_ for token in doc]
-                    item_dict['tokens'] = [token.lemma_ for token in doc if not token.is_punct]
-                    pos = [token.pos_ for token in doc]
-                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
-                    item_dict['phrases'] = list(phrases['counts'])
-                    context[ent].append(item_dict)
-
-                    freq[ent]['total'] += 1
-                    if item_dict['did'] in freq[ent]:
-                        freq[ent][item_dict['did']] += 1
-                    else:
-                        freq[ent].update({item_dict['did']:1})
+                    freq[ent].update({item_dict['did']:1})
     
     return {'context':context, 'freq':freq}
 
@@ -160,15 +145,13 @@ def split(a, n):
     k, m = divmod(len(a), n)
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
-def main_thrd(queries, num_process, corpus, target, iindex):
+def main_thrd(queries, num_process, input_dir, target, iindex):
+    start_time = time.time()
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
     
     unique_ent = set()
     for query in queries:
         unique_ent = unique_ent.union(set(query))
-
-    print('query has {} unique entities'.format(len(unique_ent)))
-    sys.stdout.flush()
 
     # ##### sentence search #####
     query_iid = {}
@@ -176,14 +159,10 @@ def main_thrd(queries, num_process, corpus, target, iindex):
     for ent in unique_ent:
         query_iid.update({ent:set(iindex[ent])})
 
-    input_files = list(range(len(corpus)))
+    input_files = os.listdir(input_dir)
     tasks = list(split(input_files, num_process))
 
-    print(tasks)
-    print('corpus has {} parts'.format(len(corpus)))
-    sys.stdout.flush()
-
-    inputs = [(tasks[i], corpus, query_iid) for i in range(num_process)]
+    inputs = [(tasks[i], query_iid, input_dir) for i in range(num_process)]
 
     with Pool(num_process) as p:
         search_results = p.map(sent_search, inputs)
@@ -204,7 +183,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
         for index in range(len(search_merge[ent])):
             search_merge[ent][index]['doc_score'] = count_merge[ent][search_merge[ent][index]['did']]/count_merge[ent]['total']
 
-    print('(1/8) finish sentence search')
+    print("--- search use %s seconds ---" % (time.time() - start_time))
     sys.stdout.flush()
 
     ### query processing ###
@@ -221,7 +200,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
                 unigrams += sent['unigram']
         unigram_set = set(unigrams)
 
-        print('(2/8) generate unigrams')
+        print('(1/7) generate unigrams')
         sys.stdout.flush()
 
         N = 0
@@ -241,7 +220,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
         for key in cnt.keys():
             idf.update({key:np.log((N / cnt[key]))})
 
-        print('(3/8) compute idf')
+        print('(2/7) compute idf')
         sys.stdout.flush()
             
         unigram_sents = {}
@@ -256,7 +235,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
                     else:
                         unigram_sents[ent].update({item:[sent]})
 
-        print('(4/8) group sents by unigrams')
+        print('(3/7) group sents by unigrams')
         sys.stdout.flush()
 
         unigram_idf = {}
@@ -278,7 +257,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
                         did = sent['did']
                         score_dist[ug][ent] += (1/(sent['pid']+1)) * sent['doc_score'] * unigram_idf[ug][ent][did]
 
-        print('(5/8) score unigrams')
+        print('(4/7) score unigrams')
         sys.stdout.flush()
         
         #using rank to score unigram
@@ -302,7 +281,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
             for ent in query:
                 score_dist[ug][ent] = score_redist[ent][ug]
 
-        print('(6/8) map score to rank')
+        print('(5/7) map score to rank')
         sys.stdout.flush()
 
         query_weight = []
@@ -320,7 +299,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
             agg_score.update({ug: wgmean})
 
         score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
-        print('(7/8) aggegrate ranks')
+        print('(6/7) aggegrate ranks')
         sys.stdout.flush()
 
 
@@ -358,7 +337,7 @@ def main_thrd(queries, num_process, corpus, target, iindex):
 
         phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
         results.append(phrases_sorted[:100])
-        print('(8/8) evaluate phrases')
+        print('(7/7) evaluate phrases')
         print(phrases_sorted[:10])
         sys.stdout.flush()
 
@@ -396,24 +375,6 @@ def main():
     f.close()
     iindex = json.loads(raw)
 
-    print('load inverted index successfully!')
-    sys.stdout.flush()
-
-    files = os.listdir(args.input_dir)
-    tasks = list(split(files, args.num_process))
-    corpus = []
-
-    inputs = [(tasks[i], args.input_dir, i) for i in range(args.num_process)]
-
-    with Pool(args.num_process) as p:
-        subcorpus = p.map(corpus_loader, inputs)
-
-    for parts in subcorpus:
-        corpus += parts
-
-    print('load corpus successfully!')
-    sys.stdout.flush()
-
     num_query = args.num_query
     query_length = args.query_length
     eval_metric = {}
@@ -441,7 +402,7 @@ def main():
         
         print('prcessing set: ', target)
         sys.stdout.flush()
-        results = main_thrd(queries, args.num_process, corpus, target, iindex)
+        results = main_thrd(queries, args.num_process, args.input_dir, target, iindex)
         for query, labels in zip(queries, results):
             top10 = [lab[0] for lab in labels[:10]]
             best_phrase = labels[0][0]
