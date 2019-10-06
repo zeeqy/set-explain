@@ -48,15 +48,15 @@ def split(a, n):
 def main_thrd(query_set, num_process, input_dir):
     start_time = time.time()
 
-    regex = re.compile('[@_!#$%^&*()<>?/\|}{~:-,.]')
+    #regex = re.compile('[@_!#$%^&*()<>?/\|}{~:-,.]')
 
     query_set_prob = []
     for item in set(query_set):
         clean_set = []
         for ent in item['entities']:
-            if regex.search(ent) == None: 
+            if all(x.isalpha() or x.isspace() for x in ent): 
                 clean_set.append(ent.lower())
-        if len(clean_set) > 7 and regex.search(item['title']) == None:
+        if len(clean_set) > 7 and all(x.isalpha() or x.isspace() for x in item['title']):
             item['title'] = item['title'].lower()
             item['entities'] = clean_set
             query_set_prob.append(item)
