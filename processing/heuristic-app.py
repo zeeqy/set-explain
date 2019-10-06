@@ -106,8 +106,12 @@ def phrase_eval(params):
 
     phrases_score = {}
     for phrase in list_phrases:
+        if any(char.isdigit() for char in phrase):
+            continue
         score = 0
         tokens = nltk.word_tokenize(phrase)
+        if tokens[0] in stop:
+            continue
         if not set(tokens).issubset(idf_set):
             continue
         nonstop_tokens = [token for token in tokens if token not in stop]
