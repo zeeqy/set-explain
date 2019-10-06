@@ -387,6 +387,8 @@ def main():
     for entry in sets:
         query_set.append(json.loads(entry))
 
+    bar = 1
+    np.random.shuffle(query_set)
     for item in query_set:
         top1_score = 0
         top5_score = 0
@@ -437,6 +439,10 @@ def main():
         with open('{}/tfidf-sim-{}-{}.txt'.format(args.output_dir, query_length, args.sampling_method), 'a+') as f:
             f.write(json.dumps(eval_metric) + '\n')
         f.close()
+        
+        print('---- progess in {}/{} ----'.format(bar, len(query_set)))
+        bar += 1
+        sys.stdout.flush()
 
 if __name__ == '__main__':
     main()
