@@ -128,7 +128,10 @@ def phrase_eval(params):
         target_token_freq = dict(Counter(target_token))
         for token in target_token:
             index = vocab.index(token)
-            target_vec[index] = target_token_freq[token]/len(target_token) * idf[token]
+            if token in idf_set:
+                target_vec[index] = target_token_freq[token]/len(target_token) * idf[token]
+            else:
+                target_vec[index] = 0
         
         phrase_token_freq = dict(Counter(tokens))
         for token in tokens:
