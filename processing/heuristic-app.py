@@ -86,16 +86,6 @@ def sent_search(params):
 
 def phrase_eval(params):
     list_phrases, unigram_set, target_token, idf, agg_score, pid = params
-
-    sorted_score = sorted(agg_score.items(), key=lambda item: item[1], reverse=True)
-    rank, count, previous, agg_score_sorted = 0, 0, None, {}
-    for key, num in sorted_score:
-        count += 1
-        if num != previous:
-            rank += count
-            previous = num
-            count = 0
-        agg_score_sorted[key] = 1.0 / rank
     
     idf_list = [*idf]
     idf_set = set(idf_list)
@@ -121,7 +111,7 @@ def phrase_eval(params):
         tokenized_set = set(raw_tokenized)
         keywords = tokenized_set.intersection(unigram_set)
         for token in keywords:
-            score += agg_score_sorted[token]
+            score += agg_score[token]
         score /= len(nonstop_tokens)
         
 
@@ -366,7 +356,7 @@ def main():
     args = parser.parse_args()
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
-    with open('{}/set_prob.txt'.format(args.query_dir), 'r') as f:
+    with open('{}/set_prob_large.txt'.format(args.query_dir), 'r') as f:
         sets = f.read().split('\n')
     f.close()
 
