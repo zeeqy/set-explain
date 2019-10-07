@@ -109,7 +109,7 @@ def main():
 
     results = main_thrd(query_set, args.num_process, args.input_dir)
 
-    with open('{}/set_prob.txt'.format(args.query_dir), 'w+') as f:
+    with open('{}/set_prob_large.txt'.format(args.query_dir), 'w+') as f:
         for item in results:
             f.write(json.dumps(item) + '\n')
     f.close()
