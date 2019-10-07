@@ -37,7 +37,7 @@ def scraper(params):
             except:
                 continue
             try:
-                string = first_column.find('a').text
+                string = first_column.find('a').get('title')
             except:
                 continue
             if string is None:
