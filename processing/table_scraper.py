@@ -33,7 +33,7 @@ def scraper(params):
             if len(row.findAll('td')) == 0:
                 continue
             try:
-                first_column = row.findAll('td')[1]
+                first_column = row.findAll('td')[0]
             except:
                 continue
             try:
