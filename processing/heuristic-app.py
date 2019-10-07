@@ -356,7 +356,7 @@ def main():
     args = parser.parse_args()
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
-    with open('{}/set_prob_large.txt'.format(args.query_dir), 'r') as f:
+    with open('{}'.format(args.query_dir), 'r') as f:
         sets = f.read().split('\n')
     f.close()
 
@@ -368,7 +368,7 @@ def main():
 
     sets = [line for line in sets if line != '']
 
-    with open('{}/inverted_index_large.txt'.format(args.inverted_dir), "r") as f:
+    with open('{}'.format(args.inverted_dir), "r") as f:
         raw = f.read()
     f.close()
     iindex = json.loads(raw)
