@@ -47,7 +47,7 @@ def merge_task(task_list, args):
 
         for item in tqdm(doc, desc='{}'.format(fname), mininterval=30):
             item_dict = json.loads(item)
-            if set(item_dict['nsubj']).issubset(pronoun) or item_dict['nsubj'] = []:
+            if set(item_dict['nsubj']).issubset(pronoun) or item_dict['nsubj'] == []:
                 continue
             sent = nltk.word_tokenize(item_dict['text'])
             raw_tokenized = tokenizer.tokenize(sent)
