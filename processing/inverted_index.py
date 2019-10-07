@@ -50,7 +50,7 @@ def main():
             for ent in item_dict['entityMentioned']:
                 context[ent].append(item_dict['iid'])
 
-    with open('{}/inverted_index.txt'.format(args.output_dir), "w+") as f:
+    with open('{}/inverted_index_large.txt'.format(args.output_dir), "w+") as f:
         json.dump(context, f)
     f.close()
 
