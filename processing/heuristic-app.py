@@ -383,7 +383,7 @@ def main():
         query_set.append(json.loads(entry))
 
     bar = 1
-    np.random.shuffle(query_set)
+    #np.random.shuffle(query_set)
     for item in query_set:
         top1_score = 0
         top5_score = 0
