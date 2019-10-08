@@ -112,7 +112,7 @@ def phrase_eval(params):
         keywords = tokenized_set.intersection(unigram_set)
         for token in keywords:
             score += agg_score[token]
-        score /= len(nonstop_tokens)
+        score /= (1+np.log(len(nonstop_tokens)))
         
 
         vocab = list(set(target_token).union(set(tokens)))
@@ -242,7 +242,7 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
                 if ug in unigram_sents[ent].keys():
                     did_list = [sent['did'] for sent in unigram_sents[ent][ug]]
                     did_freq = Counter(did_list)
-                    unigram_idf[ug].update({ent:{k: np.log(count_merge[ent][k]/v) for k,v in did_freq.items()}})
+                    unigram_idf[ug].update({ent:{k: count_merge[ent][k]/v for k,v in did_freq.items()}})
 
 
         score_dist = {}
@@ -253,8 +253,8 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
                 if ug in unigram_sents[ent].keys():
                     for sent in unigram_sents[ent][ug]:
                         did = sent['did']
-                        score_dist[ug][ent] += (1/(sent['pid']+1)) * sent['doc_score'] #* unigram_idf[ug][ent][did]
-                    score_dist[ug][ent] *= idf[ug]
+                        score_dist[ug][ent] += (1/(sent['pid']+1)) * sent['doc_score'] * unigram_idf[ug][ent][did]
+                    #score_dist[ug][ent] *= idf[ug]
 
         print('(4/7) score unigrams')
         sys.stdout.flush()
