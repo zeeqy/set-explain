@@ -253,7 +253,8 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
                 if ug in unigram_sents[ent].keys():
                     for sent in unigram_sents[ent][ug]:
                         did = sent['did']
-                        score_dist[ug][ent] += (1/(sent['pid']+1)) * sent['doc_score'] * unigram_idf[ug][ent][did]
+                        score_dist[ug][ent] += (1/(sent['pid']+1)) * sent['doc_score'] #* unigram_idf[ug][ent][did]
+                    score_dist[ug][ent] *= idf[ug]
 
         print('(4/7) score unigrams')
         sys.stdout.flush()
