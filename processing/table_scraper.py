@@ -52,9 +52,10 @@ def scraper(params):
                     continue
                 string = string.lower()
                 if string.split(',')[0] in entityset:
-                    ent.append(string.split(',')[0])
+                    if all(x.isalpha() or x.isspace() for x in string): 
+                        ent.append(string.split(',')[0])
         ent = list(set(ent))
-        if len(ent) >= 7:
+        if len(ent) >= 10 and len(ent) <= 20:
             tables.append({'id':'SCR{}{}'.format(pid,tid), 'title':title_text, "entities":ent, 'url':url})
             tid +=1
         
