@@ -30,7 +30,7 @@ from nltk.stem import WordNetLemmatizer
 LEMMA = WordNetLemmatizer()
 
 def sent_search(params):
-    (task_list, query_iid, input_dir) = params
+    (corpus, query_iid, pid) = params
 
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
@@ -41,29 +41,10 @@ def sent_search(params):
 
     context = dict((ent,[]) for ent in query_iid.keys())
 
-    subcorpus = []
-    
-    for fname in task_list:
-
-        with open('{}/{}'.format(input_dir,fname), 'r') as f:
-            doc = f.readlines()
-        f.close()
-
-        for item in doc:
-            try:
-                item_dict = json.loads(item)
-                subcorpus.append(item_dict)
-            except:
-                print(fname, item)
-                sys.stdout.flush()
-                continue
-
-    for item_dict in tqdm(subcorpus, desc='{}'.format(fname), mininterval=10):
-
-        entity_text = set([em for em in item_dict['entityMentioned']])
+    for item_dict in tqdm(corpus, desc='sentence-search-{}'.format(pid), mininterval=10):
 
         for ent in query_iid.keys():
-            if ent not in entity_text:
+            if item_dict['iid'] not in query_iid[ent]:
                 continue
             else:
                 doc = nlp(item_dict['text'])
@@ -135,46 +116,9 @@ def split(a, n):
     k, m = divmod(len(a), n)
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
-def main_thrd(queries, num_process, input_dir, target, iindex):
-    start_time = time.time()
-    nlp = spacy.load('en_core_web_lg', disable=['ner'])
+def score_and_rank(queries, num_process, target, search_merge, count_merge):
     
-    unique_ent = set()
-    for query in queries:
-        unique_ent = unique_ent.union(set(query))
-
-    # ##### sentence search #####
-    query_iid = {}
-
-    for ent in unique_ent:
-        query_iid.update({ent:set(iindex[ent])})
-
-    input_files = os.listdir(input_dir)
-    tasks = list(split(input_files, num_process))
-
-    inputs = [(tasks[i], query_iid, input_dir) for i in range(num_process)]
-
-    with Pool(num_process) as p:
-        search_results = p.map(sent_search, inputs)
-
-    search_merge = search_results[0]['context']
-    count_merge = search_results[0]['freq']
-
-    for pid in range(1, len(search_results)):
-        tmp_context = search_results[pid]['context']
-        tmp_freq = search_results[pid]['freq']
-        for ent in unique_ent:
-            search_merge[ent] += tmp_context[ent]
-            count_merge[ent]['total'] += tmp_freq[ent]['total']
-            tmp_freq[ent].pop('total', None)
-            count_merge[ent].update(tmp_freq[ent])
-
-    for ent in unique_ent:
-        for index in range(len(search_merge[ent])):
-            search_merge[ent][index]['doc_score'] = count_merge[ent][search_merge[ent][index]['did']]/count_merge[ent]['total']
-
-    print("--- search use %s seconds ---" % (time.time() - start_time))
-    sys.stdout.flush()
+    nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
     ### query processing ###
     results = []
@@ -293,7 +237,6 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
         print('(6/7) aggegrate ranks')
         sys.stdout.flush()
 
-
         mined_phrases = []
         query_set = set(query)
         for ent in query:
@@ -345,8 +288,8 @@ def main():
     parser.add_argument('--output_dir', type=str, default='', help='output dict')
     
     args = parser.parse_args()
-    nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
+    #### load query ####
     with open('{}'.format(args.query_dir), 'r') as f:
         sets = f.read().split('\n')
     f.close()
@@ -356,17 +299,43 @@ def main():
     query_set = []
     for entry in sets:
         query_set.append(json.loads(entry))
+    print('successfully load query')
 
+    #### load entity ####
     with open('{}/wiki_quality.txt'.format(args.entity_dir), 'r') as f:
         raw_list = f.read()
     f.close()
 
     entityset = set(raw_list.split('\n'))
+    print('successfully load entity')
 
+
+    #### load inverted index ####
     with open('{}'.format(args.inverted_dir), "r") as f:
         raw = f.read()
     f.close()
     iindex = json.loads(raw)
+    print('successfully load inverted index')
+
+    sys.stdout.flush()
+
+    #### load corpus ####
+    corpus = []
+    input_files = os.listdir(input_dir)
+    subfiles = list(split(input_files, args.num_process))
+    
+    for subfname in subfiles:
+        subcorpus = []
+        for fname in tqdm(subfname, desc='loading-corpus', mininterval=10):
+            with open('{}/{}'.format(input_dir,fname), 'r') as f:
+                for doc in f:
+                    subcorpus.append(json.loads(doc))
+            f.close()
+        corpus.append(subcorpus)
+    print('successfully load corpus, break into {} parts'.foramt(len(corpus)))
+
+    sys.stdout.flush()
+
 
     num_query = args.num_query
     query_length = args.query_length
@@ -374,6 +343,7 @@ def main():
 
     bar = 1
     for item in query_set:
+        
         top1_score = 0
         top5_score = 0
         top10_score = 0
@@ -384,7 +354,44 @@ def main():
         queries = item['queries']
         print('prcessing set: ', target)
         sys.stdout.flush()
-        results = main_thrd(queries, args.num_process, args.input_dir, target, iindex)
+
+        ##### sentence search #####
+
+        unique_ent = set()
+        for query in queries:
+            unique_ent = unique_ent.union(set(query))
+        
+        query_iid = {}
+        for ent in unique_ent:
+            query_iid.update({ent:set(iindex[ent])})
+
+        inputs = [(corpus[i], query_iid, i) for i in range(num_process)]
+
+        with Pool(num_process) as p:
+            search_results = p.map(sent_search, inputs)
+
+        search_merge = search_results[0]['context']
+        count_merge = search_results[0]['freq']
+
+        for pid in range(1, len(search_results)):
+            tmp_context = search_results[pid]['context']
+            tmp_freq = search_results[pid]['freq']
+            for ent in unique_ent:
+                search_merge[ent] += tmp_context[ent]
+                count_merge[ent]['total'] += tmp_freq[ent]['total']
+                tmp_freq[ent].pop('total', None)
+                count_merge[ent].update(tmp_freq[ent])
+
+        for ent in unique_ent:
+            for index in range(len(search_merge[ent])):
+                search_merge[ent][index]['doc_score'] = count_merge[ent][search_merge[ent][index]['did']]/count_merge[ent]['total']
+
+        print('successfully search the query entities')
+        sys.stdout.flush()
+
+        results = score_and_rank(queries, args.num_process, target, search_merge, count_merge)
+
+
         for query, labels in zip(queries, results):
             top10 = [lab[0] for lab in labels[:10]]
             best_phrase = labels[0][0]
