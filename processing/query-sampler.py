@@ -29,6 +29,8 @@ def main():
 
     query_data = []
     for item in query_set:
+        if np.count_nonzero(list(item['prob'].values())) < 7:
+            continue
         if sampling_method == 'freq':
             queries = [np.random.choice(list(item['prob'].keys()), query_length, replace=False, p=list(item['prob'].values())).tolist() for i in range(num_query)]
         if sampling_method == 'random':
