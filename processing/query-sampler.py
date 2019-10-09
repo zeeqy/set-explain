@@ -33,3 +33,6 @@ def main():
         for q in query_data:
             f.write(json.dumps(q) + '\n')
     f.close()
+
+if __name__ == '__main__':
+    main()
