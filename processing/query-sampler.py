@@ -18,6 +18,10 @@ def main():
     f.close()
 
     sets = [line for line in sets if line != '']
+
+    query_set = []
+    for entry in sets:
+        query_set.append(json.loads(entry))
     
     num_query = args.num_query
     query_length = args.query_length
