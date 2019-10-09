@@ -352,6 +352,8 @@ def main():
         sets = f.read().split('\n')
     f.close()
 
+    sets = [line for line in sets if line != '']
+
     query_set = []
     for entry in sets:
         query_set.append(json.loads(entry))
