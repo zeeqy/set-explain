@@ -11,6 +11,8 @@ def main():
     parser.add_argument('--num_query', type=int, default=5, help='number of query per set')
     parser.add_argument('--output_dir', type=int, default='', help='output dir')
 
+    args = parser.parse_args()
+    
     with open('{}'.format(args.query_dir), 'r') as f:
         sets = f.read().split('\n')
     f.close()
