@@ -367,7 +367,10 @@ def main():
         for ent in unique_ent:
             query_iid.update({ent:set(iindex[ent])})
 
-        inputs = [(corpus[i], query_iid, i) for i in range(args.num_process)]
+        inputs = []
+        for i in range(args.num_process):
+            subset = copy.deepcopy(corpus[i])
+            inputs.append((subset, query_iid, i))
 
         with Pool(args.num_process) as p:
             search_results = p.map(sent_search, inputs)
