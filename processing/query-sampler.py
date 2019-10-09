@@ -1,8 +1,10 @@
 import json, sys, os, re
 import numpy as np
+import argparse
 
 
 def main():
+    parser = argparse.ArgumentParser(description="query sampler")
     parser.add_argument('--query_dir', type=str, default='', help='search query')
     parser.add_argument('--sampling_method', type=str, default='random', help='query sampling method')
     parser.add_argument('--query_length', type=int, default=3, help='query length')
