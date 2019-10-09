@@ -327,7 +327,7 @@ def main():
     for subfname in subfiles:
         subcorpus = []
         for fname in tqdm(subfname, desc='loading-corpus', mininterval=10):
-            with open('{}/{}'.format(input_dir,fname), 'r') as f:
+            with open('{}/{}'.format(args.input_dir,fname), 'r') as f:
                 for doc in f:
                     subcorpus.append(json.loads(doc))
             f.close()
