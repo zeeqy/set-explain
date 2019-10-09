@@ -352,13 +352,15 @@ def main():
         sets = f.read().split('\n')
     f.close()
 
+    query_set = []
+    for entry in sets:
+        query_set.append(json.loads(entry))
+
     with open('{}/wiki_quality.txt'.format(args.entity_dir), 'r') as f:
         raw_list = f.read()
     f.close()
 
     entityset = set(raw_list.split('\n'))
-
-    sets = [line for line in sets if line != '']
 
     with open('{}'.format(args.inverted_dir), "r") as f:
         raw = f.read()
@@ -369,12 +371,7 @@ def main():
     query_length = args.query_length
     eval_metric = {}
 
-    query_set = []
-    for entry in sets:
-        query_set.append(json.loads(entry))
-
     bar = 1
-    #np.random.shuffle(query_set)
     for item in query_set:
         top1_score = 0
         top5_score = 0
@@ -382,16 +379,8 @@ def main():
         recall = 0
         norm_score = 0
         index = 0
-        seeds = item['entities']
-        target = item['title'].lower().split(',')[0]
-        if np.count_nonzero(list(item['prob'].values())) < 7:
-            continue
-        if args.sampling_method == 'freq':
-            queries = [np.random.choice(list(item['prob'].keys()), query_length, replace=False, p=list(item['prob'].values())).tolist() for i in range(num_query)]
-        if args.sampling_method == 'random':
-            valid_ent = [ent[0] for ent in item['prob'].items() if ent[1] > 0]
-            queries = [np.random.choice(valid_ent, query_length, replace=False).tolist() for i in range(num_query)]
-        
+        target = item['target']
+        queries = item['queries']
         print('prcessing set: ', target)
         sys.stdout.flush()
         results = main_thrd(queries, args.num_process, args.input_dir, target, iindex)
