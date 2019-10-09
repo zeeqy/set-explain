@@ -288,7 +288,8 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
             wgmean = np.exp(sum(query_weight * np.log(tmp_res)) / sum(query_weight))
             agg_score.update({ug: wgmean})
 
-        agg_score = {k:v/sum(agg_score.values()) for k,v in agg_score.items()}
+        norm_fct = sum(agg_score.values())
+        agg_score = {k:v/norm_fct for k,v in agg_score.items()}
         print('(6/7) aggegrate ranks')
         sys.stdout.flush()
 
