@@ -332,7 +332,7 @@ def main():
                     subcorpus.append(json.loads(doc))
             f.close()
         corpus.append(subcorpus)
-    print('successfully load corpus, break into {} parts'.foramt(len(corpus)))
+    print('successfully load corpus, break into {} parts'.format(len(corpus)))
     if args.num_process != len(corpus):
         print('number of process NOT equals to number of subcorpus!!!')
 
