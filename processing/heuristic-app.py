@@ -289,8 +289,6 @@ def main_thrd(queries, num_process, input_dir, target, iindex):
             agg_score.update({ug: wgmean})
 
         agg_score = {k:v/sum(agg_score.values()) for k,v in agg_score.items()}
-        score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
-        print(score_sorted[:10])
         print('(6/7) aggegrate ranks')
         sys.stdout.flush()
 
