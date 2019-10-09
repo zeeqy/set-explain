@@ -321,7 +321,7 @@ def main():
 
     #### load corpus ####
     corpus = []
-    input_files = os.listdir(input_dir)
+    input_files = os.listdir(args.input_dir)
     subfiles = list(split(input_files, args.num_process))
     
     for subfname in subfiles:
@@ -333,6 +333,8 @@ def main():
             f.close()
         corpus.append(subcorpus)
     print('successfully load corpus, break into {} parts'.foramt(len(corpus)))
+    if args.num_process != len(corpus):
+        print('number of process NOT equals to number of subcorpus!!!')
 
     sys.stdout.flush()
 
@@ -365,9 +367,9 @@ def main():
         for ent in unique_ent:
             query_iid.update({ent:set(iindex[ent])})
 
-        inputs = [(corpus[i], query_iid, i) for i in range(num_process)]
+        inputs = [(corpus[i], query_iid, i) for i in range(args.num_process)]
 
-        with Pool(num_process) as p:
+        with Pool(args.num_process) as p:
             search_results = p.map(sent_search, inputs)
 
         search_merge = search_results[0]['context']
