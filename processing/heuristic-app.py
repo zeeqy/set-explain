@@ -97,7 +97,8 @@ def phrase_eval(params):
         score /= (1+np.log(len(nonstop_tokens)))
         
 
-        vocab = list(set(target_token).union(set(tokens)))
+        vocab = set(target_token).union(set(tokens))
+        vocab = list(vocab.intersection(idf_set))
         target_vec = [0] * len(vocab)
         phrase_vec = [0] * len(vocab)
         
