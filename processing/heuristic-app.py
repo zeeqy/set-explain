@@ -24,7 +24,7 @@ from nltk.stem import WordNetLemmatizer
 LEMMA = WordNetLemmatizer()
 
 def sent_search(params):
-    (task_list, query_iid, input_dir) = params
+    (task_list, query_iid, related_sent, input_dir) = params
 
     nlp = spacy.load('en_core_web_lg', disable=['ner'])
 
@@ -35,36 +35,37 @@ def sent_search(params):
 
     context = dict((ent,[]) for ent in query_iid.keys())
 
+    subcorpus = []
     for fname in task_list:
-
-        subcorpus = []
        
         with open('{}/{}'.format(input_dir,fname), 'r') as f:
             for line in f:
-                subcorpus.append(json.loads(line))
+                doc = json.loads(line)
+                if doc['iid'] in related_sent:
+                    subcorpus.append(doc)
         f.close()
 
-        for item_dict in tqdm(subcorpus, desc='{}'.format(fname), mininterval=10):
+    for item_dict in tqdm(subcorpus, desc='{}'.format(fname), mininterval=10):
 
-            for ent in query_iid.keys():
-                if item_dict['iid'] not in query_iid[ent]:
-                    continue
+        for ent in query_iid.keys():
+            if item_dict['iid'] not in query_iid[ent]:
+                continue
+            else:
+                doc = nlp(item_dict['text'])
+                unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1, filter_nums=True, filter_punct=True, filter_stops=True)]
+                item_dict['unigram'] = unigram
+                tokens = [token.lemma_ for token in doc]
+                item_dict['tokens'] = [token.lemma_ for token in doc if not token.is_punct]
+                pos = [token.pos_ for token in doc]
+                phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
+                item_dict['phrases'] = list(phrases['counts'])
+                context[ent].append(item_dict)
+
+                freq[ent]['total'] += 1
+                if item_dict['did'] in freq[ent]:
+                    freq[ent][item_dict['did']] += 1
                 else:
-                    doc = nlp(item_dict['text'])
-                    unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1, filter_nums=True, filter_punct=True, filter_stops=True)]
-                    item_dict['unigram'] = unigram
-                    tokens = [token.lemma_ for token in doc]
-                    item_dict['tokens'] = [token.lemma_ for token in doc if not token.is_punct]
-                    pos = [token.pos_ for token in doc]
-                    phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
-                    item_dict['phrases'] = list(phrases['counts'])
-                    context[ent].append(item_dict)
-
-                    freq[ent]['total'] += 1
-                    if item_dict['did'] in freq[ent]:
-                        freq[ent][item_dict['did']] += 1
-                    else:
-                        freq[ent].update({item_dict['did']:1})
+                    freq[ent].update({item_dict['did']:1})
     
     return {'context':context, 'freq':freq}
 
@@ -131,16 +132,20 @@ def main_thrd(query_set, args, iindex):
         for query in queries:
             unique_ent = unique_ent.union(set(query))
 
+    
+
     # ##### sentence search #####
     query_iid = {}
-
+    related_sent = set()
     for ent in unique_ent:
-        query_iid.update({ent:set(iindex[ent])})
+        mentions = set(iindex[ent])
+        query_iid.update({ent:mentions})
+        related_sent = related_sent.union(mentions)
 
     input_files = os.listdir(args.input_dir)
     tasks = list(split(input_files, args.num_process))
 
-    inputs = [(tasks[i], query_iid, args.input_dir) for i in range(args.num_process)]
+    inputs = [(tasks[i], query_iid, related_sent, args.input_dir) for i in range(args.num_process)]
 
     with Pool(args.num_process) as p:
         search_results = p.map(sent_search, inputs)
