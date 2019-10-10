@@ -292,8 +292,7 @@ def main_thrd(query_set, args, iindex):
                      
             agg_score = {}
             for ug in score_dist.keys():
-                tmp_res = [item[1] for item in score_dist[ug].items()]
-                agg_score.update({ug: np.mean(tmp_res)})
+                agg_score.update({ug: np.mean(list(score_dist[ug].values()))})
 
             print('(6/7) aggegrate ranks')
             sys.stdout.flush()
