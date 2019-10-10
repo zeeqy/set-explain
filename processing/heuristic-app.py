@@ -39,13 +39,13 @@ def sent_search(params):
     for fname in task_list:
        
         with open('{}/{}'.format(input_dir,fname), 'r') as f:
-            for line in f:
+            for line in tqdm(f, desc='{}'.format(fname), mininterval=10):
                 doc = json.loads(line)
                 if doc['iid'] in related_sent:
                     subcorpus.append(doc)
         f.close()
 
-    for item_dict in tqdm(subcorpus, desc='{}'.format(fname), mininterval=10):
+    for item_dict in tqdm(subcorpus, desc='enrich-{}'.format(len(subcorpus)), mininterval=10):
 
         for ent in query_iid.keys():
             if item_dict['iid'] not in query_iid[ent]:
