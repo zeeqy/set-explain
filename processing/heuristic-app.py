@@ -15,6 +15,7 @@ from scipy import spatial
 import time
 from itertools import product, combinations
 from collections import Counter
+from collections import defaultdict
 from scipy.stats.mstats import gmean, hmean
 from scipy.stats import skew, kurtosis
 stop = set(stopwords.words('english'))
@@ -34,6 +35,7 @@ def sent_search(params):
         freq.update({ent:{'total':0}})
 
     context = dict((ent,[]) for ent in query_iid.keys())
+    iid_set = set(related_sent.keys())
 
     subcorpus = []
     for fname in task_list:
@@ -41,31 +43,29 @@ def sent_search(params):
         with open('{}/{}'.format(input_dir,fname), 'r') as f:
             for line in tqdm(f, desc='{}'.format(fname), mininterval=10):
                 doc = json.loads(line)
-                if doc['iid'] in related_sent:
+                if doc['iid'] in iid_set:
                     subcorpus.append(doc)
         f.close()
 
     for item_dict in tqdm(subcorpus, desc='enrich-{}'.format(len(subcorpus)), mininterval=10):
+        
+        doc = nlp(item_dict['text'])
+        item_dict['unigram'] = unigram
+        tokens = [token.lemma_ for token in doc]
+        item_dict['tokens'] = [token.lemma_ for token in doc if not token.is_punct]
+        pos = [token.pos_ for token in doc]
+        phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
+        item_dict['phrases'] = list(phrases['counts'])
+        
+        for ent in related_sent[item_dict['iid']]:
+            
+            context[ent].append(item_dict)
 
-        for ent in query_iid.keys():
-            if item_dict['iid'] not in query_iid[ent]:
-                continue
+            freq[ent]['total'] += 1
+            if item_dict['did'] in freq[ent]:
+                freq[ent][item_dict['did']] += 1
             else:
-                doc = nlp(item_dict['text'])
-                unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1, filter_nums=True, filter_punct=True, filter_stops=True)]
-                item_dict['unigram'] = unigram
-                tokens = [token.lemma_ for token in doc]
-                item_dict['tokens'] = [token.lemma_ for token in doc if not token.is_punct]
-                pos = [token.pos_ for token in doc]
-                phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
-                item_dict['phrases'] = list(phrases['counts'])
-                context[ent].append(item_dict)
-
-                freq[ent]['total'] += 1
-                if item_dict['did'] in freq[ent]:
-                    freq[ent][item_dict['did']] += 1
-                else:
-                    freq[ent].update({item_dict['did']:1})
+                freq[ent].update({item_dict['did']:1})
     
     return {'context':context, 'freq':freq}
 
@@ -132,15 +132,16 @@ def main_thrd(query_set, args, iindex):
         for query in queries:
             unique_ent = unique_ent.union(set(query))
 
-    
-
     # ##### sentence search #####
     query_iid = {}
-    related_sent = set()
-    for ent in unique_ent:
+    related_sent = defaultdict(list)
+    for ent in tqdm(unique_ent, desc='loading-entity', mininterval=10):
         mentions = set(iindex[ent])
         query_iid.update({ent:mentions})
-        related_sent = related_sent.union(mentions)
+
+    for k, v in tqdm(query_iid.items(), desc='related-sents', mininterval=10):
+        for iid in v:
+            related_sent[v].append(k)
 
     input_files = os.listdir(args.input_dir)
     tasks = list(split(input_files, args.num_process))
