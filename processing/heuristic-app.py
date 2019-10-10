@@ -50,6 +50,7 @@ def sent_search(params):
     for item_dict in tqdm(subcorpus, desc='enrich-{}'.format(len(subcorpus)), mininterval=10):
         
         doc = nlp(item_dict['text'])
+        unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1, filter_nums=True, filter_punct=True, filter_stops=True, include_pos=["NOUN"])]
         item_dict['unigram'] = unigram
         tokens = [token.lemma_ for token in doc]
         item_dict['tokens'] = [token.lemma_ for token in doc if not token.is_punct]
@@ -58,7 +59,7 @@ def sent_search(params):
         item_dict['phrases'] = list(phrases['counts'])
         
         for ent in related_sent[item_dict['iid']]:
-            
+
             context[ent].append(item_dict)
 
             freq[ent]['total'] += 1
