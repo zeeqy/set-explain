@@ -141,7 +141,7 @@ def main_thrd(query_set, args, iindex):
 
     for k, v in tqdm(query_iid.items(), desc='related-sents', mininterval=10):
         for iid in v:
-            related_sent[v].append(k)
+            related_sent[iid].append(k)
 
     input_files = os.listdir(args.input_dir)
     tasks = list(split(input_files, args.num_process))
