@@ -320,10 +320,10 @@ def main_thrd(query_set, args, iindex):
 
             tasks = list(split(list_phrases, args.num_process))
 
-            inputs = [(tasks[i], unigram_set, target_token, idf, agg_score, i) for i in range(num_process)]
+            inputs = [(tasks[i], unigram_set, target_token, idf, agg_score, i) for i in range(args.num_process)]
 
             phrases_score = {}
-            with Pool(num_process) as p:
+            with Pool(args.num_process) as p:
                 eval_results = p.map(phrase_eval, inputs)
 
             for tmp_res in eval_results:
