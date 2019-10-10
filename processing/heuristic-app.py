@@ -307,7 +307,6 @@ def main_thrd(query_set, args, iindex):
 
 
             mined_phrases = []
-            query_set = set(query)
             for ent in query:
                 for sent in search_merge[ent]:
                     for phrase in sent['phrases']:
