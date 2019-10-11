@@ -116,8 +116,8 @@ def phrase_eval(params):
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
 
         phrases_score.update({phrase:{'score': score, 'eval': tfidf_sim}})
-
-    return phrases_score
+    
+    return dict(sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)[:20])
 
 def split(a, n):
     k, m = divmod(len(a), n)
@@ -191,7 +191,6 @@ def main_thrd(query_set, args, iindex):
         print('prcessing set: ', target)
         sys.stdout.flush()
         
-        results = []
         for query in queries:
 
             print('prcessing query: ', query)
@@ -336,7 +335,6 @@ def main_thrd(query_set, args, iindex):
                 phrases_score.update(tmp_res)
 
             phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
-            results.append(phrases_sorted[:50])
             print('(7/7) evaluate phrases')
             print(phrases_sorted[:10])
             sys.stdout.flush()
