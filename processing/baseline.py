@@ -225,7 +225,7 @@ def main_thrd(query_set, args, iindex):
             doc = nlp(context)
             tokens = [token.lemma_ for token in doc]
             pos = [token.pos_ for token in doc]
-            phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
+            phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=1, maxlen=4)
             list_phrases = list(phrases['counts'])[:15]
 
             idf_list = [*idf]
@@ -238,6 +238,9 @@ def main_thrd(query_set, args, iindex):
             print(phrases_sorted)
             print('(3/3) evaluate phrases')
             sys.stdout.flush()
+
+            if phrases_sorted == []:
+                continue
 
             top10 = [lab[0] for lab in phrases_sorted[:10]]
             best_phrase = phrases_sorted[0][0]
