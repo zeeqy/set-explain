@@ -60,10 +60,11 @@ def main():
             for j in range(num_query):
                 skew_dist = item['skew']
                 query = []
-                for i in range(query_length)
+                for i in range(query_length):
                     ent = choice(list(skew_dist.keys()), skew_dist.values())
                     skew_dist.pop(ent,None)
                     query.append(ent)
+                assert len(set(query)) == query_length
                 queries.append(query)
 
         query_data.append({'target': item['title'].lower().split(',')[0], 'queries': queries})
