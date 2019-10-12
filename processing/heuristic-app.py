@@ -179,7 +179,6 @@ def main_thrd(query_set, args, iindex):
 
     print("--- search use %s seconds ---" % (time.time() - start_time))
     del search_results
-    sys.stdout.flush()
 
     ### query processing ###
     num_query = args.num_query
@@ -197,12 +196,10 @@ def main_thrd(query_set, args, iindex):
         target = item['target']
         queries = item['queries']
         print('prcessing set: ', target)
-        sys.stdout.flush()
         
         for query in queries:
 
             print('prcessing query: ', query)
-            sys.stdout.flush()
 
             unigrams = []
             for ent in query:
@@ -211,7 +208,6 @@ def main_thrd(query_set, args, iindex):
             unigram_set = set(unigrams)
 
             print('(1/7) generate unigrams')
-            sys.stdout.flush()
 
             N = 0
             cnt = Counter()
@@ -231,7 +227,6 @@ def main_thrd(query_set, args, iindex):
                 idf.update({key:np.log((N / cnt[key]))})
 
             print('(2/7) compute idf')
-            sys.stdout.flush()
                 
             unigram_sents = {}
             for ent in query:
@@ -246,7 +241,6 @@ def main_thrd(query_set, args, iindex):
                             unigram_sents[ent].update({item:[sent]})
 
             print('(3/7) group sents by unigrams')
-            sys.stdout.flush()
 
             unigram_idf = {}
             for ug in unigram_set:
@@ -269,7 +263,6 @@ def main_thrd(query_set, args, iindex):
                             score_dist[ug][ent] += (1/(sent['pid']+1)) * sent['doc_score'] * unigram_idf[ug][ent][did]
 
             print('(4/7) score unigrams')
-            sys.stdout.flush()
             
             #using rank to score unigram
             score_redist = {}
@@ -293,7 +286,6 @@ def main_thrd(query_set, args, iindex):
                     score_dist[ug][ent] = score_redist[ent][ug]
 
             print('(5/7) map score to rank')
-            sys.stdout.flush()
 
             query_weight = []
             for ent in query:
@@ -310,8 +302,6 @@ def main_thrd(query_set, args, iindex):
                 agg_score.update({ug: wgmean})
 
             print('(6/7) aggegrate ranks')
-            sys.stdout.flush()
-
 
             mined_phrases = []
             for ent in query:
@@ -362,7 +352,6 @@ def main_thrd(query_set, args, iindex):
             norm_score += norm_best_sim
             meta = {'query':query, 'target': target, 'top10': top10, 'sim@1':best_sim, 'sim@5': top5_sim, 'sim@10': top10_sim, 'sim@full':(recall_phrase, recall_rank+1, recall_sim), 'norm_sim@1': norm_best_sim}
             print(meta)
-            sys.stdout.flush()
             with open('{}/log-{}-{}.txt'.format(args.output_dir, query_length, args.sampling_method), 'a+') as f:
                 f.write(json.dumps(meta) + '\n')
             f.close()
@@ -379,7 +368,6 @@ def main_thrd(query_set, args, iindex):
         
         print('---- progess in {}/{} ----'.format(bar, len(query_set)))
         bar += 1
-        sys.stdout.flush()
 
 def main():
     parser = argparse.ArgumentParser(description="heuristic approach")

@@ -11,6 +11,7 @@ from nltk.tokenize import MWETokenizer
 from nltk.corpus import stopwords
 import nltk
 import phrasemachine
+from scipy.stats import kurtosis, skew
 from scipy import spatial
 import time
 from collections import Counter
@@ -201,7 +202,7 @@ def main_thrd(query, num_process, input_dir, target):
             if ug in unigram_sents[ent].keys():
                 did = set()
                 for sent in unigram_sents[ent][ug]:
-                    score_dist[ug][ent] += sent['doc_score']
+                    score_dist[ug][ent] += sent['doc_score'] * idf[ug]
                     did.add(sent['did'])
 
     #using rank to score unigram
@@ -225,10 +226,15 @@ def main_thrd(query, num_process, input_dir, target):
         for ent in query:
             score_dist[ug][ent] = score_redist[ent][ug]
 
+    query_weight = []
+    for ent in query:
+        query_weight.append(1/skew([sent['doc_score'] for sent in search_merge[ent]]))
+             
     agg_score = {}
     for ug in score_dist.keys():
         tmp_res = [item[1] for item in score_dist[ug].items()]
-        agg_score.update({ug: gmean(tmp_res)})
+        wgmean = np.exp(sum(query_weight * np.log(tmp_res)) / sum(query_weight))
+        agg_score.update({ug: wgmean})
 
 
     score_sorted = sorted(agg_score.items(), key=lambda x: x[1], reverse=True)
@@ -263,10 +269,6 @@ def main_thrd(query, num_process, input_dir, target):
     target_doc = nlp(target)
     target_vec = [0] * len(idf_list)
     target_token = [token.lemma_ for token in target_doc if not token.is_punct]
-    # target_token_freq = dict(Counter(target_token))
-    # for token in target_token:
-    #     index = idf_list.index(token)
-    #     target_vec[index] = target_token_freq[token]/len(target_token) * idf[token]
 
     list_phrases = list(set(mined_phrases))
 
