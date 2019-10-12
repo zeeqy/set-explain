@@ -101,10 +101,11 @@ def main_thrd(query_set, num_process, input_dir):
         did_list = [did for did in  count_merge[ent] if did != 'total']
         for did in did_list:
             weight = count_merge[ent][did]/count_merge[ent]['total']
-            skew_list.append(weight)
-            #[weight]*count_merge[ent][did]
-        
-        skew_dict.update({ent:skew(skew_list)})
+            skew_list += [weight]*count_merge[ent][did]
+        if len(skew_list) > 1:
+            skew_dict.update({ent:skew(skew_list)})
+        else:
+            skew_dict.update({ent:0})
 
     results = []
     for item in search_merge:
