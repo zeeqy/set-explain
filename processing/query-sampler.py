@@ -58,15 +58,14 @@ def main():
             valid_ent = [ent[0] for ent in item['prob'].items() if ent[1] > 0]
             queries = []
             for j in range(num_query):
+                skew_dist = item['skew']
                 query = []
-                i = 0
-                while i < query_length:
-                    ent = choice(list(item['skew'].keys()), item['skew'].values())
-                    if ent not in query:
-                        query.append(ent)
-                        i += 1
+                for i in range(query_length)
+                    ent = choice(list(skew_dist.keys()), skew_dist.values())
+                    skew_dist.pop(ent,None)
+                    query.append(ent)
                 queries.append(query)
-                
+
         query_data.append({'target': item['title'].lower().split(',')[0], 'queries': queries})
     
     with open('{}/query-{}-{}.txt'.format(args.output_dir, query_length, sampling_method), 'a+') as f:
