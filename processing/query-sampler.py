@@ -62,7 +62,6 @@ def main():
                 skew_dist = copy.deepcopy(item['skew'])
                 query = []
                 for i in range(query_length):
-                    print(item['title'], skew_dist)
                     ent = choice(list(skew_dist.keys()), skew_dist.values())
                     skew_dist.pop(ent,None)
                     query.append(ent)
