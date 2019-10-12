@@ -7,6 +7,7 @@ from tqdm import tqdm
 import numpy as np
 import copy
 import time
+from scipy.stats import skew, kurtosis
 
 def sent_search(params):
     (task_list, query_set, input_dir) = params
