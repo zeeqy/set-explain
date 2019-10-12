@@ -108,7 +108,7 @@ def phrase_eval(params):
         
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
 
-        phrases_score.append((phrase, tfidf_sim))
+        phrases_score.append([phrase, tfidf_sim])
     
     return phrases_score
 
@@ -195,7 +195,7 @@ def main_thrd(query_set, args, iindex):
                     unigrams += sent['unigram']
             unigram_set = set(unigrams)
 
-            print('(1/7) generate unigrams')
+            print('(1/3) generate unigrams')
             sys.stdout.flush()
 
             N = 0
@@ -215,7 +215,7 @@ def main_thrd(query_set, args, iindex):
             for key in cnt.keys():
                 idf.update({key:np.log((N / cnt[key]))})
 
-            print('(2/7) compute idf')
+            print('(2/3) compute idf')
             sys.stdout.flush()
 
             context = ''
@@ -234,8 +234,9 @@ def main_thrd(query_set, args, iindex):
 
             params = (list_phrases, unigram_set, target_token, idf, 0)
             phrases_sorted = phrase_eval(params)
-            
-            print('(7/7) evaluate phrases')
+
+            print(phrases_sorted)
+            print('(3/3) evaluate phrases')
             sys.stdout.flush()
 
             top10 = [lab[0] for lab in phrases_sorted[:10]]
