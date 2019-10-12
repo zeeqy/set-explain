@@ -59,13 +59,14 @@ def sent_search(params):
         
             for ent in related_sent[item_dict['iid']]:
 
-                context[ent].append(item_dict)
+                if ent in item_dict['nsubj']:
+                    context[ent].append(item_dict)
 
-                freq[ent]['total'] += 1
-                if item_dict['did'] in freq[ent]:
-                    freq[ent][item_dict['did']] += 1
-                else:
-                    freq[ent].update({item_dict['did']:1})
+                    freq[ent]['total'] += 1
+                    if item_dict['did'] in freq[ent]:
+                        freq[ent][item_dict['did']] += 1
+                    else:
+                        freq[ent].update({item_dict['did']:1})
     
     return {'context':context, 'freq':freq}
 
