@@ -48,7 +48,7 @@ def sent_search(params):
                         else:
                             freq[ent].update({item_dict['did']:1})
 
-    return {'setprob': query_set_prob, 'freq':freq}
+    return {'set-prob': query_set_prob, 'freq':freq}
 
 def split(a, n):
     k, m = divmod(len(a), n)
