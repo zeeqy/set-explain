@@ -3,6 +3,7 @@ import numpy as np
 import argparse
 import random
 import bisect
+import copy
 
 def cdf(weights):
     total = sum(weights)
@@ -58,7 +59,7 @@ def main():
             valid_ent = [ent[0] for ent in item['prob'].items() if ent[1] > 0]
             queries = []
             for j in range(num_query):
-                skew_dist = item['skew']
+                skew_dist = copy.deepcopy(item['skew'])
                 query = []
                 for i in range(query_length):
                     print(item['title'], skew_dist)
