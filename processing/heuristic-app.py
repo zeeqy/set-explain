@@ -10,6 +10,7 @@ import numpy as np
 from nltk.tokenize import MWETokenizer
 from nltk.corpus import stopwords
 import nltk
+from heapq import nlargest
 import phrasemachine
 from scipy import spatial
 import time
@@ -116,8 +117,14 @@ def phrase_eval(params):
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
 
         phrases_score.update({phrase:{'score': score, 'eval': tfidf_sim}})
+
+
+    rearrange = {}
+    for k,v in phrases_score.items():
+       rearrange.update({k: v['score']})
+    top_10 = nlargest(10, rearrange, key=rearrange.get)
     
-    return dict(sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)[:20])
+    return {key: phrases_score[key] for key in top_10}
 
 def split(a, n):
     k, m = divmod(len(a), n)

@@ -7,6 +7,7 @@ from tqdm import tqdm
 import spacy
 import textacy
 import numpy as np
+from heapq import nlargest
 from nltk.tokenize import MWETokenizer
 from nltk.corpus import stopwords
 import nltk
@@ -117,7 +118,12 @@ def phrase_eval(params):
 
         phrases_score.update({phrase:{'score': score, 'eval': tfidf_sim}})
 
-    return dict(sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)[:20])
+    rearrange = {}
+    for k,v in phrases_score.items():
+       rearrange.update({k: v['score']})
+    top_10 = nlargest(10, rearrange, key=rearrange.get)
+    
+    return {key: phrases_score[key] for key in top_10}
 
 def split(a, n):
     k, m = divmod(len(a), n)
