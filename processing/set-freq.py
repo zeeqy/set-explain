@@ -11,11 +11,14 @@ import time
 def sent_search(params):
     (task_list, query_set, input_dir) = params
 
+    freq = dict()
+
     query_set_prob = copy.deepcopy(query_set)
     for i in range(len(query_set_prob)):
         query_set_prob[i].update({'prob':{}})
         for ent in query_set_prob[i]['entities']:
             query_set_prob[i]['prob'].update({ent:0})
+            freq.update({ent:{'total':0}})
 
     for fname in task_list:
 
@@ -39,7 +42,13 @@ def sent_search(params):
                     else:
                         query_set_prob[i]['prob'][ent] += 1
 
-    return query_set_prob
+                        freq[ent]['total'] += 1
+                        if item_dict['did'] in freq[ent]:
+                            freq[ent][item_dict['did']] += 1
+                        else:
+                            freq[ent].update({item_dict['did']:1})
+
+    return {'setprob': query_set_prob, 'freq':freq}
 
 def split(a, n):
     k, m = divmod(len(a), n)
@@ -70,17 +79,38 @@ def main_thrd(query_set, num_process, input_dir):
     with Pool(num_process) as p:
         search_results = p.map(sent_search, inputs)
     
-    search_merge = search_results[0]
+    search_merge = search_results[0]['set-prob']
+    count_merge = search_results[0]['freq']
     
     for pid in range(1, len(search_results)):
         for i in range(len(query_set_prob)):
             for ent in search_merge[i]['prob'].keys():
-                search_merge[i]['prob'][ent] += search_results[pid][i]['prob'][ent]
+                search_merge[i]['prob'][ent] += search_results[pid]['set-prob'][i]['prob'][ent]
+
+    for pid in range(1, len(search_results)):
+        tmp_freq = search_results[pid]['freq']
+        for ent in count_merge.keys():
+            count_merge[ent]['total'] += tmp_freq[ent]['total']
+            tmp_freq[ent].pop('total', None)
+            count_merge[ent].update(tmp_freq[ent])
+    
+    skew_dict = {}
+    for ent in count_merge.keys():
+        skew_list = []
+        did_list = [did for did in  count_merge[ent] if did != 'total']
+        for did in did_list:
+            weight = count_merge[ent][did]/count_merge[ent]['total']
+            skew_list.append(weight)
+            #[weight]*count_merge[ent][did]
+        
+        skew_dict.update({ent:skew(skew_list)})
 
     results = []
     for item in search_merge:
         try:
+            item['freq'] = item['prob']
             item['prob'] = {k: v / total for total in (sum(item['prob'].values()),) for k, v in item['prob'].items()}
+            item['skew'] = {k: skew_dict[k] for k, v in item['prob'].items()}
             results.append(item)
         except:
             print(item)
