@@ -1,6 +1,24 @@
 import json, sys, os, re
 import numpy as np
 import argparse
+import random
+import bisect
+
+def cdf(weights):
+    total = sum(weights)
+    result = []
+    cumsum = 0
+    for w in weights:
+        cumsum += w
+        result.append(cumsum / total)
+    return result
+
+def choice(population, weights):
+    assert len(population) == len(weights)
+    cdf_vals = cdf(weights)
+    x = random.random()
+    idx = bisect.bisect(cdf_vals, x)
+    return population[idx]
 
 
 def main():
@@ -36,7 +54,19 @@ def main():
         if sampling_method == 'random':
             valid_ent = [ent[0] for ent in item['prob'].items() if ent[1] > 0]
             queries = [np.random.choice(valid_ent, query_length, replace=False).tolist() for i in range(num_query)]
-
+        if sampling_method == 'skew':
+            valid_ent = [ent[0] for ent in item['prob'].items() if ent[1] > 0]
+            queries = []
+            for j in range(num_query):
+                query = []
+                i = 0
+                while i < query_length:
+                    ent = choice(list(item['skew'].keys()), item['skew'].values())
+                    if ent not in query:
+                        query.append(ent)
+                        i += 1
+                queries.append(query)
+                
         query_data.append({'target': item['title'].lower().split(',')[0], 'queries': queries})
     
     with open('{}/query-{}-{}.txt'.format(args.output_dir, query_length, sampling_method), 'a+') as f:
