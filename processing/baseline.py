@@ -225,7 +225,7 @@ def main_thrd(query_set, args, iindex):
             doc = nlp(context)
             tokens = [token.lemma_ for token in doc]
             pos = [token.pos_ for token in doc]
-            phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=1, maxlen=4)
+            phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=4)
             list_phrases = list(phrases['counts'])[:15]
 
             idf_list = [*idf]
