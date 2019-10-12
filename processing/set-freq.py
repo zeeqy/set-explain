@@ -103,6 +103,7 @@ def main_thrd(query_set, num_process, input_dir):
             weight = count_merge[ent][did]/count_merge[ent]['total']
             skew_list += [weight]*count_merge[ent][did]
         if len(skew_list) > 1:
+            skew_list.sort(reverse=True)
             skew_dict.update({ent:skew(skew_list)})
         else:
             skew_dict.update({ent:0})
