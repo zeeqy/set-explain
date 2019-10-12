@@ -49,29 +49,28 @@ def sent_search(params):
 
     for item_dict in tqdm(subcorpus, desc='enrich-{}'.format(len(subcorpus)), mininterval=10):
         
-        doc = nlp(item_dict['text'])
-        unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1, filter_nums=True, filter_punct=True, filter_stops=True, include_pos=["NOUN"])]
-        item_dict['unigram'] = unigram
-        tokens = [token.lemma_ for token in doc]
-        item_dict['tokens'] = [token.lemma_ for token in doc if not token.is_punct]
-        pos = [token.pos_ for token in doc]
-        phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
-        item_dict['phrases'] = list(phrases['counts'])
+        if item_dict['pid'] == 0 and item_dict['sid'] == 0: 
+            doc = nlp(item_dict['text'])
+            unigram = [token.lemma_ for token in textacy.extract.ngrams(doc,n=1, filter_nums=True, filter_punct=True, filter_stops=True, include_pos=["NOUN"])]
+            item_dict['unigram'] = unigram
+            tokens = [token.lemma_ for token in doc]
+            item_dict['tokens'] = [token.lemma_ for token in doc if not token.is_punct]
+            pos = [token.pos_ for token in doc]
         
-        for ent in related_sent[item_dict['iid']]:
+            for ent in related_sent[item_dict['iid']]:
 
-            context[ent].append(item_dict)
+                context[ent].append(item_dict)
 
-            freq[ent]['total'] += 1
-            if item_dict['did'] in freq[ent]:
-                freq[ent][item_dict['did']] += 1
-            else:
-                freq[ent].update({item_dict['did']:1})
+                freq[ent]['total'] += 1
+                if item_dict['did'] in freq[ent]:
+                    freq[ent][item_dict['did']] += 1
+                else:
+                    freq[ent].update({item_dict['did']:1})
     
     return {'context':context, 'freq':freq}
 
 def phrase_eval(params):
-    list_phrases, unigram_set, target_token, idf, agg_score, pid = params
+    list_phrases, unigram_set, target_token, idf, pid = params
     
     idf_list = [*idf]
     idf_set = set(idf_list)
@@ -80,23 +79,16 @@ def phrase_eval(params):
     for e in unigram_set:
         tokenizer.add_mwe(nltk.word_tokenize(e))
 
-    phrases_score = {}
-    for phrase in tqdm(list_phrases, desc='phrase-eval-{}'.format(pid), mininterval=10):
+    phrases_score = []
+    for phrase in list_phrases:
         score = 0
         tokens = nltk.word_tokenize(phrase)
         if not set(tokens).issubset(idf_set):
             continue
         nonstop_tokens = [token for token in tokens if token not in stop]
         if len(nonstop_tokens) / len(tokens) <= 0.5:
-            continue
-        raw_tokenized = tokenizer.tokenize(tokens)
-        tokenized_set = set(raw_tokenized)
-        keywords = tokenized_set.intersection(unigram_set)
-        for token in keywords:
-            score += agg_score[token]
-        score /= (1+np.log(len(nonstop_tokens)))
+            continue        
         
-
         vocab = set(target_token).union(set(tokens))
         vocab = list(vocab.intersection(idf_set))
         target_vec = [0] * len(vocab)
@@ -115,9 +107,9 @@ def phrase_eval(params):
         
         tfidf_sim = 1 - spatial.distance.cosine(target_vec, phrase_vec)
 
-        phrases_score.update({phrase:{'score': score, 'eval': tfidf_sim}})
+        phrases_score.append((phrase, tfidf_sim))
     
-    return dict(sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)[:20])
+    return phrases_score
 
 def split(a, n):
     k, m = divmod(len(a), n)
@@ -171,7 +163,6 @@ def main_thrd(query_set, args, iindex):
             search_merge[ent][index]['doc_score'] = count_merge[ent][search_merge[ent][index]['did']]/count_merge[ent]['total']
 
     print("--- search use %s seconds ---" % (time.time() - start_time))
-    del search_results
     sys.stdout.flush()
 
     ### query processing ###
@@ -225,128 +216,35 @@ def main_thrd(query_set, args, iindex):
 
             print('(2/7) compute idf')
             sys.stdout.flush()
-                
-            unigram_sents = {}
+
+            context = ''
             for ent in query:
-                unigram_sents.update({ent:{}})  
-                for sent in search_merge[ent]:
-                    unigram = set(sent['unigram'])
-                    unigram_intersect = unigram.intersection(unigram_set)
-                    for item in unigram_intersect:
-                        if item in unigram_sents[ent].keys():
-                            unigram_sents[ent][item].append(sent)
-                        else:
-                            unigram_sents[ent].update({item:[sent]})
-
-            print('(3/7) group sents by unigrams')
-            sys.stdout.flush()
-
-            unigram_idf = {}
-            for ug in unigram_set:
-                unigram_idf.update({ug:{}})
-                for ent in query:
-                    if ug in unigram_sents[ent].keys():
-                        did_list = [sent['did'] for sent in unigram_sents[ent][ug]]
-                        did_freq = Counter(did_list)
-                        unigram_idf[ug].update({ent:{k: np.log(count_merge[ent][k]/v) for k,v in did_freq.items()}})
-
-
-            score_dist = {}
-            for ug in unigram_set:
-                score_dist.update({ug:{}})
-                for ent in query:
-                    score_dist[ug].update({ent:0})
-                    if ug in unigram_sents[ent].keys():
-                        for sent in unigram_sents[ent][ug]:
-                            did = sent['did']
-                            score_dist[ug][ent] += (1/(sent['pid']+1)) * sent['doc_score'] * unigram_idf[ug][ent][did]
-
-            print('(4/7) score unigrams')
-            sys.stdout.flush()
+                context += ' '.join([sent['text'] for sent in search_merge[ent]])
             
-            #using rank to score unigram
-            score_redist = {}
-            for ent in query:
-                score_redist.update({ent:{}})
-                for ug in unigram_set:
-                    score_redist[ent].update({ug:score_dist[ug][ent]})
-                sorted_score = sorted(score_redist[ent].items(), key=lambda item: item[1], reverse=True)
-                rank, count, previous, result = 0, 0, None, {}
-                for key, num in sorted_score:
-                    count += 1
-                    if num != previous:
-                        rank += count
-                        previous = num
-                        count = 0
-                    result[key] = 1.0 / rank
-                score_redist[ent] = result
-
-            for ug in unigram_set:
-                for ent in query:
-                    score_dist[ug][ent] = score_redist[ent][ug]
-
-            print('(5/7) map score to rank')
-            sys.stdout.flush()
-
-            query_weight = []
-            for ent in query:
-                doc_skew = skew([sent['doc_score'] for sent in search_merge[ent]])
-                if doc_skew != 0:
-                    query_weight.append(1/doc_skew)
-                else:
-                    query_weight.append(1)
-                     
-            agg_score = {}
-            for ug in score_dist.keys():
-                tmp_res = [item[1] for item in score_dist[ug].items()]
-                wgmean = np.exp(sum(query_weight * np.log(tmp_res)) / sum(query_weight))
-                agg_score.update({ug: wgmean})
-
-            print('(6/7) aggegrate ranks')
-            sys.stdout.flush()
-
-
-            mined_phrases = []
-            for ent in query:
-                for sent in search_merge[ent]:
-                    for phrase in sent['phrases']:
-                        add = True
-                        for seed in query:
-                            if seed in phrase:
-                                add = False
-                        if add:
-                            mined_phrases.append(phrase)
+            doc = nlp(context)
+            tokens = [token.lemma_ for token in doc]
+            pos = [token.pos_ for token in doc]
+            phrases = phrasemachine.get_phrases(tokens=tokens, postags=pos, minlen=2, maxlen=8)
+            list_phrases = list(phrases['counts'])[:15]
 
             idf_list = [*idf]
             target_doc = nlp(target)
             target_token = [token.lemma_ for token in target_doc if not token.is_punct]
 
-            list_phrases = list(set(mined_phrases))
-
-            tasks = list(split(list_phrases, args.num_process))
-
-            inputs = [(tasks[i], unigram_set, target_token, idf, agg_score, i) for i in range(args.num_process)]
-
-            phrases_score = {}
-            with Pool(args.num_process) as p:
-                eval_results = p.map(phrase_eval, inputs)
-
-            for tmp_res in eval_results:
-                phrases_score.update(tmp_res)
-
-            phrases_sorted = sorted(phrases_score.items(), key=lambda x: x[1]['score'], reverse=True)
+            params = (list_phrases, unigram_set, target_token, idf, 0)
+            phrases_sorted = phrase_eval(params)
+            
             print('(7/7) evaluate phrases')
-            print(phrases_sorted[:10])
             sys.stdout.flush()
 
             top10 = [lab[0] for lab in phrases_sorted[:10]]
             best_phrase = phrases_sorted[0][0]
-            best_sim = phrases_sorted[0][1]['eval']
-            top5_sim = max([lab[1]['eval'] for lab in phrases_sorted[:5]])
-            top10_sim = max([lab[1]['eval'] for lab in phrases_sorted[:10]])
-            recall_rank = int(np.argmax([lab[1]['eval'] for lab in phrases_sorted]))
+            best_sim = phrases_sorted[0][1]
+            top5_sim = max([lab[1] for lab in phrases_sorted[:5]])
+            top10_sim = max([lab[1] for lab in phrases_sorted[:10]])
+            recall_rank = int(np.argmax([lab[1] for lab in phrases_sorted]))
             recall_phrase = phrases_sorted[recall_rank][0]
-            recall_sim = phrases_sorted[recall_rank][1]['eval']
+            recall_sim = phrases_sorted[recall_rank][1]
             norm_best_sim = best_sim / recall_sim if recall_sim != 0 else 0
             recall += recall_sim
             top1_score += best_sim

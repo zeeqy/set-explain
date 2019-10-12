@@ -171,6 +171,7 @@ def main_thrd(query_set, args, iindex):
             search_merge[ent][index]['doc_score'] = count_merge[ent][search_merge[ent][index]['did']]/count_merge[ent]['total']
 
     print("--- search use %s seconds ---" % (time.time() - start_time))
+    del search_results
     sys.stdout.flush()
 
     ### query processing ###
@@ -311,7 +312,6 @@ def main_thrd(query_set, args, iindex):
 
             idf_list = [*idf]
             target_doc = nlp(target)
-            target_vec = [0] * len(idf_list)
             target_token = [token.lemma_ for token in target_doc if not token.is_punct]
 
             list_phrases = list(set(mined_phrases))
