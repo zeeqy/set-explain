@@ -70,7 +70,7 @@ def main():
 
         query_data.append({'target': item['title'].lower().split(',')[0], 'queries': queries})
     
-    with open('{}/query-{}-{}.txt'.format(args.output_dir, query_length, sampling_method), 'a+') as f:
+    with open('{}/query-{}-{}.txt'.format(args.output_dir, query_length, sampling_method), 'w+') as f:
         for q in query_data:
             f.write(json.dumps(q) + '\n')
     f.close()
